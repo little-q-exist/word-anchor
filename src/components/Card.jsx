@@ -1,16 +1,12 @@
-import { forwardRef } from 'react'
 import CardInfo from './CardInfo'
-import Togglable from './Togglable'
 
-const Card = forwardRef(({ word }, ref) => {
+const Card = ({ word, visible }) => {
     return (
         <div>
             {word.eng}
-            <Togglable ref={ref} buttonlabel={'show translation'}>
-                <CardInfo word={word} />
-            </Togglable>
+            <CardInfo word={word} visible={visible} />
         </div>
     )
-})
+}
 
 export default Card

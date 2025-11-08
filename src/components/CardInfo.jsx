@@ -1,6 +1,8 @@
-const CardInfo = ({ word }) => {
+const CardInfo = ({ word, visible }) => {
+    const showWhenVisible = { display: visible ? '' : 'none' }
+
     return (
-        <div>
+        <div style={showWhenVisible}>
             <div>{word.ch}</div>
             <div>master degree: {word.master}</div>
         </div>

@@ -1,7 +1,7 @@
 import words from './word'
 import Card from './components/Card'
 import ButtonGroup from './components/ButtonGroup'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import Button from './components/Button'
 
 const App = () => {
@@ -13,20 +13,17 @@ const App = () => {
     */
     const [shouldShowInfo, setShouldShowInfo] = useState(false)
 
-    const visibilityRef = useRef(null)
-
     const handleNextClick = () => {
         const nextIndex = (index + 1) % words.length
         setIndex(nextIndex)
+        setShouldShowInfo(false)
     }
 
     const handleKnown = () => {
-        visibilityRef.current.toggleVisibility()
         setShouldShowInfo(true)
     }
 
     const handleUnknown = () => {
-        visibilityRef.current.toggleVisibility()
         setShouldShowInfo(true)
     }
 
@@ -34,14 +31,10 @@ const App = () => {
         <div>
             <div>Recite Word App</div>
 
-            <Card word={words[index]} ref={visibilityRef} />
+            <Card word={words[index]} visible={shouldShowInfo} />
 
             {!shouldShowInfo && (<ButtonGroup handleKnown={handleKnown} handleUnknown={handleUnknown} />)}
-            {shouldShowInfo && (<Button label={'Next'} onClick={() => {
-                handleNextClick()
-                setShouldShowInfo(false)
-                visibilityRef.current.toggleVisibility()
-            }} />)}
+            {shouldShowInfo && (<Button label={'Next'} onClick={handleNextClick} />)}
         </div>
     )
 }
