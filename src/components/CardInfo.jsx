@@ -1,6 +1,9 @@
 const CardInfo = ({ word }) => {
     return (
-        <div>{word.ch}</div>
+        <div>
+            <div>{word.ch}</div>
+            <div>master degree: {word.master}</div>
+        </div>
     )
 }
 
