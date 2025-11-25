@@ -16,7 +16,7 @@
         "highly ambiguous"
       ],
       "related": "ambiguity (n.)",
-      "familiarity": 0,
+      "familiarity": 1,
       "mastered": false,
       "id": "ambg001",
       "favorited": false
@@ -37,7 +37,7 @@
         "extremely diligent"
       ],
       "related": "industrious",
-      "familiarity": 2,
+      "familiarity": 3,
       "mastered": false,
       "id": "dilg002",
       "favorited": false
@@ -58,7 +58,7 @@
         "particularly eloquent"
       ],
       "related": "articulate",
-      "familiarity": 0,
+      "familiarity": 1,
       "mastered": false,
       "id": "eloq003",
       "favorited": false
@@ -79,7 +79,7 @@
         "frugal with money"
       ],
       "related": "thrifty",
-      "familiarity": 1,
+      "familiarity": 2,
       "mastered": false,
       "id": "frug004",
       "favorited": false

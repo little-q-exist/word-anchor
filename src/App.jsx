@@ -24,7 +24,9 @@ const App = () => {
 
     const handleKnown = async () => {
         const word = words[index]
-        const updatedWord = { ...word, familiarity: word.familiarity + 1 }
+        const familiarity = word.familiarity >= 3 ? 3 : word.familiarity + 1
+        const mastered = familiarity === 3 ? true : false
+        const updatedWord = { ...word, familiarity, mastered }
         const newWord = await wordServices.update(updatedWord)
         setWords(words.map((word) => word.english === newWord.english ? newWord : word))
         setShouldShowInfo(true)
@@ -32,7 +34,8 @@ const App = () => {
 
     const handleUnknown = async () => {
         const word = words[index]
-        const updatedWord = { ...word, familiarity: 0 }
+        const mastered = false
+        const updatedWord = { ...word, familiarity: 0, mastered }
         const newWord = await wordServices.update(updatedWord)
         setWords(words.map((word) => word.english === newWord.english ? newWord : word))
         setShouldShowInfo(true)
