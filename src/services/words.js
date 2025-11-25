@@ -7,4 +7,9 @@ const getALL = async () => {
     return response.data
 }
 
-export default { getALL }
+const update = async (word) => {
+    const response = await axios.put(`${APIURL}/${word.id}`, word)
+    return response.data
+}
+
+export default { getALL, update }

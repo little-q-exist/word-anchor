@@ -10,9 +10,13 @@
         }
       ],
       "exampleSentence": "His ambiguous instructions confused the entire team.",
-      "collocations": ["ambiguous statement", "ambiguous answer", "highly ambiguous"],
+      "collocations": [
+        "ambiguous statement",
+        "ambiguous answer",
+        "highly ambiguous"
+      ],
       "related": "ambiguity (n.)",
-      "familiarity": 2,
+      "familiarity": 0,
       "mastered": false,
       "id": "ambg001",
       "favorited": false
@@ -27,9 +31,13 @@
         }
       ],
       "exampleSentence": "She is a diligent student who always completes her homework on time.",
-      "collocations": ["diligent work", "diligent effort", "extremely diligent"],
+      "collocations": [
+        "diligent work",
+        "diligent effort",
+        "extremely diligent"
+      ],
       "related": "industrious",
-      "familiarity": 1,
+      "familiarity": 2,
       "mastered": false,
       "id": "dilg002",
       "favorited": false
@@ -44,7 +52,11 @@
         }
       ],
       "exampleSentence": "The lawyer's eloquent speech convinced the jury.",
-      "collocations": ["eloquent speaker", "eloquent expression", "particularly eloquent"],
+      "collocations": [
+        "eloquent speaker",
+        "eloquent expression",
+        "particularly eloquent"
+      ],
       "related": "articulate",
       "familiarity": 0,
       "mastered": false,
@@ -61,7 +73,11 @@
         }
       ],
       "exampleSentence": "Despite his wealth, he maintains a frugal lifestyle.",
-      "collocations": ["frugal habits", "frugal meal", "frugal with money"],
+      "collocations": [
+        "frugal habits",
+        "frugal meal",
+        "frugal with money"
+      ],
       "related": "thrifty",
       "familiarity": 1,
       "mastered": false,
@@ -78,7 +94,11 @@
         }
       ],
       "exampleSentence": "Her gregarious nature makes her popular at parties.",
-      "collocations": ["gregarious personality", "gregarious animal", "naturally gregarious"],
+      "collocations": [
+        "gregarious personality",
+        "gregarious animal",
+        "naturally gregarious"
+      ],
       "related": "sociable",
       "familiarity": 0,
       "mastered": false,
@@ -95,7 +115,11 @@
         }
       ],
       "exampleSentence": "His criticism of others' laziness was pure hypocrisy.",
-      "collocations": ["political hypocrisy", "sheer hypocrisy", "accuse of hypocrisy"],
+      "collocations": [
+        "political hypocrisy",
+        "sheer hypocrisy",
+        "accuse of hypocrisy"
+      ],
       "related": "hypocritical (adj.)",
       "familiarity": 2,
       "mastered": false,
@@ -112,7 +136,11 @@
         }
       ],
       "exampleSentence": "She is respected for her professional integrity.",
-      "collocations": ["personal integrity", "moral integrity", "territorial integrity"],
+      "collocations": [
+        "personal integrity",
+        "moral integrity",
+        "territorial integrity"
+      ],
       "related": "honesty",
       "familiarity": 3,
       "mastered": true,
@@ -133,7 +161,11 @@
         }
       ],
       "exampleSentence": "The juvenile offender was given a lighter sentence.",
-      "collocations": ["juvenile crime", "juvenile behavior", "juvenile court"],
+      "collocations": [
+        "juvenile crime",
+        "juvenile behavior",
+        "juvenile court"
+      ],
       "related": "adolescent",
       "familiarity": 1,
       "mastered": false,
@@ -150,7 +182,11 @@
         }
       ],
       "exampleSentence": "The kinetic energy of the moving car was tremendous.",
-      "collocations": ["kinetic energy", "kinetic art", "kinetic theory"],
+      "collocations": [
+        "kinetic energy",
+        "kinetic art",
+        "kinetic theory"
+      ],
       "related": "dynamic",
       "familiarity": 0,
       "mastered": false,
@@ -167,7 +203,11 @@
         }
       ],
       "exampleSentence": "He gave a lucid explanation of the complex theory.",
-      "collocations": ["lucid dream", "lucid style", "perfectly lucid"],
+      "collocations": [
+        "lucid dream",
+        "lucid style",
+        "perfectly lucid"
+      ],
       "related": "clear",
       "familiarity": 1,
       "mastered": false,
@@ -184,7 +224,11 @@
         }
       ],
       "exampleSentence": "She is meticulous about checking every detail.",
-      "collocations": ["meticulous planning", "meticulous attention", "meticulous work"],
+      "collocations": [
+        "meticulous planning",
+        "meticulous attention",
+        "meticulous work"
+      ],
       "related": "thorough",
       "familiarity": 2,
       "mastered": false,
@@ -201,7 +245,11 @@
         }
       ],
       "exampleSentence": "The old photos filled her with nostalgia for childhood.",
-      "collocations": ["feel nostalgia", "wave of nostalgia", "nostalgia for"],
+      "collocations": [
+        "feel nostalgia",
+        "wave of nostalgia",
+        "nostalgia for"
+      ],
       "related": "nostalgic (adj.)",
       "familiarity": 2,
       "mastered": false,
@@ -218,7 +266,11 @@
         }
       ],
       "exampleSentence": "Floppy disks have become obsolete technology.",
-      "collocations": ["obsolete equipment", "obsolete word", "render obsolete"],
+      "collocations": [
+        "obsolete equipment",
+        "obsolete word",
+        "render obsolete"
+      ],
       "related": "outdated",
       "familiarity": 1,
       "mastered": false,
@@ -235,7 +287,11 @@
         }
       ],
       "exampleSentence": "The book had a profound influence on my thinking.",
-      "collocations": ["profound effect", "profound knowledge", "profoundly deaf"],
+      "collocations": [
+        "profound effect",
+        "profound knowledge",
+        "profoundly deaf"
+      ],
       "related": "deep",
       "familiarity": 3,
       "mastered": true,
@@ -252,7 +308,11 @@
         }
       ],
       "exampleSentence": "This dish is the quintessential example of Italian cuisine.",
-      "collocations": ["quintessential example", "quintessential feature", "quintessentially British"],
+      "collocations": [
+        "quintessential example",
+        "quintessential feature",
+        "quintessentially British"
+      ],
       "related": "typical",
       "familiarity": 0,
       "mastered": false,
@@ -269,7 +329,11 @@
         }
       ],
       "exampleSentence": "Children are often more resilient than adults think.",
-      "collocations": ["resilient material", "resilient economy", "highly resilient"],
+      "collocations": [
+        "resilient material",
+        "resilient economy",
+        "highly resilient"
+      ],
       "related": "flexible",
       "familiarity": 1,
       "mastered": false,
@@ -286,7 +350,11 @@
         }
       ],
       "exampleSentence": "The committee will scrutinize all applications carefully.",
-      "collocations": ["scrutinize documents", "scrutinize closely", "carefully scrutinize"],
+      "collocations": [
+        "scrutinize documents",
+        "scrutinize closely",
+        "carefully scrutinize"
+      ],
       "related": "examine",
       "familiarity": 2,
       "mastered": false,
@@ -303,7 +371,11 @@
         }
       ],
       "exampleSentence": "We've made tentative plans for the summer vacation.",
-      "collocations": ["tentative agreement", "tentative date", "tentative step"],
+      "collocations": [
+        "tentative agreement",
+        "tentative date",
+        "tentative step"
+      ],
       "related": "provisional",
       "familiarity": 1,
       "mastered": false,
@@ -320,7 +392,11 @@
         }
       ],
       "exampleSentence": "The desire for happiness is universal.",
-      "collocations": ["universal truth", "universal language", "universal appeal"],
+      "collocations": [
+        "universal truth",
+        "universal language",
+        "universal appeal"
+      ],
       "related": "global",
       "familiarity": 3,
       "mastered": true,
@@ -337,7 +413,11 @@
         }
       ],
       "exampleSentence": "Elderly people are particularly vulnerable to fraud.",
-      "collocations": ["vulnerable group", "vulnerable position", "emotionally vulnerable"],
+      "collocations": [
+        "vulnerable group",
+        "vulnerable position",
+        "emotionally vulnerable"
+      ],
       "related": "susceptible",
       "familiarity": 2,
       "mastered": false,

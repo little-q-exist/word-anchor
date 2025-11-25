@@ -22,17 +22,19 @@ const App = () => {
         setShouldShowInfo(false)
     }
 
-    const handleKnown = () => {
+    const handleKnown = async () => {
         const word = words[index]
         const updatedWord = { ...word, familiarity: word.familiarity + 1 }
-        setWords(words.map((word) => word.english === updatedWord.english ? updatedWord : word))
+        const newWord = await wordServices.update(updatedWord)
+        setWords(words.map((word) => word.english === newWord.english ? newWord : word))
         setShouldShowInfo(true)
     }
 
-    const handleUnknown = () => {
+    const handleUnknown = async () => {
         const word = words[index]
         const updatedWord = { ...word, familiarity: 0 }
-        setWords(words.map((word) => word.english === updatedWord.english ? updatedWord : word))
+        const newWord = await wordServices.update(updatedWord)
+        setWords(words.map((word) => word.english === newWord.english ? newWord : word))
         setShouldShowInfo(true)
     }
 
