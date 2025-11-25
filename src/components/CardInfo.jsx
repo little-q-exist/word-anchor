@@ -3,8 +3,12 @@ const CardInfo = ({ word, visible }) => {
 
     return (
         <div style={showWhenVisible}>
-            <div>{word.ch}</div>
-            <div>master degree: {word.master}</div>
+            {word.definitions.map((definition, index) => (
+                <div key={index}>
+                    <div>{definition.partOfSpeech}</div>
+                    <div>{definition.meaning}</div>
+                </div>
+            ))}
         </div>
     )
 }
