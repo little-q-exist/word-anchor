@@ -8,8 +8,15 @@ const getALL = async () => {
 };
 
 const update = async (word) => {
-    const response = await axios.put(`${APIURL}/${word.id}`, word);
+    const response = await axios.put(`${APIURL}/${word._id}`, word);
     return response.data;
 };
 
-export default { getALL, update };
+const updateFamiliarity = async (wordId, familiarity) => {
+    const response = await axios.patch(`${APIURL}/${wordId}/familiarity`, {
+        familiarity,
+    });
+    return response.data;
+};
+
+export default { getALL, update, updateFamiliarity };
