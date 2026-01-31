@@ -6,9 +6,9 @@ import Button from './components/Button';
 
 const App = () => {
     const [index, setIndex] = useState(0);
-    // TODO: 从服务器获取单词列表
     const [words, setWords] = useState([]);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
+    const wordToShow = words[index];
 
     useEffect(() => {
         wordServices.getALL().then((words) => {
@@ -23,11 +23,9 @@ const App = () => {
     };
 
     const handleKnown = async () => {
-        const word = words[index];
-        const familiarity = word.familiarity >= 3 ? 3 : word.familiarity + 1;
-        const mastered = familiarity === 3 ? true : false;
-        const updatedWord = { ...word, familiarity, mastered };
-        const newWord = await wordServices.update(updatedWord);
+        // TODO: update the familiarity of the word, find familiarity in userLearningData
+        const familiarity = wordToShow.familiarity >= 3 ? 3 : word.familiarity + 1;
+        const newWord = await wordServices.updateFamiliarity({ familiarity });
         setWords(words.map((word) => (word.english === newWord.english ? newWord : word)));
         setShouldShowInfo(true);
     };
