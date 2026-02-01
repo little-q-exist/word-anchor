@@ -1,8 +1,15 @@
-import CardInfo from './CardInfo'
+import CardInfo from './CardInfo';
 
-const Card = ({ word, visible }) => {
+import type { Word } from '../types';
+
+interface CardProps {
+    word: Word;
+    visible: boolean;
+}
+
+const Card = ({ word, visible }: CardProps) => {
     if (!word) {
-        return <div>Loading...</div>
+        return <div>Loading...</div>;
     }
 
     return (
@@ -13,7 +20,7 @@ const Card = ({ word, visible }) => {
             {word.mastered && <div>mastered!congradulations!</div>}
             <CardInfo word={word} visible={visible} />
         </div>
-    )
-}
+    );
+};
 
-export default Card
+export default Card;

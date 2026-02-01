@@ -1,13 +1,17 @@
-import wordServices from './services/words';
-import Card from './components/Card';
-import ButtonGroup from './components/ButtonGroup';
 import { useEffect, useState } from 'react';
+
+import wordServices from './services/words';
+
+import Card from './components/Card';
 import Button from './components/Button';
+
+import type { User, Word } from './types';
 
 const App = () => {
     const [index, setIndex] = useState(0);
-    const [words, setWords] = useState([]);
+    const [words, setWords] = useState<Word[]>([]);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
     const wordToShow = words[index];
 
     useEffect(() => {
@@ -16,7 +20,15 @@ const App = () => {
         });
     }, []);
 
-    const handleNextClick = () => {
+    useEffect(() => {
+        const loggedUserJSON = localStorage.getItem('loggedReciteAppUser');
+        if (loggedUserJSON) {
+            const loggedInUser = JSON.parse(loggedUserJSON)
+            setUser(loggedInUser)
+        }
+    }, [])
+
+    const navigateToNextWord = () => {
         const nextIndex = (index + 1) % words.length;
         setIndex(nextIndex);
         setShouldShowInfo(false);
@@ -24,9 +36,9 @@ const App = () => {
 
     const handleKnown = async () => {
         // TODO: update the familiarity of the word, find familiarity in userLearningData
-        const familiarity = wordToShow.familiarity >= 3 ? 3 : word.familiarity + 1;
-        const newWord = await wordServices.updateFamiliarity({ familiarity });
-        setWords(words.map((word) => (word.english === newWord.english ? newWord : word)));
+        const learningData = user?.userLearningData.find(data => data.wordId === wordToShow._id)
+
+
         setShouldShowInfo(true);
     };
 
@@ -46,9 +58,12 @@ const App = () => {
             <Card word={words[index]} visible={shouldShowInfo} />
 
             {!shouldShowInfo && (
-                <ButtonGroup handleKnown={handleKnown} handleUnknown={handleUnknown} />
+                <div>
+                    <Button label={'Known'} onClick={handleKnown} />
+                    <Button label={'Unknown'} onClick={handleUnknown} />
+                </div>
             )}
-            {shouldShowInfo && <Button label={'Next'} onClick={handleNextClick} />}
+            {shouldShowInfo && <Button label={'Next'} onClick={navigateToNextWord} />}
         </div>
     );
 };

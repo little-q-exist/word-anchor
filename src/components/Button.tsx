@@ -1,9 +1,10 @@
-const Button = ({ onClick, label }) => {
-    return (
-        <button onClick={onClick}>
-            {label}
-        </button>
-    )
+interface ButtonProps {
+    onClick: () => void;
+    label: string;
 }
 
-export default Button
+const Button = ({ onClick, label }: ButtonProps) => {
+    return <button onClick={onClick}>{label}</button>;
+};
+
+export default Button;

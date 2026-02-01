@@ -1,5 +1,12 @@
-const CardInfo = ({ word, visible }) => {
-    const showWhenVisible = { display: visible ? '' : 'none' }
+import type { Word } from '../types';
+
+interface CardInfoProps {
+    word: Word;
+    visible: boolean;
+}
+
+const CardInfo = ({ word, visible }: CardInfoProps) => {
+    const showWhenVisible = { display: visible ? '' : 'none' };
 
     return (
         <div style={showWhenVisible}>
@@ -10,7 +17,7 @@ const CardInfo = ({ word, visible }) => {
                 </div>
             ))}
         </div>
-    )
-}
+    );
+};
 
-export default CardInfo
+export default CardInfo;
