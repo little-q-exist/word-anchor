@@ -16,11 +16,4 @@ const update = async (word: Word) => {
     return response.data;
 };
 
-const updateFamiliarity = async (wordId: string, familiarity: number) => {
-    const response = await axios.patch(`${APIURL}/${wordId}/familiarity`, {
-        familiarity,
-    });
-    return response.data;
-};
-
-export default { getALL, update, updateFamiliarity };
+export default { getALL, update };
