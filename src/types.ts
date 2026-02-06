@@ -29,9 +29,7 @@ export interface NewUser {
 }
 
 export interface User {
+    token: string;
     username: string;
-    email?: string;
-    passwordHash: string;
-    userLearningData: UserLearningData[];
-    isAdmin: boolean;
+    _id: string;
 }

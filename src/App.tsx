@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import wordServices from './services/words';
+import userServices from './services/users';
 
 import Card from './components/Card';
 import Button from './components/Button';
@@ -23,10 +24,10 @@ const App = () => {
     useEffect(() => {
         const loggedUserJSON = localStorage.getItem('loggedReciteAppUser');
         if (loggedUserJSON) {
-            const loggedInUser = JSON.parse(loggedUserJSON)
-            setUser(loggedInUser)
+            const loggedInUser = JSON.parse(loggedUserJSON);
+            setUser(loggedInUser);
         }
-    }, [])
+    }, []);
 
     const navigateToNextWord = () => {
         const nextIndex = (index + 1) % words.length;
@@ -34,20 +35,14 @@ const App = () => {
         setShouldShowInfo(false);
     };
 
-    const handleKnown = async () => {
-        // TODO: update the familiarity of the word, find familiarity in userLearningData
-        const learningData = user?.userLearningData.find(data => data.wordId === wordToShow._id)
-
-
-        setShouldShowInfo(true);
-    };
-
-    const handleUnknown = async () => {
-        const word = words[index];
-        const mastered = false;
-        const updatedWord = { ...word, familiarity: 0, mastered };
-        const newWord = await wordServices.update(updatedWord);
-        setWords(words.map((word) => (word.english === newWord.english ? newWord : word)));
+    // TODO: update the familiarity of the word
+    const handleLearn = (familiarity: number) => {
+        if (!user) {
+            console.error('user not logged in')
+            return;
+        }
+        // get learn data.
+        userServices.updateFamiliarity(user._id, wordToShow._id, familiarity)
         setShouldShowInfo(true);
     };
 
@@ -55,12 +50,12 @@ const App = () => {
         <div>
             <div>Recite Word App</div>
 
-            <Card word={words[index]} visible={shouldShowInfo} />
+            <Card word={wordToShow} visible={shouldShowInfo} />
 
             {!shouldShowInfo && (
                 <div>
-                    <Button label={'Known'} onClick={handleKnown} />
-                    <Button label={'Unknown'} onClick={handleUnknown} />
+                    <Button label={'Known'} onClick={() => handleLearn(5)} />
+                    <Button label={'Unknown'} onClick={() => handleLearn(0)} />
                 </div>
             )}
             {shouldShowInfo && <Button label={'Next'} onClick={navigateToNextWord} />}
