@@ -1,26 +1,26 @@
-import Button from './Button';
-import { useImperativeHandle, useState } from 'react';
+// import Button from './Button';
+// import { useImperativeHandle, useState } from 'react';
 
-const Togglable = ({ children, ref }) => {
-    const [visible, setVisible] = useState(false);
+// const Togglable = ({ children, ref }) => {
+//     const [visible, setVisible] = useState(false);
 
-    useImperativeHandle(ref, () => {
-        return {
-            toggleVisibility: toggleVisibility,
-        };
-    });
+//     useImperativeHandle(ref, () => {
+//         return {
+//             toggleVisibility: toggleVisibility,
+//         };
+//     });
 
-    const toggleVisibility = () => {
-        setVisible(!visible);
-    };
+//     const toggleVisibility = () => {
+//         setVisible(!visible);
+//     };
 
-    const showWhenVisible = { display: visible ? '' : 'none' };
+//     const showWhenVisible = { display: visible ? '' : 'none' };
 
-    return (
-        <div>
-            <div style={showWhenVisible}>{children}</div>
-        </div>
-    );
-};
+//     return (
+//         <div>
+//             <div style={showWhenVisible}>{children}</div>
+//         </div>
+//     );
+// };
 
-export default Togglable;
+// export default Togglable;

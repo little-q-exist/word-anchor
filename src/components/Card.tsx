@@ -16,8 +16,6 @@ const Card = ({ word, visible }: CardProps) => {
         <div>
             <div>{word.english}</div>
             <div>{word.phonetic}</div>
-            {!word.mastered && <div>familiarity: {word.familiarity}</div>}
-            {word.mastered && <div>mastered!congradulations!</div>}
             <CardInfo word={word} visible={visible} />
         </div>
     );
