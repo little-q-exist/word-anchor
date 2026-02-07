@@ -1,12 +1,7 @@
 import { Outlet } from 'react-router';
 
 const App = () => {
-    return (
-        <div>
-            <div>Recite Word App</div>
-            <Outlet />
-        </div>
-    );
+    return <Outlet />;
 };
 
 export default App;
