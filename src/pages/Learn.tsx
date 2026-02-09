@@ -4,7 +4,7 @@ import wordServices from '../services/words';
 import userServices from '../services/users';
 
 import Card from '../components/Card';
-import Button from '../components/Button';
+import { Button } from 'antd';
 
 import type { User, Word } from '../types';
 
@@ -52,11 +52,15 @@ const Learn = () => {
 
             {!shouldShowInfo && (
                 <div>
-                    <Button label={'Known'} onClick={() => handleLearn(5)} />
-                    <Button label={'Unknown'} onClick={() => handleLearn(0)} />
+                    <Button type="primary" onClick={() => handleLearn(5)}>
+                        Known
+                    </Button>
+                    <Button type="primary" onClick={() => handleLearn(0)}>
+                        Unknown
+                    </Button>
                 </div>
             )}
-            {shouldShowInfo && <Button label={'Next'} onClick={navigateToNextWord} />}
+            {shouldShowInfo && <Button type="primary" onClick={navigateToNextWord} />}
         </div>
     );
 };

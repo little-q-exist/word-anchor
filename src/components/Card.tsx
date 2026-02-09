@@ -1,4 +1,4 @@
-import CardInfo from './CardInfo';
+import WordInfo from './WordInfo';
 
 import type { Word } from '../types';
 
@@ -16,7 +16,7 @@ const Card = ({ word, visible }: CardProps) => {
         <div>
             <div>{word.english}</div>
             <div>{word.phonetic}</div>
-            <CardInfo word={word} visible={visible} />
+            <WordInfo word={word} visible={visible} />
         </div>
     );
 };

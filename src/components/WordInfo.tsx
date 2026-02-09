@@ -1,11 +1,11 @@
 import type { Word } from '../types';
 
-interface CardInfoProps {
+interface WordInfoProps {
     word: Word;
     visible: boolean;
 }
 
-const CardInfo = ({ word, visible }: CardInfoProps) => {
+const WordInfo = ({ word, visible }: WordInfoProps) => {
     const showWhenVisible = { display: visible ? '' : 'none' };
 
     return (
@@ -20,4 +20,4 @@ const CardInfo = ({ word, visible }: CardInfoProps) => {
     );
 };
 
-export default CardInfo;
+export default WordInfo;
