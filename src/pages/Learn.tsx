@@ -50,7 +50,7 @@ const Learn = () => {
         return <div>No Words Avaliable!</div>;
     }
     return (
-        <div>
+        <div style={{ height: '100%' }}>
             <WordInfo word={wordToShow} visible={shouldShowInfo} />
 
             {!shouldShowInfo && (

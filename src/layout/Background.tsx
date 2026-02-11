@@ -12,17 +12,18 @@ const menuItems: MenuItem[] = [
 
 const Background = () => {
     return (
-        <Layout>
+        <Layout style={{ height: '100%' }}>
             <Header style={{ display: 'flex', alignItems: 'center' }}>
                 <div
                     style={{
                         backgroundColor: 'grey',
-                        borderRadius: '2px',
-                        width: '1rem',
+                        borderRadius: '5px',
+                        width: '5rem',
+                        margin: '.7rem 1rem',
                         display: 'block',
                     }}
                 >
-                    hhh
+                    LOGO
                 </div>
                 <Menu
                     mode="horizontal"
@@ -31,11 +32,9 @@ const Background = () => {
                     style={{ flex: 1, minWidth: 0 }}
                 />
             </Header>
-            <Layout>
-                <Content style={{margin: '0 1rem'}}>
-                    <Outlet />
-                </Content>
-            </Layout>
+            <Content style={{ margin: '0 1.5rem' }}>
+                <Outlet />
+            </Content>
         </Layout>
     );
 };
