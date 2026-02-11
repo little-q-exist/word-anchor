@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import wordServices from '../services/words';
 import userServices from '../services/users';
 
-import Card from '../components/Card';
+import WordInfo from '../components/WordInfo';
 import { Button } from 'antd';
 
 import type { User, Word } from '../types';
@@ -46,9 +46,12 @@ const Learn = () => {
         setShouldShowInfo(true);
     };
 
+    if (words.length === 0) {
+        return <div>No Words Avaliable!</div>;
+    }
     return (
         <div>
-            <Card word={wordToShow} visible={shouldShowInfo} />
+            <WordInfo word={wordToShow} visible={shouldShowInfo} />
 
             {!shouldShowInfo && (
                 <div>
