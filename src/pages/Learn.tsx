@@ -4,7 +4,7 @@ import wordServices from '../services/words';
 import userServices from '../services/users';
 
 import WordInfo from '../components/WordInfo';
-import { Button } from 'antd';
+import { Button, Flex } from 'antd';
 
 import type { User, Word } from '../types';
 
@@ -53,17 +53,31 @@ const Learn = () => {
         <div style={{ height: '100%' }}>
             <WordInfo word={wordToShow} visible={shouldShowInfo} />
 
-            {!shouldShowInfo && (
-                <div>
-                    <Button type="primary" onClick={() => handleLearn(5)}>
-                        Known
+            <Flex justify="space-around" style={{ height: '5%' }}>
+                {!shouldShowInfo && (
+                    <>
+                        <Button
+                            type="primary"
+                            onClick={() => handleLearn(5)}
+                            style={{ width: '47%' }}
+                        >
+                            Known
+                        </Button>
+                        <Button
+                            type="default"
+                            onClick={() => handleLearn(0)}
+                            style={{ width: '47%' }}
+                        >
+                            Unknown
+                        </Button>
+                    </>
+                )}
+                {shouldShowInfo && (
+                    <Button type="primary" onClick={navigateToNextWord} style={{ width: '50%' }}>
+                        Next
                     </Button>
-                    <Button type="primary" onClick={() => handleLearn(0)}>
-                        Unknown
-                    </Button>
-                </div>
-            )}
-            {shouldShowInfo && <Button type="primary" onClick={navigateToNextWord} />}
+                )}
+            </Flex>
         </div>
     );
 };

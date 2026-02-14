@@ -21,7 +21,7 @@ const WordInfo = ({ word, visible }: WordInfoProps) => {
     };
 
     // debug: modify it to none
-    const showWhenVisible: React.CSSProperties = { opacity: visible ? 1 : 1 };
+    const showWhenVisible: React.CSSProperties = { opacity: visible ? 1 : 0 };
 
     return (
         <div style={{ width: '100%', height: '95%' }}>
