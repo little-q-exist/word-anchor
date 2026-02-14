@@ -1,4 +1,4 @@
-import { Button, Checkbox, Flex, Form, Input, type FormProps } from 'antd';
+import { Button, Card, Checkbox, Flex, Form, Input, type FormProps } from 'antd';
 import { useNavigate } from 'react-router';
 
 type FieldType = {
@@ -18,54 +18,52 @@ const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
 const Login = () => {
     const navigate = useNavigate();
     return (
-        <div>
-            <h2>login</h2>
-            <Form
-                name="basic"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                style={{ maxWidth: 600 }}
-                initialValues={{ remember: true }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-                autoComplete="off"
-            >
-                <Form.Item<FieldType>
-                    label="Username"
-                    name="username"
-                    rules={[{ required: true, message: 'Please input your username!' }]}
+        <Flex vertical align="center" justify="space-around" style={{ height: '100%' }}>
+            <Card>
+                <h2>login</h2>
+                <Form
+                    name="login"
+                    wrapperCol={{ span: 50 }}
+                    style={{ width: '25rem' }}
+                    initialValues={{ remember: true }}
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
+                    autoComplete="off"
                 >
-                    <Input />
-                </Form.Item>
+                    <Form.Item<FieldType>
+                        name="username"
+                        rules={[{ required: true, message: 'Please input your username!' }]}
+                    >
+                        <Input placeholder="Username" />
+                    </Form.Item>
 
-                <Form.Item<FieldType>
-                    label="Password"
-                    name="password"
-                    rules={[{ required: true, message: 'Please input your password!' }]}
-                >
-                    <Input.Password />
-                </Form.Item>
+                    <Form.Item<FieldType>
+                        name="password"
+                        rules={[{ required: true, message: 'Please input your password!' }]}
+                    >
+                        <Input.Password placeholder="Password" />
+                    </Form.Item>
 
-                <Form.Item<FieldType> name="remember" valuePropName="checked" label={null}>
-                    <Checkbox>Remember me</Checkbox>
-                </Form.Item>
+                    <Form.Item<FieldType> name="remember" valuePropName="checked">
+                        <Checkbox>Remember me</Checkbox>
+                    </Form.Item>
 
-                <Form.Item label={null}>
-                    <Flex justify="space-around">
-                        <Button type="primary" htmlType="submit">
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" block>
                             Log in
                         </Button>
                         <Button
-                            type="default"
+                            type="link"
                             htmlType="button"
+                            style={{ margin: '.5rem 0' }}
                             onClick={() => navigate('../register', { relative: 'route' })}
                         >
-                            Register
+                            Register here!
                         </Button>
-                    </Flex>
-                </Form.Item>
-            </Form>
-        </div>
+                    </Form.Item>
+                </Form>
+            </Card>
+        </Flex>
     );
 };
 
