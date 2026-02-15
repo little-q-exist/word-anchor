@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { SERVER_URL } from '../constant';
+import type { NewUser } from '../types';
 
 const APIURL = `${SERVER_URL}/users`;
 
@@ -15,4 +16,9 @@ const updateFamiliarity = async (userId: string, wordId: string, familiarity: nu
     return response.data;
 };
 
-export default { getUserById, updateFamiliarity };
+const register = async (user: NewUser) => {
+    const response = await axios.post(`${APIURL}/register`, user);
+    return response.data;
+};
+
+export default { getUserById, updateFamiliarity, register };
