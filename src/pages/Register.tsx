@@ -5,7 +5,7 @@ import userService from '../services/users';
 
 import { Link } from 'react-router';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { AxiosError } from 'axios';
 
 type FieldType = {
@@ -32,17 +32,33 @@ const SuccessResult = () => {
     );
 };
 
-const FailedResult = ({ message }: { message?: string }) => {
+const FailedResult = ({
+    message,
+    setStatus,
+}: {
+    message?: string;
+    setStatus: React.Dispatch<React.SetStateAction<StatusType>>;
+}) => {
     return (
         <Result
             status="error"
             title="Opps! Something went wrong."
-            subTitle={message || 'please go back and try again.'}
-            extra={
-                <Button type="primary" key="home">
+            subTitle={message || 'please go back or try again.'}
+            extra={[
+                <Button type="default" key="home">
                     <Link to="..">Back Home</Link>
-                </Button>
-            }
+                </Button>,
+                <Button
+                    type="primary"
+                    key="return"
+                    onClick={() => {
+                        console.info('clicked');
+                        setStatus('idle');
+                    }}
+                >
+                    Try Again
+                </Button>,
+            ]}
         />
     );
 };
@@ -174,7 +190,7 @@ const Register = () => {
             case 'success':
                 return <SuccessResult />;
             case 'failed':
-                return <FailedResult message={errorMessage} />;
+                return <FailedResult message={errorMessage} setStatus={setStatus} />;
         }
     };
 
