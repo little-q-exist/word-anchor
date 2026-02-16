@@ -10,7 +10,7 @@ const menuItems: MenuItem[] = [
     { label: <Link to={`/login`}>LOGIN</Link>, key: 'login' },
 ];
 
-const Background = () => {
+const BackgroundLayout = () => {
     return (
         <Layout style={{ height: '100%' }}>
             <Header style={{ display: 'flex', alignItems: 'center' }}>
@@ -39,4 +39,4 @@ const Background = () => {
     );
 };
 
-export default Background;
+export default BackgroundLayout;
