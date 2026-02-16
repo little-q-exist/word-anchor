@@ -52,7 +52,6 @@ const FailedResult = ({
                     type="primary"
                     key="return"
                     onClick={() => {
-                        console.info('clicked');
                         setStatus('idle');
                     }}
                 >
@@ -141,7 +140,7 @@ const RegisterForm = ({ onFinish, onFinishFailed }: RegisterFormInterface) => {
 
                 <Form.Item>
                     <Button type="primary" htmlType="submit" block>
-                        Log in
+                        Register
                     </Button>
                 </Form.Item>
             </Form>
@@ -170,8 +169,9 @@ const Register = () => {
                     setErrorMessage(
                         error.response?.data?.error || error.message || 'Unknown error occurred'
                     );
+                } else {
+                    setErrorMessage(error.message || 'Unknown error occurred');
                 }
-                setErrorMessage(error.message || 'Unknown error occurred');
             }
             setStatus('failed');
         }
