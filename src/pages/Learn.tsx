@@ -4,22 +4,25 @@ import wordServices from '../services/words';
 import userServices from '../services/users';
 
 import WordInfo from '../components/WordInfo';
-import { Button, Flex } from 'antd';
+import { Button, Empty, Flex } from 'antd';
 
-import type { User, Word } from '../types';
+import type { Route } from './+types/Learn';
 
-const Learn = () => {
+import type { User } from '../types';
+
+// eslint-disable-next-line react-refresh/only-export-components
+export async function clientLoader() {
+    const words = await wordServices.getALL();
+    return { words };
+}
+
+const Learn = ({ loaderData }: Route.ComponentProps) => {
+    const { words } = loaderData;
+
     const [index, setIndex] = useState(0);
-    const [words, setWords] = useState<Word[]>([]);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const wordToShow = words[index];
-
-    useEffect(() => {
-        wordServices.getALL().then((words) => {
-            setWords(words);
-        });
-    }, []);
 
     useEffect(() => {
         const loggedUserJSON = localStorage.getItem('loggedReciteAppUser');
@@ -47,7 +50,11 @@ const Learn = () => {
     };
 
     if (words.length === 0) {
-        return <div>No Words Avaliable!</div>;
+        return (
+            <Flex style={{ height: '100%' }} justify="center" align="center">
+                <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            </Flex>
+        );
     }
     return (
         <div style={{ height: '100%' }}>
