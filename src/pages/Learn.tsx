@@ -4,12 +4,13 @@ import wordServices from '../services/words';
 import userServices from '../services/users';
 
 import WordInfo from '../components/WordInfo';
-import { Button, Empty, Flex } from 'antd';
+import { Button, Empty, Flex, message } from 'antd';
 
 import type { Route } from './+types/Learn';
 
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
+import { useNavigate } from 'react-router';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function clientLoader() {
@@ -21,6 +22,10 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
     const { words } = loaderData;
 
     const user = useSelector((state: RootState) => state.user);
+
+    const navigate = useNavigate();
+
+    const [messageApi, contextHolder] = message.useMessage();
 
     const [index, setIndex] = useState(0);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
@@ -48,36 +53,51 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
             </Flex>
         );
     }
-    return (
-        <div style={{ height: '100%' }}>
-            <WordInfo word={wordToShow} visible={shouldShowInfo} />
 
-            <Flex justify="space-around" style={{ height: '5%' }}>
-                {!shouldShowInfo && (
-                    <>
+    if (!user) {
+        messageApi.info('Please login first!');
+        setTimeout(() => {
+            navigate('../login');
+        }, 3000);
+    }
+
+    return (
+        <>
+            {contextHolder}
+            <div style={{ height: '100%' }}>
+                <WordInfo word={wordToShow} visible={shouldShowInfo} />
+
+                <Flex justify="space-around" style={{ height: '5%' }}>
+                    {!shouldShowInfo && (
+                        <>
+                            <Button
+                                type="primary"
+                                onClick={() => handleLearn(5)}
+                                style={{ width: '47%' }}
+                            >
+                                Known
+                            </Button>
+                            <Button
+                                type="default"
+                                onClick={() => handleLearn(0)}
+                                style={{ width: '47%' }}
+                            >
+                                Unknown
+                            </Button>
+                        </>
+                    )}
+                    {shouldShowInfo && (
                         <Button
                             type="primary"
-                            onClick={() => handleLearn(5)}
-                            style={{ width: '47%' }}
+                            onClick={navigateToNextWord}
+                            style={{ width: '50%' }}
                         >
-                            Known
+                            Next
                         </Button>
-                        <Button
-                            type="default"
-                            onClick={() => handleLearn(0)}
-                            style={{ width: '47%' }}
-                        >
-                            Unknown
-                        </Button>
-                    </>
-                )}
-                {shouldShowInfo && (
-                    <Button type="primary" onClick={navigateToNextWord} style={{ width: '50%' }}>
-                        Next
-                    </Button>
-                )}
-            </Flex>
-        </div>
+                    )}
+                </Flex>
+            </div>
+        </>
     );
 };
 
