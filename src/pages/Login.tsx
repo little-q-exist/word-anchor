@@ -134,15 +134,15 @@ const Login = () => {
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         setStatus('loading');
         try {
+            messageApi.success('Login successful!');
             const userToken: User = await loginService.login(values);
             console.log('Success:', values);
             setStatus('success');
             if (values.remember) {
                 localStorage.setItem('reciteWordAppUser', JSON.stringify(userToken));
             }
-            dispatch(login(userToken));
-            messageApi.success('Login successful!');
             navigate('..');
+            dispatch(login(userToken));
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
                 console.error('Login failed:', error);
@@ -175,17 +175,21 @@ const Login = () => {
             case 'success':
                 return (
                     <Spin spinning={status === 'loading'}>
-                        <LoginForm onFinish={onFinish} onFinishFailed={onFinishFailed} />
+                        {status === 'idle' && user && (
+                            <FailedResult
+                                message="You have alreadly logged in!"
+                                setStatus={setStatus}
+                            />
+                        )}
+                        {!(status === 'idle' && user) && (
+                            <LoginForm onFinish={onFinish} onFinishFailed={onFinishFailed} />
+                        )}
                     </Spin>
                 );
             case 'failed':
                 return <FailedResult message={errorMessage} setStatus={setStatus} />;
         }
     };
-
-    if (user) {
-        return <FailedResult message="You have alreadly logged in!" setStatus={setStatus} />;
-    }
     return (
         <>
             {contextHolder}
