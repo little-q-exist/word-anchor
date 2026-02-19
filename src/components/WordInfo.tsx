@@ -20,7 +20,6 @@ const WordInfo = ({ word, visible }: WordInfoProps) => {
         flexDirection: 'column',
     };
 
-    // debug: modify it to none
     const showWhenVisible: React.CSSProperties = { opacity: visible ? 1 : 0 };
 
     return (

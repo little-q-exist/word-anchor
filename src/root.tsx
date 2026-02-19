@@ -1,6 +1,9 @@
 import { Button, Result, Skeleton } from 'antd';
 import { isRouteErrorResponse, Link, Outlet, Scripts, ScrollRestoration } from 'react-router';
 import type { Route } from './+types/root';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setUser } from './features/userSlice';
 
 export function Layout({ children }: { children: React.ReactNode }) {
     const resetStyle = {
@@ -63,6 +66,17 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 }
 
 const App = () => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        let loggedInUser = null;
+        const loggedUserJSON = localStorage.getItem('loggedReciteAppUser');
+        if (loggedUserJSON) {
+            loggedInUser = JSON.parse(loggedUserJSON);
+            dispatch(setUser(loggedInUser));
+        }
+    }, [dispatch]);
+
     return <Outlet />;
 };
 

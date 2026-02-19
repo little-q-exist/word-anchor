@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import wordServices from '../services/words';
 import userServices from '../services/users';
@@ -8,7 +8,8 @@ import { Button, Empty, Flex } from 'antd';
 
 import type { Route } from './+types/Learn';
 
-import type { User } from '../types';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../store';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function clientLoader() {
@@ -19,18 +20,11 @@ export async function clientLoader() {
 const Learn = ({ loaderData }: Route.ComponentProps) => {
     const { words } = loaderData;
 
+    const user = useSelector((state: RootState) => state.user);
+
     const [index, setIndex] = useState(0);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
     const wordToShow = words[index];
-
-    useEffect(() => {
-        const loggedUserJSON = localStorage.getItem('loggedReciteAppUser');
-        if (loggedUserJSON) {
-            const loggedInUser = JSON.parse(loggedUserJSON);
-            setUser(loggedInUser);
-        }
-    }, []);
 
     const navigateToNextWord = () => {
         const nextIndex = (index + 1) % words.length;
@@ -38,13 +32,11 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
         setShouldShowInfo(false);
     };
 
-    // TODO: update the familiarity of the word
     const handleLearn = (familiarity: number) => {
         if (!user) {
             console.error('user not logged in');
             return;
         }
-        // get learn data.
         userServices.updateFamiliarity(user._id, wordToShow._id, familiarity);
         setShouldShowInfo(true);
     };
