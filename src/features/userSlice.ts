@@ -2,30 +2,24 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { User } from '../types';
 
-const initialState: User = {
-    token: '',
-    username: '',
-    _id: '',
-};
+type SliceStateType = User | null;
 
 export const userSlice = createSlice({
     name: 'user',
-    initialState,
+    initialState: null satisfies SliceStateType as SliceStateType,
     reducers: {
-        login: (state, action: PayloadAction<User | undefined>) => {
+        login: (_state, action: PayloadAction<User | undefined>) => {
             if (action.payload) {
-                state = action.payload;
+                return action.payload;
             } else {
                 const loggedUserJSON = localStorage.getItem('reciteWordAppUser');
                 if (loggedUserJSON) {
-                    state = JSON.parse(loggedUserJSON);
+                    return JSON.parse(loggedUserJSON);
                 }
             }
         },
-        logout: (state) => {
-            state._id = '';
-            state.token = '';
-            state.username = '';
+        logout: () => {
+            return null;
         },
     },
 });
