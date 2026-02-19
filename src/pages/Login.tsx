@@ -144,6 +144,7 @@ const Login = () => {
             navigate('..');
             dispatch(login(userToken));
         } catch (error: unknown) {
+            messageApi.error('Login failed!');
             if (error instanceof AxiosError) {
                 console.error('Login failed:', error);
                 if (error instanceof AxiosError) {

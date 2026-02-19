@@ -19,6 +19,7 @@ export const userSlice = createSlice({
             }
         },
         logout: () => {
+            localStorage.removeItem('reciteWordAppUser');
             return null;
         },
     },
