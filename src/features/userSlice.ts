@@ -12,14 +12,24 @@ export const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<User>) => {
-            state._id = action.payload._id;
-            state.token = action.payload.token;
-            state.username = action.payload.username;
+        login: (state, action: PayloadAction<User | undefined>) => {
+            if (action.payload) {
+                state = action.payload;
+            } else {
+                const loggedUserJSON = localStorage.getItem('reciteWordAppUser');
+                if (loggedUserJSON) {
+                    state = JSON.parse(loggedUserJSON);
+                }
+            }
+        },
+        logout: (state) => {
+            state._id = '';
+            state.token = '';
+            state.username = '';
         },
     },
 });
 
-export const { setUser } = userSlice.actions;
+export const { login, logout } = userSlice.actions;
 
 export default userSlice.reducer;

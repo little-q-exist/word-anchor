@@ -3,7 +3,7 @@ import { isRouteErrorResponse, Link, Outlet, Scripts, ScrollRestoration } from '
 import type { Route } from './+types/root';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setUser } from './features/userSlice';
+import { login } from './features/userSlice';
 
 export function Layout({ children }: { children: React.ReactNode }) {
     const resetStyle = {
@@ -69,12 +69,7 @@ const App = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        let loggedInUser = null;
-        const loggedUserJSON = localStorage.getItem('loggedReciteAppUser');
-        if (loggedUserJSON) {
-            loggedInUser = JSON.parse(loggedUserJSON);
-            dispatch(setUser(loggedInUser));
-        }
+        dispatch(login());
     }, [dispatch]);
 
     return <Outlet />;

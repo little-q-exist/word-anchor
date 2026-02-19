@@ -17,6 +17,9 @@ import { Link, useNavigate } from 'react-router';
 import loginService from '../services/login';
 import { AxiosError } from 'axios';
 import type { User } from '../types';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '../store';
+import { login } from '../features/userSlice';
 
 type FieldType = {
     username: string;
@@ -125,6 +128,9 @@ const Login = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const navigate = useNavigate();
 
+    const user = useSelector((state: RootState) => state.user);
+    const dispatch = useDispatch();
+
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         setStatus('loading');
         try {
@@ -134,6 +140,7 @@ const Login = () => {
             if (values.remember) {
                 localStorage.setItem('reciteWordAppUser', JSON.stringify(userToken));
             }
+            dispatch(login(userToken));
             messageApi.success('Login successful!');
             navigate('..');
         } catch (error: unknown) {
@@ -165,6 +172,7 @@ const Login = () => {
         switch (status) {
             case 'idle':
             case 'loading':
+            case 'success':
                 return (
                     <Spin spinning={status === 'loading'}>
                         <LoginForm onFinish={onFinish} onFinishFailed={onFinishFailed} />
@@ -175,6 +183,9 @@ const Login = () => {
         }
     };
 
+    if (user) {
+        return <FailedResult message="You have alreadly logged in!" setStatus={setStatus} />;
+    }
     return (
         <>
             {contextHolder}
