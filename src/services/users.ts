@@ -1,9 +1,12 @@
 import axios from 'axios';
 
-import { SERVER_URL } from '../constant';
 import type { NewUser } from '../types';
 
-const APIURL = `${SERVER_URL}/users`;
+import globalConfig from './config';
+
+globalConfig();
+
+const APIURL = `/users`;
 
 const getUserById = async (id: string) => {
     return (await axios.get(`${APIURL}/${id}`)).data;

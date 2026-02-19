@@ -2,9 +2,11 @@ import axios from 'axios';
 
 import type { Word } from '../types';
 
-import { SERVER_URL } from '../constant';
+import globalConfig from './config';
 
-const APIURL = `${SERVER_URL}/words`;
+globalConfig();
+
+const APIURL = `/words`;
 
 const getALL = async () => {
     const response = await axios.get(APIURL);
