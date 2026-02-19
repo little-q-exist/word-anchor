@@ -39,7 +39,10 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
 
     const handleLearn = (familiarity: number) => {
         if (!user) {
-            console.error('user not logged in');
+            messageApi.info('Please login first!');
+            setTimeout(() => {
+                navigate('../login');
+            }, 3000);
             return;
         }
         userServices.updateFamiliarity(user._id, wordToShow._id, familiarity);
@@ -52,13 +55,6 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
                 <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE} />
             </Flex>
         );
-    }
-
-    if (!user) {
-        messageApi.info('Please login first!');
-        setTimeout(() => {
-            navigate('../login');
-        }, 3000);
     }
 
     return (
