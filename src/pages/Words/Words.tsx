@@ -1,10 +1,11 @@
 import { Table } from 'antd';
 
-import wordServices from '../services/words';
+import wordServices from '../../services/words';
 
-import type { Word } from '../types';
-import type { Route } from './+types/Words';
+import type { Word } from '../../types';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
+import type { Route } from './+types/Words';
 
 const { Column, ColumnGroup } = Table;
 
@@ -40,20 +41,16 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
                     },
                 }}
             >
-                <Column title="English" dataIndex="english" key="english" />
-                <ColumnGroup title="definitions">
-                    <Column
-                        title="meaning"
-                        dataIndex="definitions"
-                        key="meaning"
-                        render={(definitions: Word['definitions']) => (
-                            <>
-                                {definitions.map((def, i) => (
-                                    <div key={i}>{def.meaning}</div>
-                                ))}
-                            </>
-                        )}
-                    />
+                <Column
+                    title="English"
+                    dataIndex="english"
+                    key="english"
+                    render={(english: Word['english']) => (
+                        <Link to={`./${english}`}>{english}</Link>
+                    )}
+                />
+                <Column title="Phonetic" dataIndex="phonetic" key="phonetic" />
+                <ColumnGroup title="Definitions">
                     <Column
                         title="partOfSpeech"
                         dataIndex="definitions"
@@ -62,6 +59,18 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
                             <>
                                 {definitions.map((def, i) => (
                                     <div key={i}>{def.partOfSpeech}</div>
+                                ))}
+                            </>
+                        )}
+                    />
+                    <Column
+                        title="meaning"
+                        dataIndex="definitions"
+                        key="meaning"
+                        render={(definitions: Word['definitions']) => (
+                            <>
+                                {definitions.map((def, i) => (
+                                    <div key={i}>{def.meaning}</div>
                                 ))}
                             </>
                         )}

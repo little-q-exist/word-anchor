@@ -9,7 +9,7 @@ interface WordInfoProps {
     visible: boolean;
 }
 
-const WordInfo = ({ word, visible }: WordInfoProps) => {
+const WordCard = ({ word, visible }: WordInfoProps) => {
     const cardStyle: React.CSSProperties = {
         minWidth: '15rem',
         width: '49.5%',
@@ -48,4 +48,4 @@ const WordInfo = ({ word, visible }: WordInfoProps) => {
     );
 };
 
-export default WordInfo;
+export default WordCard;
