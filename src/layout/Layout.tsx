@@ -41,6 +41,7 @@ const BackgroundLayout = () => {
 
     const menuItems: MenuItem[] = [
         { label: <Link to={`/learn`}>LEARN</Link>, key: '/learn' },
+        { label: <Link to="/words">WORDS</Link>, key: '/words' },
         user ? userItem : loginItem,
     ];
 
