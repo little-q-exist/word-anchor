@@ -30,7 +30,7 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
     });
 
     return (
-        <div style={{ height: '100%' }}>
+        <div style={{ display: 'flex', margin: '1rem 0' }}>
             <Table<Word>
                 dataSource={wordsToShow}
                 pagination={{
@@ -40,6 +40,7 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
                         setPage(page);
                     },
                 }}
+                style={{ flex: 1 }}
             >
                 <Column
                     title="English"

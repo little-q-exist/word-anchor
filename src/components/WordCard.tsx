@@ -1,7 +1,7 @@
 import type React from 'react';
 import type { Word } from '../types';
 
-import { Card, Flex, Typography, Space, Tabs, type TabsProps } from 'antd';
+import { Card, Flex, Typography, Space, Tabs, type TabsProps, Skeleton } from 'antd';
 import { useState } from 'react';
 
 const { Title, Text } = Typography;
@@ -52,9 +52,7 @@ const tabItems: TabsProps['items'] = [
 
 const WordCard = ({ word, visible }: WordInfoProps) => {
     const [tabKey, setTabKey] = useState<TabKeyType>('definitions');
-
-    const showWhenVisible: React.CSSProperties = { opacity: visible ? 1 : 0 };
-
+    
     const renderTabContent = () => {
         switch (tabKey) {
             case 'definitions':
@@ -79,45 +77,49 @@ const WordCard = ({ word, visible }: WordInfoProps) => {
     };
 
     return (
-        <div style={{ width: '100%', height: '95%' }}>
-            <Flex align="center" justify="space-between" style={{ width: '100%', height: '100%' }}>
-                <Card style={{ ...cardStyle, ...cardContentCenterStyle }} variant="borderless">
-                    <Space align="end" size="large" style={{ flex: 1 }}>
-                        <Title level={1} style={{ margin: 0 }}>
-                            {word.english}
-                        </Title>
-                        <Text style={{ fontSize: 20, padding: '0.5em 0' }}>{word.phonetic}</Text>
-                    </Space>
-                </Card>
-                <Card
-                    style={{ ...cardStyle, ...showWhenVisible, textAlign: 'center' }}
-                    styles={{
-                        body: {
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            paddingBottom: 0,
-                        },
-                    }}
-                    variant="borderless"
-                >
-                    <div
-                        style={{
-                            flex: 1,
-                            ...cardContentCenterStyle,
-                        }}
-                    >
-                        <TabContent>{renderTabContent()}</TabContent>
-                    </div>
-                    <Tabs
-                        items={tabItems}
-                        tabPlacement="bottom"
-                        activeKey={tabKey}
-                        onChange={(activeKey) => setTabKey(activeKey as TabKeyType)}
-                    />
-                </Card>
-            </Flex>
-        </div>
+        <Flex align="center" justify="space-between" style={{ width: '100%', height: '100%' }}>
+            <Card style={{ ...cardStyle, ...cardContentCenterStyle }} variant="borderless">
+                <Space align="end" size="large" style={{ flex: 1 }}>
+                    <Title level={1} style={{ margin: 0 }}>
+                        {word.english}
+                    </Title>
+                    <Text style={{ fontSize: 20, padding: '0.5em 0' }}>{word.phonetic}</Text>
+                </Space>
+            </Card>
+            <Card
+                style={{ ...cardStyle, textAlign: 'center' }}
+                styles={{
+                    body: {
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        paddingBottom: 0,
+                        // ...showWhenVisible,
+                    },
+                }}
+                variant="borderless"
+            >
+                {visible && (
+                    <>
+                        <div
+                            style={{
+                                flex: 1,
+                                ...cardContentCenterStyle,
+                            }}
+                        >
+                            <TabContent>{renderTabContent()}</TabContent>
+                        </div>
+                        <Tabs
+                            items={tabItems}
+                            tabPlacement="bottom"
+                            activeKey={tabKey}
+                            onChange={(activeKey) => setTabKey(activeKey as TabKeyType)}
+                        />
+                    </>
+                )}
+                {!visible && <Skeleton />}
+            </Card>
+        </Flex>
     );
 };
 
