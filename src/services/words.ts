@@ -8,8 +8,8 @@ globalConfig();
 
 const APIURL = `/words`;
 
-const getAll = async (): Promise<Word[]> => {
-    const response = await axios.get(APIURL);
+const getWordToLearn = async (): Promise<Word[]> => {
+    const response = await axios.get(`${APIURL}/learn`);
     return response.data;
 };
 
@@ -42,4 +42,4 @@ const post = async (word: NewWord): Promise<Word> => {
     return response.data;
 };
 
-export default { getAll, getBy, getCount, update, post };
+export default { getWordToLearn, getBy, getCount, update, post };
