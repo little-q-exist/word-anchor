@@ -29,4 +29,15 @@ const updateFavorite = async (userId: string, wordId: string) => {
     return response.data;
 };
 
-export default { getUserById, updateFamiliarity, register, updateFavorite };
+const getLearningData = async (userId: string, wordId: string, fields?: string[]) => {
+    let fieldsString;
+    if (fields) {
+        fieldsString = fields.join(',');
+    }
+    const response = await axios.get(
+        `${APIURL}/${userId}/words/${wordId}${fields ? `?fields=${fieldsString}` : ''}`
+    );
+    return response.data;
+};
+
+export default { getUserById, updateFamiliarity, register, updateFavorite, getLearningData };
