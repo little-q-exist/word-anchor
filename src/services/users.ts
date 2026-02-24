@@ -24,4 +24,9 @@ const register = async (user: NewUser) => {
     return response.data;
 };
 
-export default { getUserById, updateFamiliarity, register };
+const updateFavorite = async (userId: string, wordId: string) => {
+    const response = await axios.patch(`${APIURL}/${userId}/words/${wordId}/favorite`);
+    return response.data;
+};
+
+export default { getUserById, updateFamiliarity, register, updateFavorite };
