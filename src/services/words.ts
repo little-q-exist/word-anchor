@@ -8,7 +8,7 @@ globalConfig();
 
 const APIURL = `/words`;
 
-const getWordToLearn = async (limit: number): Promise<Word[]> => {
+const getWordToLearn = async (limit?: number): Promise<Word[]> => {
     const response = await axios.get(`${APIURL}/learn${limit ? `?limit=${limit}` : ''}`);
     return response.data;
 };

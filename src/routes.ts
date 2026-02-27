@@ -5,9 +5,9 @@ export default [
     layout('layout/Layout.tsx', [
         index('pages/Home.tsx'),
         route('login', 'pages/Login.tsx'),
-        route('learn', 'pages/Learn.tsx'),
         route('register', 'pages/Register.tsx'),
         route('words', 'pages/Words/Words.tsx'),
+        route('learn', 'pages/Learn.tsx'),
         route('words/:english', 'pages/Words/WordInfo.tsx'),
     ]),
 ] satisfies RouteConfig;

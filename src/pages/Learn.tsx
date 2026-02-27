@@ -3,7 +3,7 @@ import { useState } from 'react';
 import wordServices from '../services/words';
 import userServices from '../services/users';
 
-import WordInfo from '../components/WordInfo';
+import WordCard from '../components/WordCard';
 import { Button, Empty, Flex, message } from 'antd';
 
 import type { Route } from './+types/Learn';
@@ -11,10 +11,11 @@ import type { Route } from './+types/Learn';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { useNavigate } from 'react-router';
+import WordSideButtonGroup from '../components/WordSideButtonGroup';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function clientLoader() {
-    const words = await wordServices.getALL();
+    const words = await wordServices.getWordToLearn();
     return { words };
 }
 
@@ -60,10 +61,12 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
     return (
         <>
             {contextHolder}
-            <div style={{ height: '100%' }}>
-                <WordInfo word={wordToShow} visible={shouldShowInfo} />
+            <Flex style={{ height: '100%' }} vertical>
+                <div style={{ flex: 1 }}>
+                    <WordCard word={wordToShow} visible={shouldShowInfo} />
+                </div>
 
-                <Flex justify="space-around" style={{ height: '5%' }}>
+                <Flex justify="space-around" style={{ marginBottom: '1rem' }}>
                     {!shouldShowInfo && (
                         <>
                             <Button
@@ -92,7 +95,8 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
                         </Button>
                     )}
                 </Flex>
-            </div>
+                <WordSideButtonGroup wordId={wordToShow._id} />
+            </Flex>
         </>
     );
 };
