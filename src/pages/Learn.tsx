@@ -20,25 +20,54 @@ export async function clientLoader() {
 }
 
 const Learn = ({ loaderData }: Route.ComponentProps) => {
-    const { words } = loaderData;
-
     const user = useSelector((state: RootState) => state.user);
 
     const navigate = useNavigate();
 
     const [messageApi, contextHolder] = message.useMessage();
 
+    const words = loaderData.words;
     const [index, setIndex] = useState(0);
+    const [wordToRepeat, setWordToRepeat] = useState<number[]>([]);
+    const [isRepeating, setIsRepeating] = useState(false);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
     const wordToShow = words[index];
 
     const navigateToNextWord = () => {
-        const nextIndex = (index + 1) % words.length;
-        setIndex(nextIndex);
+        if (!isRepeating) {
+            if (index < words.length - 1) {
+                setIndex(index + 1);
+            } else {
+                if (wordToRepeat.length > 0) {
+                    setIsRepeating(true);
+                    setIndex(wordToRepeat[0]);
+                } else {
+                    messageApi.info(
+                        'You have finished learning all the words for today! Great job!'
+                    );
+                    setTimeout(() => {
+                        navigate('..');
+                    }, 3000);
+                    return;
+                }
+            }
+        } else {
+            if (wordToRepeat.length > 0) {
+                setIndex(wordToRepeat[0]);
+            } else {
+                messageApi.success(
+                    'You have finished learning all the words for today! Great job!'
+                );
+                setTimeout(() => {
+                    navigate('..');
+                }, 3000);
+                return;
+            }
+        }
         setShouldShowInfo(false);
     };
 
-    const handleLearn = (familiarity: number) => {
+    const handleLearn = async (familiarity: number) => {
         if (!user) {
             messageApi.info('Please login first!');
             setTimeout(() => {
@@ -46,7 +75,25 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
             }, 3000);
             return;
         }
-        userServices.updateFamiliarity(user._id, wordToShow._id, familiarity);
+
+        if (isRepeating) {
+            setWordToRepeat((queue) => {
+                const nextQueue = queue.slice(1);
+                if (familiarity < 4) {
+                    return nextQueue.concat(index);
+                }
+                return nextQueue;
+            });
+        } else {
+            const { shouldRepeat } = await userServices.updateFamiliarity(
+                user._id,
+                wordToShow._id,
+                familiarity
+            );
+            if (shouldRepeat) {
+                setWordToRepeat((queue) => queue.concat(index));
+            }
+        }
         setShouldShowInfo(true);
     };
 
@@ -66,20 +113,27 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
                     <WordCard word={wordToShow} visible={shouldShowInfo} />
                 </div>
 
-                <Flex justify="space-around" style={{ marginBottom: '1rem' }}>
+                <Flex justify="space-around" gap="middle" style={{ marginBottom: '1rem' }}>
                     {!shouldShowInfo && (
                         <>
                             <Button
                                 type="primary"
                                 onClick={() => handleLearn(5)}
-                                style={{ width: '47%' }}
+                                style={{ flex: 1 }}
                             >
                                 Known
                             </Button>
                             <Button
+                                type="primary"
+                                onClick={() => handleLearn(3)}
+                                style={{ flex: 1 }}
+                            >
+                                Unfamiliar
+                            </Button>
+                            <Button
                                 type="default"
                                 onClick={() => handleLearn(0)}
-                                style={{ width: '47%' }}
+                                style={{ flex: 1 }}
                             >
                                 Unknown
                             </Button>
@@ -95,7 +149,7 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
                         </Button>
                     )}
                 </Flex>
-                <WordSideButtonGroup wordId={wordToShow._id} />
+                <WordSideButtonGroup wordId={wordToShow._id} showReturn={false} />
             </Flex>
         </>
     );

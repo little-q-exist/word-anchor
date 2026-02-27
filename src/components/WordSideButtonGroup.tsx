@@ -10,9 +10,10 @@ import userService from '../services/users';
 
 interface WordSideButtonGroupInterface {
     wordId: string;
+    showReturn?: boolean;
 }
 
-const WordSideButtonGroup = ({ wordId }: WordSideButtonGroupInterface) => {
+const WordSideButtonGroup = ({ wordId, showReturn = false }: WordSideButtonGroupInterface) => {
     const user = useSelector((state: RootState) => state.user);
     const [favorited, setFavorited] = useState(false);
 
@@ -24,7 +25,9 @@ const WordSideButtonGroup = ({ wordId }: WordSideButtonGroupInterface) => {
             userService
                 .getLearningData(user._id, wordId, ['favorited'])
                 .then((data: UserLearningData) => {
-                    setFavorited(data.favorited);
+                    if (data) {
+                        setFavorited(data.favorited);
+                    }
                 });
         }
     }, [user, wordId]);
@@ -46,6 +49,11 @@ const WordSideButtonGroup = ({ wordId }: WordSideButtonGroupInterface) => {
             setFavorited(!favorited);
         }
     };
+
+    const handleReturn = () => {
+        navigate('..', { relative: 'path' });
+    };
+
     return (
         <>
             {contextHolder}
@@ -62,10 +70,7 @@ const WordSideButtonGroup = ({ wordId }: WordSideButtonGroupInterface) => {
                         }
                     />
                 )}
-                <FloatButton
-                    onClick={() => navigate('..', { relative: 'path' })}
-                    icon={<LeftOutlined />}
-                />
+                {showReturn && <FloatButton onClick={handleReturn} icon={<LeftOutlined />} />}
             </FloatButton.Group>
         </>
     );

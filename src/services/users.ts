@@ -12,7 +12,11 @@ const getUserById = async (id: string): Promise<User> => {
     return (await axios.get(`${APIURL}/${id}`)).data;
 };
 
-const updateFamiliarity = async (userId: string, wordId: string, familiarity: number) => {
+const updateFamiliarity = async (
+    userId: string,
+    wordId: string,
+    familiarity: number
+): Promise<UserLearningData & { shouldRepeat: boolean }> => {
     const response = await axios.patch(`${APIURL}/${userId}/words/${wordId}/familiarity`, {
         familiarity,
     });
