@@ -23,6 +23,10 @@ export interface Word {
     createdBy: string;
 }
 
+export interface WordWithLearnStatus extends Word {
+    status: 'idle' | 'passed' | 'failed';
+}
+
 export interface UserLearningData {
     userId: string;
     wordId: string;

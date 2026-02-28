@@ -40,7 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export function HydrateFallback() {
     return (
-        <Flex justify="center" align="center" vertical>
+        <Flex justify="center" align="center" vertical style={{ height: '100%' }}>
             <Spin />
         </Flex>
     );
