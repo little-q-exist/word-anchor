@@ -6,12 +6,11 @@ import {
     Form,
     Input,
     message,
-    Result,
     Spin,
     type FormProps,
     type GetProp,
 } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import loginService from '../services/login';
@@ -19,7 +18,8 @@ import { AxiosError } from 'axios';
 import type { User } from '../types';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store';
-import { login } from '../features/userSlice';
+import { login, logout } from '../features/userSlice';
+import FailedResult from '../components/common/FailedResult';
 
 type FieldType = {
     username: string;
@@ -92,36 +92,6 @@ const LoginForm = ({ onFinish, onFinishFailed }: LoginFormInterface) => {
     );
 };
 
-const FailedResult = ({
-    message,
-    setStatus,
-}: {
-    message?: string;
-    setStatus: React.Dispatch<React.SetStateAction<StatusType>>;
-}) => {
-    return (
-        <Result
-            status="error"
-            title="Opps! Something went wrong."
-            subTitle={message || 'please go back or try again.'}
-            extra={[
-                <Button type="default" key="home">
-                    <Link to="..">Back Home</Link>
-                </Button>,
-                <Button
-                    type="primary"
-                    key="return"
-                    onClick={() => {
-                        setStatus('idle');
-                    }}
-                >
-                    Try Again
-                </Button>,
-            ]}
-        />
-    );
-};
-
 const Login = () => {
     const [status, setStatus] = useState<StatusType>('idle');
     const [errorMessage, setErrorMessage] = useState<string>('');
@@ -130,6 +100,13 @@ const Login = () => {
 
     const user = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (user && status !== 'success') {
+            setStatus('failed');
+            setErrorMessage('You have alreadly logged in!');
+        }
+    }, [status, user]);
 
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         setStatus('loading');
@@ -175,20 +152,47 @@ const Login = () => {
             case 'loading':
             case 'success':
                 return (
-                    <Spin spinning={status === 'loading'}>
-                        {status === 'idle' && user && (
-                            <FailedResult
-                                message="You have alreadly logged in!"
-                                setStatus={setStatus}
-                            />
-                        )}
-                        {!(status === 'idle' && user) && (
-                            <LoginForm onFinish={onFinish} onFinishFailed={onFinishFailed} />
-                        )}
+                    <Spin spinning={status !== 'idle'}>
+                        <LoginForm onFinish={onFinish} onFinishFailed={onFinishFailed} />
                     </Spin>
                 );
             case 'failed':
-                return <FailedResult message={errorMessage} setStatus={setStatus} />;
+                return (
+                    <FailedResult message={errorMessage}>
+                        {!user && (
+                            <>
+                                <Button type="default" key="home">
+                                    <Link to="..">Back Home</Link>
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    key="return"
+                                    onClick={() => {
+                                        setStatus('idle');
+                                    }}
+                                >
+                                    Try Again
+                                </Button>
+                            </>
+                        )}
+                        {user && (
+                            <div>
+                                <div>
+                                    wanna log in?{' '}
+                                    <a
+                                        onClick={() => {
+                                            dispatch(logout());
+                                            setStatus('idle');
+                                            setErrorMessage('');
+                                        }}
+                                    >
+                                        Log out first.
+                                    </a>
+                                </div>
+                            </div>
+                        )}
+                    </FailedResult>
+                );
         }
     };
     return (

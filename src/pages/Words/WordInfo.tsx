@@ -1,9 +1,9 @@
-import WordCard from '../../components/WordCard';
+import WordCard from '../../components/Words/WordCard';
 import type { Route } from './+types/WordInfo';
 
 import wordService from '../../services/words';
 
-import WordSideButtonGroup from '../../components/WordSideButtonGroup';
+import WordSideButtonGroup from '../../components/Words/WordSideButtonGroup';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {

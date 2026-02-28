@@ -3,7 +3,7 @@ import wordServices from '../services/words';
 import type { Route } from './+types/Learn';
 
 import type { WordWithLearnStatus } from '../types';
-import LearnWord from '../components/LearnWord';
+import LearnWord from '../components/Words/LearnWord';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function clientLoader() {

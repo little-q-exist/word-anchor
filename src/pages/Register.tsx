@@ -1,12 +1,17 @@
-import { Button, Card, Checkbox, Flex, Form, Input, Result, Spin, message } from 'antd';
+import { Button, Card, Checkbox, Flex, Form, Input, Spin, message } from 'antd';
 import type { FormProps, GetProp } from 'antd';
 
 import userService from '../services/users';
 
 import { Link } from 'react-router';
 
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
+import SuccessResult from '../components/common/SuccessResult';
+import FailedResult from '../components/common/FailedResult';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '../store';
+import { logout } from '../features/userSlice';
 
 type FieldType = {
     username: string;
@@ -16,51 +21,6 @@ type FieldType = {
 };
 
 type StatusType = 'idle' | 'loading' | 'success' | 'failed';
-
-const SuccessResult = () => {
-    return (
-        <Result
-            status="success"
-            title="You have successfully registered!"
-            subTitle="please go back and login again."
-            extra={
-                <Button type="primary" key="home">
-                    <Link to="..">Back Home</Link>
-                </Button>
-            }
-        />
-    );
-};
-
-const FailedResult = ({
-    message,
-    setStatus,
-}: {
-    message?: string;
-    setStatus: React.Dispatch<React.SetStateAction<StatusType>>;
-}) => {
-    return (
-        <Result
-            status="error"
-            title="Opps! Something went wrong."
-            subTitle={message || 'please go back or try again.'}
-            extra={[
-                <Button type="default" key="home">
-                    <Link to="..">Back Home</Link>
-                </Button>,
-                <Button
-                    type="primary"
-                    key="return"
-                    onClick={() => {
-                        setStatus('idle');
-                    }}
-                >
-                    Try Again
-                </Button>,
-            ]}
-        />
-    );
-};
 
 type RegisterFormInterface = {
     onFinish: GetProp<FormProps, 'onFinish'>;
@@ -149,9 +109,18 @@ const RegisterForm = ({ onFinish, onFinishFailed }: RegisterFormInterface) => {
 };
 
 const Register = () => {
+    const user = useSelector((state: RootState) => state.user);
     const [status, setStatus] = useState<StatusType>('idle');
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [messageApi, contextHolder] = message.useMessage();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (user && status !== 'success') {
+            setStatus('failed');
+            setErrorMessage('You have already logged in.');
+        }
+    }, [user, status]);
 
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         setStatus('loading');
@@ -188,9 +157,49 @@ const Register = () => {
             case 'idle':
                 return <RegisterForm onFinish={onFinish} onFinishFailed={onFinishFailed} />;
             case 'success':
-                return <SuccessResult />;
+                return (
+                    <SuccessResult>
+                        <Button type="default" key="home">
+                            <Link to="..">Back Home</Link>
+                        </Button>
+                    </SuccessResult>
+                );
             case 'failed':
-                return <FailedResult message={errorMessage} setStatus={setStatus} />;
+                return (
+                    <FailedResult message={errorMessage}>
+                        {!user && (
+                            <>
+                                <Button type="default" key="home">
+                                    <Link to="..">Back Home</Link>
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    key="return"
+                                    onClick={() => {
+                                        setStatus('idle');
+                                    }}
+                                >
+                                    Try Again
+                                </Button>
+                            </>
+                        )}
+                        {user && (
+                            <div>
+                                <div>
+                                    wanna sign up for a new account?{' '}
+                                    <a
+                                        onClick={() => {
+                                            dispatch(logout());
+                                            setStatus('idle');
+                                        }}
+                                    >
+                                        Log out first.
+                                    </a>
+                                </div>
+                            </div>
+                        )}
+                    </FailedResult>
+                );
         }
     };
 

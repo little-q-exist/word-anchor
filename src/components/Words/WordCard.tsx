@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { Word } from '../types';
+import type { Word } from '../../types';
 
 import { Card, Flex, Typography, Space, Tabs, type TabsProps, Skeleton } from 'antd';
 import { useState } from 'react';
@@ -52,7 +52,7 @@ const tabItems: TabsProps['items'] = [
 
 const WordCard = ({ word, visible }: WordInfoProps) => {
     const [tabKey, setTabKey] = useState<TabKeyType>('definitions');
-    
+
     const renderTabContent = () => {
         switch (tabKey) {
             case 'definitions':

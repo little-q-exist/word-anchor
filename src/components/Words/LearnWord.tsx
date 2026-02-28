@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
-import userServices from '../services/users';
+import userServices from '../../services/users';
 
 import WordCard from '../components/WordCard';
 import { Button, Empty, Flex, message, Popover, Timeline } from 'antd';
 
 import { useSelector } from 'react-redux';
-import type { RootState } from '../store';
+import type { RootState } from '../../store';
 import { useNavigate } from 'react-router';
 import WordSideButtonGroup from '../components/WordSideButtonGroup';
-import type { WordWithLearnStatus } from '../types';
+import type { WordWithLearnStatus } from '../../types';
 
 interface LearnWordInterface {
     loadedWords: WordWithLearnStatus[];

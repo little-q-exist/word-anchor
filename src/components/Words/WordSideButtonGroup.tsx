@@ -1,12 +1,12 @@
 import { StarFilled, StarOutlined, LeftOutlined } from '@ant-design/icons';
 import { FloatButton, message } from 'antd';
-import type { RootState } from '../store';
+import type { RootState } from '../../store';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import type { UserLearningData } from '../types';
+import type { UserLearningData } from '../../types';
 
-import userService from '../services/users';
+import userService from '../../services/users';
 
 interface WordSideButtonGroupInterface {
     wordId: string;
