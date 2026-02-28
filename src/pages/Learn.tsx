@@ -4,7 +4,7 @@ import wordServices from '../services/words';
 import userServices from '../services/users';
 
 import WordCard from '../components/WordCard';
-import { Button, Empty, Flex, message } from 'antd';
+import { Button, Empty, Flex, message, Popover, Timeline } from 'antd';
 
 import type { Route } from './+types/Learn';
 
@@ -12,11 +12,19 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { useNavigate } from 'react-router';
 import WordSideButtonGroup from '../components/WordSideButtonGroup';
+import type { Word } from '../types';
+
+interface WordWithLearnStatus extends Word {
+    status: 'idle' | 'passed' | 'failed';
+}
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function clientLoader() {
     const words = await wordServices.getWordToLearn();
-    return { words };
+    const wordsWithStatus: WordWithLearnStatus[] = words.map((word) => {
+        return { ...word, status: 'idle' };
+    });
+    return { words: wordsWithStatus };
 }
 
 const Learn = ({ loaderData }: Route.ComponentProps) => {
@@ -26,7 +34,7 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
 
     const [messageApi, contextHolder] = message.useMessage();
 
-    const words = loaderData.words;
+    const [words, setWords] = useState(loaderData.words);
     const [index, setIndex] = useState(0);
     const [wordToRepeat, setWordToRepeat] = useState<number[]>([]);
     const [isRepeating, setIsRepeating] = useState(false);
@@ -80,9 +88,21 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
             setWordToRepeat((queue) => {
                 const nextQueue = queue.slice(1);
                 if (familiarity < 4) {
+                    words[index].status = 'failed';
+                    setWords((prev) =>
+                        prev.map((prevWord, wordIndex) =>
+                            wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
+                        )
+                    );
                     return nextQueue.concat(index);
+                } else {
+                    setWords((prev) =>
+                        prev.map((prevWord, wordIndex) =>
+                            wordIndex === index ? { ...prevWord, status: 'passed' } : prevWord
+                        )
+                    );
+                    return nextQueue;
                 }
-                return nextQueue;
             });
         } else {
             const { shouldRepeat } = await userServices.updateFamiliarity(
@@ -91,10 +111,36 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
                 familiarity
             );
             if (shouldRepeat) {
+                setWords((prev) =>
+                    prev.map((prevWord, wordIndex) =>
+                        wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
+                    )
+                );
                 setWordToRepeat((queue) => queue.concat(index));
+            } else {
+                setWords((prev) =>
+                    prev.map((prevWord, wordIndex) =>
+                        wordIndex === index ? { ...prevWord, status: 'passed' } : prevWord
+                    )
+                );
             }
         }
         setShouldShowInfo(true);
+    };
+
+    const generateColor = (word: WordWithLearnStatus, wordIndex: number) => {
+        if (wordIndex === index) {
+            return 'blue';
+        } else {
+            switch (word.status) {
+                case 'idle':
+                    return 'gray';
+                case 'passed':
+                    return 'green';
+                case 'failed':
+                    return 'red';
+            }
+        }
     };
 
     if (words.length === 0) {
@@ -108,12 +154,38 @@ const Learn = ({ loaderData }: Route.ComponentProps) => {
     return (
         <>
             {contextHolder}
-            <Flex style={{ height: '100%' }} vertical>
+            <Flex style={{ height: '100%', marginTop: '1rem' }} vertical>
+                <Timeline
+                    orientation="horizontal"
+                    items={words.map((word, wordIndex) => {
+                        return {
+                            content:
+                                index === wordIndex ? (
+                                    <div style={{ color: '#3875f6' }}>{word.english}</div>
+                                ) : word.status === 'passed' ? (
+                                    <Popover
+                                        title={word.english}
+                                        content={
+                                            <div>
+                                                <div>{word.definitions[0].meaning}</div>
+                                                <div>{word.definitions[1]?.meaning}</div>
+                                            </div>
+                                        }
+                                    >
+                                        <div>{word.english}</div>
+                                    </Popover>
+                                ) : (
+                                    <div>{word.english}</div>
+                                ),
+                            color: generateColor(word, wordIndex),
+                        };
+                    })}
+                />
                 <div style={{ flex: 1 }}>
                     <WordCard word={wordToShow} visible={shouldShowInfo} />
                 </div>
 
-                <Flex justify="space-around" gap="middle" style={{ marginBottom: '1rem' }}>
+                <Flex justify="space-around" gap="middle" style={{ marginBottom: '2rem' }}>
                     {!shouldShowInfo && (
                         <>
                             <Button
