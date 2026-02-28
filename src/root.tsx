@@ -1,5 +1,12 @@
-import { Button, Result, Skeleton } from 'antd';
-import { isRouteErrorResponse, Link, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import { Button, Flex, Result, Spin } from 'antd';
+import {
+    isRouteErrorResponse,
+    Link,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+    useNavigation,
+} from 'react-router';
 import type { Route } from './+types/root';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -32,7 +39,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function HydrateFallback() {
-    return <Skeleton active />;
+    return (
+        <Flex justify="center" align="center" vertical>
+            <Spin />
+        </Flex>
+    );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
@@ -67,12 +78,18 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
 const App = () => {
     const dispatch = useDispatch();
+    const navigation = useNavigation();
 
     useEffect(() => {
         dispatch(login());
     }, [dispatch]);
 
-    return <Outlet />;
+    return (
+        <>
+            <Spin spinning={navigation.state === 'loading'} fullscreen />
+            <Outlet />
+        </>
+    );
 };
 
 export default App;
