@@ -1,6 +1,6 @@
 import { Avatar, Layout, Menu, type MenuProps } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, Outlet, useLocation } from 'react-router';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import type { RootState } from '../store';
 import { logout } from '../features/userSlice';
 
@@ -13,7 +13,7 @@ const BackgroundLayout = () => {
     const dispatch = useDispatch();
     const location = useLocation();
 
-    const loginItem: MenuItem = { label: <Link to={`/login`}>LOGIN</Link>, key: '/login' };
+    const loginItem: MenuItem = { label: <NavLink to={`/login`}>LOGIN</NavLink>, key: '/login' };
 
     const userItem: MenuItem = {
         label: (
@@ -40,8 +40,13 @@ const BackgroundLayout = () => {
     };
 
     const menuItems: MenuItem[] = [
-        { label: <Link to={`/learn`}>LEARN</Link>, key: '/learn' },
-        { label: <Link to="/words">WORDS</Link>, key: '/words' },
+        ...(user
+            ? [
+                  { label: <NavLink to={`/learn`}>LEARN</NavLink>, key: '/learn' },
+                  { label: <NavLink to={'/review'}>REVIEW</NavLink>, key: '/review' },
+              ]
+            : []),
+        { label: <NavLink to="/words">WORDS</NavLink>, key: '/words' },
         user ? userItem : loginItem,
     ];
 
