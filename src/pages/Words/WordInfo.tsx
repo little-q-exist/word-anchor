@@ -19,8 +19,8 @@ const WordInfo = ({ loaderData }: Route.ComponentProps) => {
     return (
         <>
             <div style={{ height: '100%' }}>
-                <WordCard word={word} visible={true} />
-                <WordSideButtonGroup wordId={word._id} />
+                <WordCard word={word} visible={true} key={word._id} />
+                <WordSideButtonGroup wordId={word._id} showReturn />
             </div>
         </>
     );

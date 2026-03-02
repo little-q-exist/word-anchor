@@ -170,7 +170,7 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
                     })}
                 />
                 <div style={{ flex: 1 }}>
-                    <WordCard word={wordToShow} visible={shouldShowInfo} />
+                    <WordCard word={wordToShow} visible={shouldShowInfo} key={wordToShow._id} />
                 </div>
 
                 <Flex justify="space-around" gap="middle" style={{ marginBottom: '2rem' }}>

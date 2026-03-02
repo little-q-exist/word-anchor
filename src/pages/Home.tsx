@@ -19,7 +19,7 @@ const Home = () => {
         <Flex style={{ height: '100%' }} align="center" justify="center">
             {!user && (
                 <>
-                    <Flex flex={3} justify="center" style={{ padding: '0 20px' }}>
+                    <Flex flex={3} justify="center" style={{ padding: '0 2rem' }}>
                         <Title level={1} style={{ margin: 0, textAlign: 'center' }}>
                             {HOME_TITLE[titleIndex]}
                         </Title>
@@ -40,7 +40,7 @@ const Home = () => {
             )}
             {user && (
                 <>
-                    <Flex flex={3} justify="center" style={{ padding: '0 20px' }}>
+                    <Flex flex={3} justify="center" style={{ padding: '0 2rem' }}>
                         <Title level={1} style={{ margin: 0, textAlign: 'center' }}>
                             {HOME_TITLE[titleIndex]}
                         </Title>
