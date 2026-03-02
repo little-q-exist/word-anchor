@@ -25,7 +25,7 @@ interface getParamInterface {
     limit?: number;
     page?: number;
 }
-const getBy = async (params: getParamInterface): Promise<Word[]> => {
+const getBy = async (params: getParamInterface): Promise<{ words: Word[]; count: number }> => {
     const response = await axios.get(APIURL, {
         params,
     });

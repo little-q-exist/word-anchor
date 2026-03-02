@@ -12,31 +12,23 @@ const { Column, ColumnGroup } = Table;
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function clientLoader() {
-    const [count, tags] = await Promise.all([wordServices.getCount(), wordServices.getTags()]);
-    return { count, tags };
+    const [tags] = await Promise.all([wordServices.getTags()]);
+    return { tags };
 }
 
 type SearchProps = GetProps<typeof Input.Search>;
-type SearchStateType =
-    | {
-          english: string | undefined;
-          type: 'Eng';
-      }
-    | {
-          meaning: string | undefined;
-          type: 'Zh';
-      };
+type SearchStateType = { type: 'Eng' | 'Zh'; value: string | undefined };
 
 const Words = ({ loaderData }: Route.ComponentProps) => {
-    const wordCount = loaderData.count;
     const allTags = loaderData.tags;
 
     const [page, setPage] = useState(1);
     const [words, setWords] = useState<Word[]>([]);
+    const [wordTotalCount, setWordTotalCount] = useState(0);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [loadingStatus, setLoadingStatus] = useState(false);
     const [searchValue, setSearchValue] = useState<SearchStateType>({
-        english: undefined,
+        value: undefined,
         type: 'Eng',
     });
 
@@ -44,20 +36,17 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
         const tags = selectedTags.length > 0 ? selectedTags.join(',') : undefined;
         setLoadingStatus(true);
 
-        const searchParams: { page: number; tags?: string; english?: string; meaning?: string } = {
-            page,
-            tags,
-        };
-        if (searchValue.type === 'Eng') {
-            searchParams.english = searchValue.english;
-        } else {
-            searchParams.meaning = searchValue.meaning;
-        }
-
-        wordServices.getBy(searchParams).then((words) => {
-            setWords(words);
-            setLoadingStatus(false);
-        });
+        wordServices
+            .getBy({
+                page,
+                tags,
+                [searchValue.type === 'Eng' ? 'english' : 'meaning']: searchValue.value,
+            })
+            .then(({ words, count }) => {
+                setWords(words);
+                setWordTotalCount(count);
+                setLoadingStatus(false);
+            });
     }, [page, searchValue, selectedTags]);
 
     useEffect(() => {
@@ -69,20 +58,12 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
     });
 
     const onSearch: SearchProps['onSearch'] = async (value) => {
-        if (searchValue.type === 'Eng') {
-            setSearchValue({ english: value || undefined, type: 'Eng' });
-        } else {
-            setSearchValue({ meaning: value || undefined, type: 'Zh' });
-        }
+        setSearchValue((prev) => ({ ...prev, value: value || undefined }));
         setPage(1);
     };
 
     const handleAutoSearch = useDebounce((e: React.ChangeEvent<HTMLInputElement>) => {
-        if (searchValue.type === 'Eng') {
-            setSearchValue({ english: e.target.value || undefined, type: 'Eng' });
-        } else {
-            setSearchValue({ meaning: e.target.value || undefined, type: 'Zh' });
-        }
+        setSearchValue((prev) => ({ ...prev, value: e.target.value || undefined }));
         setPage(1);
     }, 500);
 
@@ -98,14 +79,10 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
                                 { value: 'Zh', label: 'Zh' },
                             ]}
                             onChange={(value: 'Eng' | 'Zh') => {
-                                let searchVal: SearchStateType = {
-                                    type: 'Eng',
-                                    english: undefined,
-                                };
-                                if (value === 'Zh') {
-                                    searchVal = { type: 'Zh', meaning: undefined };
-                                }
-                                setSearchValue(searchVal);
+                                setSearchValue({
+                                    type: value,
+                                    value: undefined,
+                                });
                             }}
                         />
                         <Input.Search
@@ -135,7 +112,7 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
                 <Table<Word>
                     dataSource={wordsToShow}
                     pagination={{
-                        total: wordCount,
+                        total: wordTotalCount,
                         current: page,
                         pageSize: 9,
                         onChange(page) {
