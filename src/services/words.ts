@@ -37,6 +37,11 @@ const getCount = async () => {
     return response.data;
 };
 
+const getTags = async (): Promise<string[]> => {
+    const response = await axios.get(`${APIURL}/tags`);
+    return response.data;
+};
+
 const update = async (word: Word) => {
     const response = await axios.put(`${APIURL}/${word._id}`, word);
     return response.data;
@@ -47,4 +52,4 @@ const post = async (word: NewWord): Promise<Word> => {
     return response.data;
 };
 
-export default { getWordToLearn, getWordToReview, getBy, getCount, update, post };
+export default { getWordToLearn, getWordToReview, getBy, getCount, getTags, update, post };
