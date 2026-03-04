@@ -9,7 +9,7 @@ import WordSideButtonGroup from '../../components/Words/WordSideButtonGroup';
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
     const english = params.english;
     const words = await wordService.getBy({ english });
-    const word = words[0];
+    const word = words.words[0];
     return { word };
 }
 
