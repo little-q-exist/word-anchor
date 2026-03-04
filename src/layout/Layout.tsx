@@ -74,7 +74,7 @@ const BackgroundLayout = () => {
                     selectedKeys={[location.pathname]}
                 />
             </Header>
-            <Content style={{ margin: '0 1.5rem' }}>
+            <Content style={{ padding: '0 1.5rem' }}>
                 <Outlet />
             </Content>
         </Layout>
