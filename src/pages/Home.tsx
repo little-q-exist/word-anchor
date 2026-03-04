@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import type { RootState } from '../store';
 import {
     BookOutlined,
+    CalendarOutlined,
     RocketOutlined,
     SafetyCertificateOutlined,
     ThunderboltOutlined,
@@ -111,7 +112,7 @@ const Home = () => {
                                     <Button
                                         ghost
                                         size="large"
-                                        icon={<BookOutlined />}
+                                        icon={<CalendarOutlined />}
                                         style={{
                                             height: '3.5rem',
                                             padding: '0 3rem',

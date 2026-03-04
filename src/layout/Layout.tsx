@@ -1,8 +1,10 @@
-import { Avatar, Layout, Menu, type MenuProps } from 'antd';
+import { Avatar, Flex, Layout, Menu, type MenuProps } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import type { RootState } from '../store';
 import { logout } from '../features/userSlice';
+import Title from 'antd/es/typography/Title';
+import { BookOutlined } from '@ant-design/icons';
 
 const { Header, Content } = Layout;
 
@@ -53,20 +55,14 @@ const BackgroundLayout = () => {
     return (
         <Layout style={{ height: '100%' }}>
             <Header style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff' }}>
-                <div
-                    style={{
-                        backgroundColor: '#f9fafb',
-                        borderRadius: '5px',
-                        width: '5rem',
-                        margin: '.7rem 1rem',
-                        display: 'block',
-                        textAlign: 'center',
-                        lineHeight: '32px',
-                        color: 'black',
-                    }}
-                >
-                    <Link to="..">LOGO</Link>
-                </div>
+                <Link to="..">
+                    <Flex align="center" gap={'small'}>
+                        <BookOutlined style={{ fontSize: '1.5rem' }} />
+                        <Title level={1} style={{ fontSize: '1.5rem', margin: 0 }}>
+                            WordAnchor
+                        </Title>
+                    </Flex>
+                </Link>
                 <Menu
                     mode="horizontal"
                     items={menuItems}
