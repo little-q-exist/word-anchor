@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import type { NewUser, User, UserLearningData } from '../types';
+import type { NewUser, User, UserLearningData, UserStats } from '../types';
 
 import globalConfig from './config';
 
@@ -51,4 +51,16 @@ const getLearningData = async <T extends keyof UserLearningData>(
     return response.data;
 };
 
-export default { getUserById, updateFamiliarity, register, updateFavorite, getLearningData };
+const getUserStats = async (userId: string): Promise<UserStats> => {
+    const response = await axios.get(`${APIURL}/${userId}/stats`);
+    return response.data;
+};
+
+export default {
+    getUserById,
+    updateFamiliarity,
+    register,
+    updateFavorite,
+    getLearningData,
+    getUserStats,
+};

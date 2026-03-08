@@ -48,3 +48,8 @@ export interface User {
     username: string;
     _id: string;
 }
+
+export interface UserStats {
+    todayCount: number;
+    totalCount: number;
+}

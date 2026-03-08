@@ -10,5 +10,6 @@ export default [
         route('learn', 'pages/Learn.tsx'),
         route('words/:english', 'pages/Words/WordInfo.tsx'),
         route('review', 'pages/Review.tsx'),
+        route('profile', 'pages/Profile.tsx'),
     ]),
 ] satisfies RouteConfig;
