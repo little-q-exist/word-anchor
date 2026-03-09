@@ -11,6 +11,7 @@ import type { Route } from './+types/root';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from './features/userSlice';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export function Layout({ children }: { children: React.ReactNode }) {
     const resetStyle = {
@@ -76,6 +77,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     }
 }
 
+const queryClient = new QueryClient();
+
 const App = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -85,10 +88,10 @@ const App = () => {
     }, [dispatch]);
 
     return (
-        <>
+        <QueryClientProvider client={queryClient}>
             <Spin spinning={navigation.state === 'loading'} fullscreen />
             <Outlet />
-        </>
+        </QueryClientProvider>
     );
 };
 

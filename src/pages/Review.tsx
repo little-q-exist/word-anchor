@@ -1,22 +1,32 @@
 import LearnWord from '../components/Words/LearnWord';
 import wordServices from '../services/words';
 import type { WordWithLearnStatus } from '../types';
-import type { Route } from './+types/Review';
+import { useQuery } from '@tanstack/react-query';
+import { Flex, Spin } from 'antd';
 
-// eslint-disable-next-line react-refresh/only-export-components
-export async function clientLoader() {
-    const words = await wordServices.getWordToReview();
-    const wordsWithStatus: WordWithLearnStatus[] = words.map((word) => {
-        return { ...word, status: 'idle' };
+const Review = () => {
+    const { data, isError } = useQuery({
+        queryKey: ['reviewWords'],
+        queryFn: () => wordServices.getWordToReview(),
+        refetchOnWindowFocus: false,
     });
-    return { words: wordsWithStatus };
-}
 
-const Review = ({ loaderData }: Route.ComponentProps) => {
+    console.log('data', data);
+
+    const wordsWithStatus: WordWithLearnStatus[] =
+        data?.map((word) => {
+            return { ...word, status: 'idle' };
+        }) || [];
+
+    if (isError) {
+        return <div style={{ padding: '24px' }}>some error occurred</div>;
+    }
+
     return (
-        <>
-            <LearnWord loadedWords={loaderData.words} />
-        </>
+        <Flex vertical justify="center" style={{ height: '100%' }}>
+            {data && <LearnWord loadedWords={wordsWithStatus} />}
+            {!data && <Spin size="large" />}
+        </Flex>
     );
 };
 
