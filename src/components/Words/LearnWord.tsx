@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import userServices from '../../services/users';
 
@@ -9,24 +9,34 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { useNavigate } from 'react-router';
 import WordSideButtonGroup from './WordSideButtonGroup';
-import type { WordWithLearnStatus } from '../../types';
+import type { Word, WordWithLearnStatus } from '../../types';
+import LearnResult from './LearnResult';
 
 interface LearnWordInterface {
-    loadedWords: WordWithLearnStatus[];
+    loadedWords: Word[];
 }
 
 const LearnWord = ({ loadedWords }: LearnWordInterface) => {
     const user = useSelector((state: RootState) => state.user);
 
+    const wordsWithStatus: WordWithLearnStatus[] = useMemo(() => {
+        return (
+            loadedWords?.map((word) => {
+                return { ...word, status: 'idle' };
+            }) || []
+        );
+    }, [loadedWords]);
+
     const navigate = useNavigate();
 
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [words, setWords] = useState(loadedWords);
+    const [words, setWords] = useState(wordsWithStatus);
     const [index, setIndex] = useState(0);
     const [wordToRepeat, setWordToRepeat] = useState<number[]>([]);
     const [isRepeating, setIsRepeating] = useState(false);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
+    const [isFinished, setIsFinished] = useState(false);
     const wordToShow = words[index];
 
     const navigateToNextWord = () => {
@@ -38,12 +48,7 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
                     setIsRepeating(true);
                     setIndex(wordToRepeat[0]);
                 } else {
-                    messageApi.info(
-                        'You have finished learning all the words for today! Great job!'
-                    );
-                    setTimeout(() => {
-                        navigate('..');
-                    }, 3000);
+                    setIsFinished(true);
                     return;
                 }
             }
@@ -51,12 +56,7 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
             if (wordToRepeat.length > 0) {
                 setIndex(wordToRepeat[0]);
             } else {
-                messageApi.success(
-                    'You have finished learning all the words for today! Great job!'
-                );
-                setTimeout(() => {
-                    navigate('..');
-                }, 3000);
+                setIsFinished(true);
                 return;
             }
         }
@@ -139,6 +139,10 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
         );
     }
 
+    if (isFinished) {
+        return <LearnResult words={words} />;
+    }
+
     return (
         <>
             {contextHolder}
@@ -209,7 +213,7 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
                         </Button>
                     )}
                 </Flex>
-                <WordSideButtonGroup wordId={wordToShow._id} showReturn={false} />
+                <WordSideButtonGroup wordId={wordToShow._id} returnOption={{ showReturn: false }} />
             </Flex>
         </>
     );
