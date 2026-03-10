@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router';
 import WordSideButtonGroup from './WordSideButtonGroup';
 import type { Word, WordWithLearnStatus } from '../../types';
 import LearnResult from './LearnResult';
+import { useMutation } from '@tanstack/react-query';
 
 interface LearnWordInterface {
     loadedWords: Word[];
@@ -38,6 +39,46 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
     const [isFinished, setIsFinished] = useState(false);
     const wordToShow = words[index];
+
+    const farmiliarityMutation = useMutation({
+        mutationFn: ({
+            userId,
+            wordId,
+            familiarity,
+        }: {
+            userId: string;
+            wordId: string;
+            familiarity: number;
+        }) => userServices.updateFamiliarity(userId, wordId, familiarity),
+        onMutate({ familiarity }) {
+            const shouldRepeat = familiarity < 4;
+            if (shouldRepeat) {
+                setWords((prev) =>
+                    prev.map((prevWord, wordIndex) =>
+                        wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
+                    )
+                );
+                setWordToRepeat((queue) => queue.concat(index));
+            } else {
+                setWords((prev) =>
+                    prev.map((prevWord, wordIndex) =>
+                        wordIndex === index ? { ...prevWord, status: 'passed' } : prevWord
+                    )
+                );
+            }
+        },
+        onError(error) {
+            messageApi.error('Failed to update familiarity. Please try again.');
+            console.error(error);
+            setShouldShowInfo(false);
+            setWordToRepeat((queue) => queue.filter((i) => i !== index));
+            setWords((prev) =>
+                prev.map((prevWord, wordIndex) =>
+                    wordIndex === index ? { ...prevWord, status: 'idle' } : prevWord
+                )
+            );
+        },
+    });
 
     const navigateToNextWord = () => {
         if (!isRepeating) {
@@ -76,7 +117,6 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
             setWordToRepeat((queue) => {
                 const nextQueue = queue.slice(1);
                 if (familiarity < 4) {
-                    words[index].status = 'failed';
                     setWords((prev) =>
                         prev.map((prevWord, wordIndex) =>
                             wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
@@ -93,25 +133,7 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
                 }
             });
         } else {
-            const { shouldRepeat } = await userServices.updateFamiliarity(
-                user._id,
-                wordToShow._id,
-                familiarity
-            );
-            if (shouldRepeat) {
-                setWords((prev) =>
-                    prev.map((prevWord, wordIndex) =>
-                        wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
-                    )
-                );
-                setWordToRepeat((queue) => queue.concat(index));
-            } else {
-                setWords((prev) =>
-                    prev.map((prevWord, wordIndex) =>
-                        wordIndex === index ? { ...prevWord, status: 'passed' } : prevWord
-                    )
-                );
-            }
+            farmiliarityMutation.mutate({ userId: user._id, wordId: wordToShow._id, familiarity });
         }
         setShouldShowInfo(true);
     };
