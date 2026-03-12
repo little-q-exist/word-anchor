@@ -65,7 +65,7 @@ src/
 
 1. 克隆项目仓库到本地：
 ```bash
-git clone [your-repo-url]
+git clone git@github.com:little-q-exist/word-anchor.git
 cd recite-word
 ```
 
