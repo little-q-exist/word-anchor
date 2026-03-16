@@ -1,10 +1,10 @@
 import LearnWord from '../components/Words/LearnWord';
 import wordServices from '../services/words';
 import { useQuery } from '@tanstack/react-query';
-import { Flex, Spin } from 'antd';
+import { Flex } from 'antd';
 
 const Review = () => {
-    const { data, isError, isFetching } = useQuery({
+    const { data, isError, isPending } = useQuery({
         queryKey: ['reviewWords'],
         queryFn: () => wordServices.getWordToReview(),
         refetchOnWindowFocus: false,
@@ -16,11 +16,16 @@ const Review = () => {
 
     return (
         <Flex vertical justify="center" style={{ height: '100%' }}>
-            {isFetching ? (
-                <Spin size="large" />
-            ) : data ? (
-                <LearnWord key={data.map((w) => w._id).join(',')} loadedWords={data} />
-            ) : null}
+            {!isPending ? (
+                <LearnWord
+                    key={data.wordIds.map((i) => i.english).join(',')}
+                    loadedWords={data.wordIds}
+                    mode={data.mode}
+                    isLoading={isPending}
+                />
+            ) : (
+                <LearnWord isLoading={isPending} />
+            )}
         </Flex>
     );
 };

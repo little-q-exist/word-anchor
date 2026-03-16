@@ -1,29 +1,45 @@
 import { useMemo, useState } from 'react';
 
 import userServices from '../../services/users';
+import wordServices from '../../services/words';
 
 import WordCard from './WordCard';
-import { Button, Empty, Flex, message, Popover, Timeline } from 'antd';
+import { Button, Empty, Flex, message, Spin, Timeline } from 'antd';
 
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { useNavigate } from 'react-router';
 import WordSideButtonGroup from './WordSideButtonGroup';
-import type { Word, WordWithLearnStatus } from '../../types';
+import type { BriefWord, BriefWordWithLearnStatus } from '../../types';
 import LearnResult from './LearnResult';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-interface LearnWordInterface {
-    loadedWords: Word[];
-}
+type LearnWordInterface =
+    | {
+          isLoading: false;
+          loadedWords: BriefWord[];
+          mode: 'learn' | 'review';
+      }
+    | {
+          isLoading: true;
+      };
 
-const LearnWord = ({ loadedWords }: LearnWordInterface) => {
+const LearnWord = (props: LearnWordInterface) => {
+    const { isLoading } = props;
+    const loadedWords = useMemo(() => {
+        return !isLoading && 'loadedWords' in props ? props.loadedWords : [];
+    }, [isLoading, props]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+    const mode = useMemo(() => {
+        return !isLoading && 'mode' in props ? props.mode : 'learn';
+    }, [isLoading, props]);
+
     const user = useSelector((state: RootState) => state.user);
 
-    const wordsWithStatus: WordWithLearnStatus[] = useMemo(() => {
+    const wordsWithStatus: BriefWordWithLearnStatus[] = useMemo(() => {
         return (
-            loadedWords?.map((word) => {
-                return { ...word, status: 'idle' };
+            loadedWords.map((briefWord) => {
+                return { ...briefWord, status: 'idle' };
             }) || []
         );
     }, [loadedWords]);
@@ -32,15 +48,25 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
 
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [words, setWords] = useState(wordsWithStatus);
+    const [wordIds, setWordIds] = useState(wordsWithStatus);
     const [index, setIndex] = useState(0);
     const [wordToRepeat, setWordToRepeat] = useState<number[]>([]);
     const [isRepeating, setIsRepeating] = useState(false);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
     const [isFinished, setIsFinished] = useState(false);
-    const wordToShow = words[index];
 
-    const farmiliarityMutation = useMutation({
+    const {
+        data: wordToShow,
+        isError,
+        isPending,
+    } = useQuery({
+        queryKey: ['word', wordIds[index]._id],
+        queryFn: () => wordServices.getById(wordIds[index]._id),
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+    });
+
+    const familiarityMutation = useMutation({
         mutationFn: ({
             userId,
             wordId,
@@ -53,14 +79,14 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
         onMutate({ familiarity }) {
             const shouldRepeat = familiarity < 4;
             if (shouldRepeat) {
-                setWords((prev) =>
+                setWordIds((prev) =>
                     prev.map((prevWord, wordIndex) =>
                         wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
                     )
                 );
                 setWordToRepeat((queue) => queue.concat(index));
             } else {
-                setWords((prev) =>
+                setWordIds((prev) =>
                     prev.map((prevWord, wordIndex) =>
                         wordIndex === index ? { ...prevWord, status: 'passed' } : prevWord
                     )
@@ -72,7 +98,7 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
             console.error(error);
             setShouldShowInfo(false);
             setWordToRepeat((queue) => queue.filter((i) => i !== index));
-            setWords((prev) =>
+            setWordIds((prev) =>
                 prev.map((prevWord, wordIndex) =>
                     wordIndex === index ? { ...prevWord, status: 'idle' } : prevWord
                 )
@@ -82,7 +108,7 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
 
     const navigateToNextWord = () => {
         if (!isRepeating) {
-            if (index < words.length - 1) {
+            if (index < wordIds.length - 1) {
                 setIndex(index + 1);
             } else {
                 if (wordToRepeat.length > 0) {
@@ -117,14 +143,14 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
             setWordToRepeat((queue) => {
                 const nextQueue = queue.slice(1);
                 if (familiarity < 4) {
-                    setWords((prev) =>
+                    setWordIds((prev) =>
                         prev.map((prevWord, wordIndex) =>
                             wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
                         )
                     );
                     return nextQueue.concat(index);
                 } else {
-                    setWords((prev) =>
+                    setWordIds((prev) =>
                         prev.map((prevWord, wordIndex) =>
                             wordIndex === index ? { ...prevWord, status: 'passed' } : prevWord
                         )
@@ -133,12 +159,16 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
                 }
             });
         } else {
-            farmiliarityMutation.mutate({ userId: user._id, wordId: wordToShow._id, familiarity });
+            familiarityMutation.mutate({
+                userId: user._id,
+                wordId: wordIds[index]._id,
+                familiarity,
+            });
         }
         setShouldShowInfo(true);
     };
 
-    const generateColor = (word: WordWithLearnStatus, wordIndex: number) => {
+    const generateColor = (word: BriefWordWithLearnStatus, wordIndex: number) => {
         if (wordIndex === index) {
             return 'blue';
         } else {
@@ -153,7 +183,7 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
         }
     };
 
-    if (words.length === 0) {
+    if (wordIds.length === 0) {
         return (
             <Flex style={{ height: '100%' }} justify="center" align="center">
                 <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -162,7 +192,19 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
     }
 
     if (isFinished) {
-        return <LearnResult words={words} />;
+        return <LearnResult words={wordIds} />;
+    }
+
+    if (isLoading || isPending) {
+        return (
+            <Flex style={{ height: '100%' }} justify="center" align="center">
+                <Spin spinning />
+            </Flex>
+        );
+    }
+
+    if (isError) {
+        return <div>some error occurred</div>;
     }
 
     return (
@@ -171,26 +213,9 @@ const LearnWord = ({ loadedWords }: LearnWordInterface) => {
             <Flex style={{ height: '100%', marginTop: '1rem' }} vertical>
                 <Timeline
                     orientation="horizontal"
-                    items={words.map((word, wordIndex) => {
+                    items={wordIds.map((word, wordIndex) => {
                         return {
-                            content:
-                                index === wordIndex ? (
-                                    <div style={{ color: '#3875f6' }}>{word.english}</div>
-                                ) : word.status === 'passed' ? (
-                                    <Popover
-                                        title={word.english}
-                                        content={
-                                            <div>
-                                                <div>{word.definitions[0].meaning}</div>
-                                                <div>{word.definitions[1]?.meaning}</div>
-                                            </div>
-                                        }
-                                    >
-                                        <div>{word.english}</div>
-                                    </Popover>
-                                ) : (
-                                    <div>{word.english}</div>
-                                ),
+                            content: <div>{word.english}</div>,
                             color: generateColor(word, wordIndex),
                         };
                     })}
