@@ -27,11 +27,11 @@ type LearnWordInterface =
 const LearnWord = (props: LearnWordInterface) => {
     const { isLoading } = props;
     const loadedWords = useMemo(() => {
-        return !isLoading && 'loadedWords' in props ? props.loadedWords : [];
+        return !isLoading ? props.loadedWords : [];
     }, [isLoading, props]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
     const mode = useMemo(() => {
-        return !isLoading && 'mode' in props ? props.mode : 'learn';
+        return !isLoading ? props.mode : 'learn';
     }, [isLoading, props]);
 
     const user = useSelector((state: RootState) => state.user);
@@ -60,8 +60,9 @@ const LearnWord = (props: LearnWordInterface) => {
         isError,
         isPending,
     } = useQuery({
-        queryKey: ['word', wordIds[index]._id],
+        queryKey: ['word', wordIds[index]?._id],
         queryFn: () => wordServices.getById(wordIds[index]._id),
+        enabled: !!wordIds[index]?._id,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
     });
@@ -183,14 +184,6 @@ const LearnWord = (props: LearnWordInterface) => {
         }
     };
 
-    if (wordIds.length === 0) {
-        return (
-            <Flex style={{ height: '100%' }} justify="center" align="center">
-                <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            </Flex>
-        );
-    }
-
     if (isFinished) {
         return <LearnResult words={wordIds} />;
     }
@@ -205,6 +198,14 @@ const LearnWord = (props: LearnWordInterface) => {
 
     if (isError) {
         return <div>some error occurred</div>;
+    }
+
+    if (wordIds.length === 0) {
+        return (
+            <Flex style={{ height: '100%' }} justify="center" align="center">
+                <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            </Flex>
+        );
     }
 
     return (

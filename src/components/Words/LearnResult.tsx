@@ -1,16 +1,17 @@
 import { Flex, Table, Button } from 'antd';
 import { useNavigate } from 'react-router';
-import type { Word, WordWithLearnStatus } from '../../types';
+import type { Word, BriefWordWithLearnStatus } from '../../types';
 
 const { Column, ColumnGroup } = Table;
 
 interface LearnResultProps {
-    words: WordWithLearnStatus[];
+    words: BriefWordWithLearnStatus[];
 }
 
 const LearnResult = ({ words }: LearnResultProps) => {
     const navigate = useNavigate();
 
+    // TODO: fetch full word data for all words in the list to show more info in the result page, currently only english and phonetic are shown, we can show part of speech and meaning as well after fetching full data
     const wordsToShow = words.map((word) => {
         return { ...word, key: word._id };
     });
@@ -18,7 +19,7 @@ const LearnResult = ({ words }: LearnResultProps) => {
     return (
         <Flex vertical gap="middle" style={{ margin: '1rem 0', height: '100%' }}>
             <h2 style={{ textAlign: 'center' }}>Learning Complete!</h2>
-            <Table<WordWithLearnStatus>
+            <Table<BriefWordWithLearnStatus>
                 dataSource={wordsToShow}
                 pagination={false}
                 style={{ flex: 1, overflow: 'auto' }}
