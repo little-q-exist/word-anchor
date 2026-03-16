@@ -77,31 +77,41 @@ const LearnWord = (props: LearnWordInterface) => {
             wordId: string;
             familiarity: number;
         }) => userServices.updateFamiliarity(userId, wordId, familiarity),
-        onMutate({ familiarity }) {
+        onMutate({ familiarity, wordId }) {
             const shouldRepeat = familiarity < 4;
             if (shouldRepeat) {
                 setWordIds((prev) =>
-                    prev.map((prevWord, wordIndex) =>
-                        wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
+                    prev.map((prevWord) =>
+                        prevWord._id === wordId ? { ...prevWord, status: 'failed' } : prevWord
                     )
                 );
-                setWordToRepeat((queue) => queue.concat(index));
+                setWordToRepeat((queue) => {
+                    const targetIndex = wordIds.findIndex((w) => w._id === wordId);
+                    return targetIndex === -1 ? queue : queue.concat(targetIndex);
+                });
             } else {
                 setWordIds((prev) =>
-                    prev.map((prevWord, wordIndex) =>
-                        wordIndex === index ? { ...prevWord, status: 'passed' } : prevWord
+                    prev.map((prevWord) =>
+                        prevWord._id === wordId ? { ...prevWord, status: 'passed' } : prevWord
                     )
                 );
             }
         },
-        onError(error) {
+        onError(error, _variables) {
             messageApi.error('Failed to update familiarity. Please try again.');
             console.error(error);
             setShouldShowInfo(false);
-            setWordToRepeat((queue) => queue.filter((i) => i !== index));
+            const wordId = _variables?.wordId;
+            if (!wordId) {
+                return;
+            }
+            setWordToRepeat((queue) => {
+                const targetIndex = wordIds.findIndex((w) => w._id === wordId);
+                return targetIndex === -1 ? queue : queue.filter((i) => i !== targetIndex);
+            });
             setWordIds((prev) =>
-                prev.map((prevWord, wordIndex) =>
-                    wordIndex === index ? { ...prevWord, status: 'idle' } : prevWord
+                prev.map((prevWord) =>
+                    prevWord._id === wordId ? { ...prevWord, status: 'idle' } : prevWord
                 )
             );
         },
