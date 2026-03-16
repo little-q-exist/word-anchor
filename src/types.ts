@@ -23,8 +23,18 @@ export interface Word {
     createdBy: string;
 }
 
-export interface WordWithLearnStatus extends Word {
+export interface BriefWord {
+    _id: string;
+    english: string;
+}
+
+export interface BriefWordWithLearnStatus extends BriefWord {
     status: 'idle' | 'passed' | 'failed';
+}
+
+export interface BriefWordListWithMode {
+    wordIds: BriefWord[];
+    mode: 'learn' | 'review';
 }
 
 export interface UserLearningData {
