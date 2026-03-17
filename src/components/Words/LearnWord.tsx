@@ -29,10 +29,6 @@ const LearnWord = (props: LearnWordInterface) => {
     const loadedWords = useMemo(() => {
         return !isBriefWordLoading ? props.loadedWords : [];
     }, [isBriefWordLoading, props]);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-    const mode = useMemo(() => {
-        return !isBriefWordLoading ? props.mode : 'learn';
-    }, [isBriefWordLoading, props]);
 
     const user = useSelector((state: RootState) => state.user);
 

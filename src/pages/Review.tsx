@@ -18,7 +18,6 @@ const Review = () => {
         <Flex vertical justify="center" style={{ height: '100%' }}>
             {!isPending ? (
                 <LearnWord
-                    key={data.words.map((i) => i.english).join(',')}
                     loadedWords={data.words}
                     mode={data.mode}
                     isBriefWordLoading={isPending}

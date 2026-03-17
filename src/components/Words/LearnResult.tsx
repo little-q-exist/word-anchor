@@ -10,6 +10,14 @@ interface LearnResultProps {
     briefWords: BriefWordWithLearnStatus[];
 }
 
+interface DetailedWordRow {
+    key: string;
+    isLoading: boolean;
+    english?: string;
+    phonetic?: string;
+    definitions?: { partOfSpeech: string; meaning: string }[];
+}
+
 const LearnResult = ({ briefWords }: LearnResultProps) => {
     const navigate = useNavigate();
 
@@ -25,13 +33,17 @@ const LearnResult = ({ briefWords }: LearnResultProps) => {
     const detailedWordsQuery = useQueries({
         queries: briefWords.map((word) => fetchDetailedWordDataOption(word._id)),
         combine: (results) => {
-            return results.map((result, index) => {
-                return { ...result.data, key: briefWords[index]._id, isLoading: result.isLoading };
+            return results.map((result, index): DetailedWordRow => {
+                return {
+                    ...(result.data ?? {}),
+                    key: briefWords[index]._id,
+                    isLoading: result.isLoading,
+                };
             });
         },
     });
 
-    type DetailedWordWithLoading = (typeof detailedWordsQuery)[number];
+    type DetailedWordWithLoading = DetailedWordRow;
 
     return (
         <Flex vertical gap="middle" style={{ margin: '1rem 0', height: '100%' }}>
