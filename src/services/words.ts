@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import type { NewWord, Word } from '../types';
+import type { NewWord, Word, BriefWordListWithMode } from '../types';
 
 import globalConfig from './config';
 
@@ -8,12 +8,12 @@ globalConfig();
 
 const APIURL = `/words`;
 
-const getWordToLearn = async (limit?: number): Promise<Word[]> => {
+const getWordToLearn = async (limit?: number): Promise<BriefWordListWithMode> => {
     const response = await axios.get(`${APIURL}/learn${limit ? `?limit=${limit}` : ''}`);
     return response.data;
 };
 
-const getWordToReview = async (): Promise<Word[]> => {
+const getWordToReview = async (): Promise<BriefWordListWithMode> => {
     const response = await axios.get(`${APIURL}/review`);
     return response.data;
 };
@@ -29,6 +29,11 @@ const getBy = async (params: getParamInterface): Promise<{ words: Word[]; count:
     const response = await axios.get(APIURL, {
         params,
     });
+    return response.data;
+};
+
+const getById = async (id: string): Promise<Word> => {
+    const response = await axios.get(`${APIURL}/${id}`);
     return response.data;
 };
 
@@ -52,4 +57,4 @@ const post = async (word: NewWord): Promise<Word> => {
     return response.data;
 };
 
-export default { getWordToLearn, getWordToReview, getBy, getCount, getTags, update, post };
+export default { getWordToLearn, getWordToReview, getBy, getById, getCount, getTags, update, post };

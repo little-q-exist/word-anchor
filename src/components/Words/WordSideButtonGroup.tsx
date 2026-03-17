@@ -10,10 +10,18 @@ import userService from '../../services/users';
 
 interface WordSideButtonGroupInterface {
     wordId: string;
-    showReturn?: boolean;
+    returnOption?:
+        | {
+              showReturn: true;
+              to: string;
+          }
+        | { showReturn: false };
 }
 
-const WordSideButtonGroup = ({ wordId, showReturn = false }: WordSideButtonGroupInterface) => {
+const WordSideButtonGroup = ({
+    wordId,
+    returnOption = { showReturn: false },
+}: WordSideButtonGroupInterface) => {
     const user = useSelector((state: RootState) => state.user);
     const [favorited, setFavorited] = useState(false);
 
@@ -51,7 +59,9 @@ const WordSideButtonGroup = ({ wordId, showReturn = false }: WordSideButtonGroup
     };
 
     const handleReturn = () => {
-        navigate('..', { relative: 'path' });
+        if (returnOption.showReturn) {
+            navigate(returnOption.to, { relative: 'path' });
+        }
     };
 
     return (
@@ -70,7 +80,9 @@ const WordSideButtonGroup = ({ wordId, showReturn = false }: WordSideButtonGroup
                         }
                     />
                 )}
-                {showReturn && <FloatButton onClick={handleReturn} icon={<LeftOutlined />} />}
+                {returnOption.showReturn && (
+                    <FloatButton onClick={handleReturn} icon={<LeftOutlined />} />
+                )}
             </FloatButton.Group>
         </>
     );

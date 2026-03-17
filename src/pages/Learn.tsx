@@ -1,24 +1,33 @@
 import wordServices from '../services/words';
 
-import type { Route } from './+types/Learn';
-
-import type { WordWithLearnStatus } from '../types';
 import LearnWord from '../components/Words/LearnWord';
+import { useQuery } from '@tanstack/react-query';
+import { Flex } from 'antd';
 
-// eslint-disable-next-line react-refresh/only-export-components
-export async function clientLoader() {
-    const words = await wordServices.getWordToLearn();
-    const wordsWithStatus: WordWithLearnStatus[] = words.map((word) => {
-        return { ...word, status: 'idle' };
+const Learn = () => {
+    const { data, isError, isPending } = useQuery({
+        queryKey: ['learnWords'],
+        queryFn: () => wordServices.getWordToLearn(),
+        refetchOnWindowFocus: false,
     });
-    return { words: wordsWithStatus };
-}
 
-const Learn = ({ loaderData }: Route.ComponentProps) => {
+    if (isError) {
+        return <div style={{ padding: '24px' }}>some error occurred</div>;
+    }
+
     return (
-        <>
-            <LearnWord loadedWords={loaderData.words} />
-        </>
+        <Flex vertical justify="center" style={{ height: '100%' }}>
+            {!isPending ? (
+                <LearnWord
+                    key={data.words.map((i) => i._id).join(',')}
+                    loadedWords={data.words}
+                    mode={data.mode}
+                    isBriefWordLoading={isPending}
+                />
+            ) : (
+                <LearnWord isBriefWordLoading={isPending} />
+            )}
+        </Flex>
     );
 };
 

@@ -20,7 +20,10 @@ const WordInfo = ({ loaderData }: Route.ComponentProps) => {
         <>
             <div style={{ height: '100%' }}>
                 <WordCard word={word} visible={true} key={word._id} />
-                <WordSideButtonGroup wordId={word._id} showReturn />
+                <WordSideButtonGroup
+                    wordId={word._id}
+                    returnOption={{ showReturn: true, to: '..' }}
+                />
             </div>
         </>
     );

@@ -3,30 +3,19 @@ import { Flex, Table, Input, type GetProps, Select, Space, Spin } from 'antd';
 import wordServices from '../../services/words';
 
 import type { Word } from '../../types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Link } from 'react-router';
-import type { Route } from './+types/Words';
 import { useDebounce } from '../../hook/useDebounce';
+import { useQuery } from '@tanstack/react-query';
 
 const { Column, ColumnGroup } = Table;
-
-// eslint-disable-next-line react-refresh/only-export-components
-export async function clientLoader() {
-    const [tags] = await Promise.all([wordServices.getTags()]);
-    return { tags };
-}
 
 type SearchProps = GetProps<typeof Input.Search>;
 type SearchStateType = { type: 'Eng' | 'Zh'; value: string | undefined };
 
-const Words = ({ loaderData }: Route.ComponentProps) => {
-    const allTags = loaderData.tags;
-
+const Words = () => {
     const [page, setPage] = useState(1);
-    const [words, setWords] = useState<Word[]>([]);
-    const [wordTotalCount, setWordTotalCount] = useState(0);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [loadingStatus, setLoadingStatus] = useState(false);
     const [searchValue, setSearchValue] = useState<SearchStateType>({
         value: undefined,
         type: 'Eng',
@@ -34,28 +23,32 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
 
     const fetchWords = useCallback(() => {
         const tags = selectedTags.length > 0 ? selectedTags.join(',') : undefined;
-        setLoadingStatus(true);
 
-        wordServices
-            .getBy({
-                page,
-                tags,
-                [searchValue.type === 'Eng' ? 'english' : 'meaning']: searchValue.value,
-            })
-            .then(({ words, count }) => {
-                setWords(words);
-                setWordTotalCount(count);
-                setLoadingStatus(false);
-            });
+        return wordServices.getBy({
+            page,
+            tags,
+            [searchValue.type === 'Eng' ? 'english' : 'meaning']: searchValue.value,
+        });
     }, [page, searchValue, selectedTags]);
 
-    useEffect(() => {
-        fetchWords();
-    }, [fetchWords]);
-
-    const wordsToShow = words.map((word) => {
-        return { ...word, key: word._id };
+    const tagQuery = useQuery({
+        queryKey: ['tags'],
+        queryFn: () => wordServices.getTags(),
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
     });
+
+    const wordQuery = useQuery({
+        queryKey: ['words', { page, searchValue, selectedTags }],
+        queryFn: fetchWords,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+    });
+
+    const wordsToShow =
+        wordQuery.data?.words.map((word) => {
+            return { ...word, key: word._id };
+        }) || [];
 
     const onSearch: SearchProps['onSearch'] = async (value) => {
         setSearchValue((prev) => ({ ...prev, value: value || undefined }));
@@ -66,6 +59,16 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
         setSearchValue((prev) => ({ ...prev, value: e.target.value || undefined }));
         setPage(1);
     }, 500);
+
+    const handleTagChange = useDebounce((values: string[]) => {
+        setSelectedTags(values);
+        setPage(1);
+    }, 500);
+
+    if (wordQuery.isError) {
+        console.error(wordQuery.error);
+        return <div>Error loading words. Please try again later.</div>;
+    }
 
     return (
         <Flex style={{ margin: '1rem 0' }} vertical gap="small">
@@ -99,20 +102,17 @@ const Words = ({ loaderData }: Route.ComponentProps) => {
                         mode="multiple"
                         placeholder="Filter by tags"
                         style={{ minWidth: 200 }}
-                        options={allTags.map((tag) => ({ label: tag, value: tag }))}
-                        onChange={(values) => {
-                            setSelectedTags(values);
-                            setPage(1);
-                        }}
+                        options={tagQuery.data?.map((tag) => ({ label: tag, value: tag }))}
+                        onChange={handleTagChange}
                         allowClear
                     />
                 </Space>
             </Flex>
-            <Spin spinning={loadingStatus}>
+            <Spin spinning={wordQuery.isPending}>
                 <Table<Word>
                     dataSource={wordsToShow}
                     pagination={{
-                        total: wordTotalCount,
+                        total: wordQuery.data?.count || 0,
                         current: page,
                         pageSize: 9,
                         onChange(page) {

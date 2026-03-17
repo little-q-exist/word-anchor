@@ -5,6 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import { defineConfig, globalIgnores } from 'eslint/config';
+import pluginQuery from '@tanstack/eslint-plugin-query';
 
 export default defineConfig([
     globalIgnores(['dist', 'node_modules', 'build', '.react-router', 'public']),
@@ -16,6 +17,7 @@ export default defineConfig([
             reactHooks.configs['recommended-latest'],
             reactRefresh.configs.vite,
             eslintConfigPrettier,
+            ...pluginQuery.configs['flat/recommended'],
         ],
         languageOptions: {
             ecmaVersion: 2020,

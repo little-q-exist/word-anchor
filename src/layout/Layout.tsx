@@ -26,7 +26,7 @@ const BackgroundLayout = () => {
         key: 'user',
         children: [
             {
-                label: <a>Profile</a>,
+                label: <NavLink to="/profile">Profile</NavLink>,
                 key: '/profile',
             },
             {
