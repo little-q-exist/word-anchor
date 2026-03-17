@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router';
 import WordSideButtonGroup from './WordSideButtonGroup';
 import type { BriefWord, BriefWordWithLearnStatus } from '../../types';
 import LearnResult from './LearnResult';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
 
 type LearnWordInterface =
     | {
@@ -36,7 +36,7 @@ const LearnWord = (props: LearnWordInterface) => {
 
     const user = useSelector((state: RootState) => state.user);
 
-    const wordsWithStatus: BriefWordWithLearnStatus[] = useMemo(() => {
+    const briefWordsWithStatus: BriefWordWithLearnStatus[] = useMemo(() => {
         return (
             loadedWords.map((briefWord) => {
                 return { ...briefWord, status: 'idle' };
@@ -48,21 +48,24 @@ const LearnWord = (props: LearnWordInterface) => {
 
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [wordIds, setWordIds] = useState(wordsWithStatus);
+    const [briefWords, setBriefWords] = useState(briefWordsWithStatus);
     const [index, setIndex] = useState(0);
+    const [shouldDisableButton, setShouldDisableButton] = useState(false);
     const [wordToRepeat, setWordToRepeat] = useState<number[]>([]);
     const [isRepeating, setIsRepeating] = useState(false);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
     const [isFinished, setIsFinished] = useState(false);
 
     const {
-        data: wordToShow,
+        data: detailedWordToShow,
         isError,
-        isPending,
+        status,
     } = useQuery({
-        queryKey: ['word', wordIds[index]?._id],
-        queryFn: () => wordServices.getById(wordIds[index]._id),
-        enabled: !!wordIds[index]?._id,
+        queryKey: ['word', briefWords[index]?._id],
+        queryFn: briefWords[index]?._id
+            ? () => wordServices.getById(briefWords[index]._id)
+            : skipToken,
+        enabled: briefWords.length !== 0 && !!briefWords[index]?._id,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
     });
@@ -78,19 +81,20 @@ const LearnWord = (props: LearnWordInterface) => {
             familiarity: number;
         }) => userServices.updateFamiliarity(userId, wordId, familiarity),
         onMutate({ familiarity, wordId }) {
+            setShouldDisableButton(true);
             const shouldRepeat = familiarity < 4;
             if (shouldRepeat) {
-                setWordIds((prev) =>
+                setBriefWords((prev) =>
                     prev.map((prevWord) =>
                         prevWord._id === wordId ? { ...prevWord, status: 'failed' } : prevWord
                     )
                 );
                 setWordToRepeat((queue) => {
-                    const targetIndex = wordIds.findIndex((w) => w._id === wordId);
+                    const targetIndex = briefWords.findIndex((w) => w._id === wordId);
                     return targetIndex === -1 ? queue : queue.concat(targetIndex);
                 });
             } else {
-                setWordIds((prev) =>
+                setBriefWords((prev) =>
                     prev.map((prevWord) =>
                         prevWord._id === wordId ? { ...prevWord, status: 'passed' } : prevWord
                     )
@@ -106,20 +110,23 @@ const LearnWord = (props: LearnWordInterface) => {
                 return;
             }
             setWordToRepeat((queue) => {
-                const targetIndex = wordIds.findIndex((w) => w._id === wordId);
+                const targetIndex = briefWords.findIndex((w) => w._id === wordId);
                 return targetIndex === -1 ? queue : queue.filter((i) => i !== targetIndex);
             });
-            setWordIds((prev) =>
+            setBriefWords((prev) =>
                 prev.map((prevWord) =>
                     prevWord._id === wordId ? { ...prevWord, status: 'idle' } : prevWord
                 )
             );
         },
+        onSettled() {
+            setShouldDisableButton(false);
+        },
     });
 
     const navigateToNextWord = () => {
         if (!isRepeating) {
-            if (index < wordIds.length - 1) {
+            if (index < briefWords.length - 1) {
                 setIndex(index + 1);
             } else {
                 if (wordToRepeat.length > 0) {
@@ -154,14 +161,14 @@ const LearnWord = (props: LearnWordInterface) => {
             setWordToRepeat((queue) => {
                 const nextQueue = queue.slice(1);
                 if (familiarity < 4) {
-                    setWordIds((prev) =>
+                    setBriefWords((prev) =>
                         prev.map((prevWord, wordIndex) =>
                             wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
                         )
                     );
                     return nextQueue.concat(index);
                 } else {
-                    setWordIds((prev) =>
+                    setBriefWords((prev) =>
                         prev.map((prevWord, wordIndex) =>
                             wordIndex === index ? { ...prevWord, status: 'passed' } : prevWord
                         )
@@ -172,7 +179,7 @@ const LearnWord = (props: LearnWordInterface) => {
         } else {
             familiarityMutation.mutate({
                 userId: user._id,
-                wordId: wordIds[index]._id,
+                wordId: briefWords[index]._id,
                 familiarity,
             });
         }
@@ -195,10 +202,21 @@ const LearnWord = (props: LearnWordInterface) => {
     };
 
     if (isFinished) {
-        return <LearnResult words={wordIds} />;
+        return <LearnResult briefWords={briefWords} />;
     }
 
-    if (isLoading || isPending) {
+    if (!isLoading && briefWords.length === 0) {
+        return (
+            <Flex style={{ height: '100%' }} justify="center" align="center">
+                <Empty
+                    description={'You have learned all the words!'}
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
+            </Flex>
+        );
+    }
+
+    if (isLoading || status === 'pending') {
         return (
             <Flex style={{ height: '100%' }} justify="center" align="center">
                 <Spin spinning />
@@ -210,21 +228,13 @@ const LearnWord = (props: LearnWordInterface) => {
         return <div>some error occurred</div>;
     }
 
-    if (wordIds.length === 0) {
-        return (
-            <Flex style={{ height: '100%' }} justify="center" align="center">
-                <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            </Flex>
-        );
-    }
-
     return (
         <>
             {contextHolder}
             <Flex style={{ height: '100%', marginTop: '1rem' }} vertical>
                 <Timeline
                     orientation="horizontal"
-                    items={wordIds.map((word, wordIndex) => {
+                    items={briefWords.map((word, wordIndex) => {
                         return {
                             content: <div>{word.english}</div>,
                             color: generateColor(word, wordIndex),
@@ -232,7 +242,11 @@ const LearnWord = (props: LearnWordInterface) => {
                     })}
                 />
                 <div style={{ flex: 1 }}>
-                    <WordCard word={wordToShow} visible={shouldShowInfo} key={wordToShow._id} />
+                    <WordCard
+                        word={detailedWordToShow}
+                        visible={shouldShowInfo}
+                        key={detailedWordToShow._id}
+                    />
                 </div>
 
                 <Flex justify="space-around" gap="middle" style={{ marginBottom: '2rem' }}>
@@ -242,6 +256,7 @@ const LearnWord = (props: LearnWordInterface) => {
                                 type="primary"
                                 onClick={() => handleLearn(5)}
                                 style={{ flex: 1 }}
+                                disabled={shouldDisableButton}
                             >
                                 Known
                             </Button>
@@ -249,6 +264,7 @@ const LearnWord = (props: LearnWordInterface) => {
                                 type="primary"
                                 onClick={() => handleLearn(3)}
                                 style={{ flex: 1 }}
+                                disabled={shouldDisableButton}
                             >
                                 Unfamiliar
                             </Button>
@@ -256,6 +272,7 @@ const LearnWord = (props: LearnWordInterface) => {
                                 type="default"
                                 onClick={() => handleLearn(0)}
                                 style={{ flex: 1 }}
+                                disabled={shouldDisableButton}
                             >
                                 Unknown
                             </Button>
@@ -266,12 +283,16 @@ const LearnWord = (props: LearnWordInterface) => {
                             type="primary"
                             onClick={navigateToNextWord}
                             style={{ width: '50%' }}
+                            disabled={shouldDisableButton}
                         >
                             Next
                         </Button>
                     )}
                 </Flex>
-                <WordSideButtonGroup wordId={wordToShow._id} returnOption={{ showReturn: false }} />
+                <WordSideButtonGroup
+                    wordId={detailedWordToShow._id}
+                    returnOption={{ showReturn: false }}
+                />
             </Flex>
         </>
     );
