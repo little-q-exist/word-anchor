@@ -19,13 +19,13 @@ const Learn = () => {
         <Flex vertical justify="center" style={{ height: '100%' }}>
             {!isPending ? (
                 <LearnWord
-                    key={data.wordIds.map((i) => i.english).join(',')}
-                    loadedWords={data.wordIds}
+                    key={data.words.map((i) => i._id).join(',')}
+                    loadedWords={data.words}
                     mode={data.mode}
-                    isLoading={isPending}
+                    isBriefWordLoading={isPending}
                 />
             ) : (
-                <LearnWord isLoading={isPending} />
+                <LearnWord isBriefWordLoading={isPending} />
             )}
         </Flex>
     );

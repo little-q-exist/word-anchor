@@ -10,9 +10,10 @@ const { Title } = Typography;
 const Profile = () => {
     const user = useSelector((state: RootState) => state.user);
     const fetchUserStats = useCallback(() => {
-        if (user && user._id) {
-            return userService.getUserStats(user._id);
+        if (!user || !user._id) {
+            throw new Error('User ID is missing');
         }
+        return userService.getUserStats(user._id);
     }, [user]);
 
     const { data, isError, isPending } = useQuery({
