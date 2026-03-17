@@ -4,7 +4,7 @@ import userServices from '../../services/users';
 import wordServices from '../../services/words';
 
 import WordCard from './WordCard';
-import { Button, Empty, Flex, message, Spin, Timeline } from 'antd';
+import { Button, Empty, Flex, message, Skeleton, Spin, Timeline } from 'antd';
 
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
@@ -16,23 +16,23 @@ import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
 
 type LearnWordInterface =
     | {
-          isLoading: false;
+          isBriefWordLoading: false;
           loadedWords: BriefWord[];
           mode: 'learn' | 'review';
       }
     | {
-          isLoading: true;
+          isBriefWordLoading: true;
       };
 
 const LearnWord = (props: LearnWordInterface) => {
-    const { isLoading } = props;
+    const { isBriefWordLoading } = props;
     const loadedWords = useMemo(() => {
-        return !isLoading ? props.loadedWords : [];
-    }, [isLoading, props]);
+        return !isBriefWordLoading ? props.loadedWords : [];
+    }, [isBriefWordLoading, props]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
     const mode = useMemo(() => {
-        return !isLoading ? props.mode : 'learn';
-    }, [isLoading, props]);
+        return !isBriefWordLoading ? props.mode : 'learn';
+    }, [isBriefWordLoading, props]);
 
     const user = useSelector((state: RootState) => state.user);
 
@@ -59,7 +59,7 @@ const LearnWord = (props: LearnWordInterface) => {
     const {
         data: detailedWordToShow,
         isError,
-        status,
+        status: detailedWordQueryStatus,
     } = useQuery({
         queryKey: ['word', briefWords[index]?._id],
         queryFn: briefWords[index]?._id
@@ -205,7 +205,7 @@ const LearnWord = (props: LearnWordInterface) => {
         return <LearnResult briefWords={briefWords} />;
     }
 
-    if (!isLoading && briefWords.length === 0) {
+    if (!isBriefWordLoading && briefWords.length === 0) {
         return (
             <Flex style={{ height: '100%' }} justify="center" align="center">
                 <Empty
@@ -216,7 +216,8 @@ const LearnWord = (props: LearnWordInterface) => {
         );
     }
 
-    if (isLoading || status === 'pending') {
+    // TODO：闪屏。可以考虑在单词卡片上加个 loading 状态，这样界面就不会闪了。
+    if (isBriefWordLoading) {
         return (
             <Flex style={{ height: '100%' }} justify="center" align="center">
                 <Spin spinning />
@@ -242,11 +243,15 @@ const LearnWord = (props: LearnWordInterface) => {
                     })}
                 />
                 <div style={{ flex: 1 }}>
-                    <WordCard
-                        word={detailedWordToShow}
-                        visible={shouldShowInfo}
-                        key={detailedWordToShow._id}
-                    />
+                    {detailedWordQueryStatus === 'pending' ? (
+                        <Skeleton />
+                    ) : (
+                        <WordCard
+                            word={detailedWordToShow}
+                            visible={shouldShowInfo}
+                            key={detailedWordToShow._id}
+                        />
+                    )}
                 </div>
 
                 <Flex justify="space-around" gap="middle" style={{ marginBottom: '2rem' }}>
@@ -289,10 +294,12 @@ const LearnWord = (props: LearnWordInterface) => {
                         </Button>
                     )}
                 </Flex>
-                <WordSideButtonGroup
-                    wordId={detailedWordToShow._id}
-                    returnOption={{ showReturn: false }}
-                />
+                {detailedWordQueryStatus === 'success' && (
+                    <WordSideButtonGroup
+                        wordId={detailedWordToShow._id}
+                        returnOption={{ showReturn: false }}
+                    />
+                )}
             </Flex>
         </>
     );

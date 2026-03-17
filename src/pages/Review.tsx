@@ -21,10 +21,10 @@ const Review = () => {
                     key={data.words.map((i) => i.english).join(',')}
                     loadedWords={data.words}
                     mode={data.mode}
-                    isLoading={isPending}
+                    isBriefWordLoading={isPending}
                 />
             ) : (
-                <LearnWord isLoading={isPending} />
+                <LearnWord isBriefWordLoading={isPending} />
             )}
         </Flex>
     );
