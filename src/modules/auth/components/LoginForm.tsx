@@ -1,6 +1,6 @@
 import { Button, Checkbox, Form, Input, type FormProps, type GetProp } from 'antd';
 import { Link } from 'react-router';
-import type { FieldType } from '../types';
+import type { LoginFormFieldType } from '../types';
 
 type LoginFormInterface = {
     onFinish: GetProp<FormProps, 'onFinish'>;
@@ -20,7 +20,7 @@ export const LoginForm = ({ onFinish, onFinishFailed }: LoginFormInterface) => {
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
             >
-                <Form.Item<FieldType>
+                <Form.Item<LoginFormFieldType>
                     name="username"
                     rules={[
                         { required: true, message: 'Please input your username!' },
@@ -35,7 +35,7 @@ export const LoginForm = ({ onFinish, onFinishFailed }: LoginFormInterface) => {
                     <Input placeholder="Username" />
                 </Form.Item>
 
-                <Form.Item<FieldType>
+                <Form.Item<LoginFormFieldType>
                     name="password"
                     rules={[
                         { required: true, message: 'Please input your password!' },
@@ -50,7 +50,7 @@ export const LoginForm = ({ onFinish, onFinishFailed }: LoginFormInterface) => {
                     <Input.Password placeholder="Password" />
                 </Form.Item>
 
-                <Form.Item<FieldType> name="remember" valuePropName="checked">
+                <Form.Item<LoginFormFieldType> name="remember" valuePropName="checked">
                     <Checkbox>Remember me</Checkbox>
                 </Form.Item>
 
