@@ -56,6 +56,11 @@ const getUserStats = async (userId: string): Promise<UserStats> => {
     return response.data;
 };
 
+const getUsernameExistence = async (username: string): Promise<{ exists: boolean }> => {
+    const response = await axios.get(`${APIURL}/${username}/existence`);
+    return response.data;
+};
+
 export default {
     getUserById,
     updateFamiliarity,
@@ -63,4 +68,5 @@ export default {
     updateFavorite,
     getLearningData,
     getUserStats,
+    getUsernameExistence,
 };

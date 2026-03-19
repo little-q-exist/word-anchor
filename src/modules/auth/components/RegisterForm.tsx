@@ -1,5 +1,6 @@
 import { Button, Checkbox, Form, Input, message, type FormProps } from 'antd';
 import type { RegisterFormFieldType } from '../index';
+import userService from '../../../services/users';
 
 type RegisterFormInterface = {
     // eslint-disable-next-line no-unused-vars
@@ -34,6 +35,8 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
                 <Form.Item<RegisterFormFieldType>
                     label="Username"
                     name="username"
+                    validateDebounce={1000}
+                    hasFeedback
                     rules={[
                         { required: true, message: 'Please input your username!' },
                         { type: 'string' },
@@ -44,6 +47,17 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
                             pattern: new RegExp('^[\u4e00-\u9fa5a-zA-Z0-9]+$'),
                             message: 'Username only allows Chinese, characters and numbers',
                         },
+                        {
+                            validator: async (_, value) => {
+                                if (value) {
+                                    const result = await userService.getUsernameExistence(value);
+                                    if (result.exists) {
+                                        return Promise.reject(new Error('Username already exists'));
+                                    }
+                                    return await Promise.resolve();
+                                }
+                            },
+                        },
                     ]}
                 >
                     <Input />
@@ -53,6 +67,7 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
                     label="Email"
                     name="email"
                     rules={[{ type: 'email' }]}
+                    hasFeedback
                 >
                     <Input />
                 </Form.Item>
@@ -60,6 +75,7 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
                 <Form.Item<RegisterFormFieldType>
                     label="Password"
                     name="password"
+                    hasFeedback
                     rules={[
                         { required: true, message: 'Please input your password!' },
                         { type: 'string' },
