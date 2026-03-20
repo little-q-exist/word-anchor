@@ -4,7 +4,7 @@ import userServices from '../../services/users';
 import wordServices from '../../services/words';
 
 import WordCard from './WordCard';
-import { Button, Empty, Flex, message, Skeleton, Spin, Timeline } from 'antd';
+import { Button, Empty, Flex, message, Skeleton, Timeline } from 'antd';
 
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
@@ -13,6 +13,7 @@ import WordSideButtonGroup from './WordSideButtonGroup';
 import type { BriefWord, BriefWordWithLearnStatus } from '../../types';
 import LearnResult from './LearnResult';
 import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
+import CenteredSpin from '../common/CenteredSpin';
 
 type LearnWordInterface =
     | {
@@ -212,13 +213,8 @@ const LearnWord = (props: LearnWordInterface) => {
         );
     }
 
-    // TODO：闪屏。可以考虑在单词卡片上加个 loading 状态，这样界面就不会闪了。
     if (isBriefWordLoading) {
-        return (
-            <Flex style={{ height: '100%' }} justify="center" align="center">
-                <Spin spinning />
-            </Flex>
-        );
+        return <CenteredSpin />;
     }
 
     if (isError) {

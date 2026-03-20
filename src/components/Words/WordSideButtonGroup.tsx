@@ -60,7 +60,7 @@ const WordSideButtonGroup = ({
 
     const handleReturn = () => {
         if (returnOption.showReturn) {
-            navigate(returnOption.to, { relative: 'path' });
+            navigate(returnOption.to, { relative: 'path', replace: true });
         }
     };
 
