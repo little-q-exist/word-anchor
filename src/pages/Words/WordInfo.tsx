@@ -1,29 +1,44 @@
 import WordCard from '../../components/Words/WordCard';
-import type { Route } from './+types/WordInfo';
+import CenteredSpin from '../../components/common/CenteredSpin';
 
 import wordService from '../../services/words';
 
 import WordSideButtonGroup from '../../components/Words/WordSideButtonGroup';
+import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'react-router';
 
-// eslint-disable-next-line react-refresh/only-export-components
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-    const english = params.english;
-    const words = await wordService.getBy({ english });
-    const word = words.words[0];
-    return { word };
-}
+const WordInfo = () => {
+    const { id } = useParams() as { id: string };
 
-const WordInfo = ({ loaderData }: Route.ComponentProps) => {
-    const word = loaderData.word;
+    const {
+        data: word,
+        isError,
+        isPending,
+    } = useQuery({
+        queryKey: ['wordInfo', id],
+        queryFn: () => wordService.getById(id),
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+    });
+
+    if (isError) {
+        return <div>Failed to load word information.</div>;
+    }
 
     return (
         <>
             <div style={{ height: '100%' }}>
-                <WordCard word={word} visible={true} key={word._id} />
-                <WordSideButtonGroup
-                    wordId={word._id}
-                    returnOption={{ showReturn: true, to: '..' }}
-                />
+                {isPending ? (
+                    <CenteredSpin />
+                ) : (
+                    <>
+                        <WordCard word={word} visible={true} key={word._id} />
+                        <WordSideButtonGroup
+                            wordId={word._id}
+                            returnOption={{ showReturn: true, to: '..' }}
+                        />
+                    </>
+                )}
             </div>
         </>
     );

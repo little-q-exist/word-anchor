@@ -125,8 +125,8 @@ const Words = () => {
                         title="English"
                         dataIndex="english"
                         key="english"
-                        render={(english: Word['english']) => (
-                            <Link to={`./${english}`}>{english}</Link>
+                        render={(english: Word['english'], word: Word) => (
+                            <Link to={`./${word._id}`}>{english}</Link>
                         )}
                     />
                     <Column title="Phonetic" dataIndex="phonetic" key="phonetic" />
