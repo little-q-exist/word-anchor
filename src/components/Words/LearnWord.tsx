@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import userServices from '../../services/users';
 import wordServices from '../../services/words';
 
-import WordCard from './WordCard';
+import WordCards from '../../modules/word-core/components/WordCards';
 import { Button, Empty, Flex, message, Skeleton, Timeline } from 'antd';
 
 import { useSelector } from 'react-redux';
@@ -238,7 +238,7 @@ const LearnWord = (props: LearnWordInterface) => {
                     {detailedWordQueryStatus === 'pending' ? (
                         <Skeleton />
                     ) : (
-                        <WordCard
+                        <WordCards
                             word={detailedWordToShow}
                             visible={shouldShowInfo}
                             key={detailedWordToShow._id}

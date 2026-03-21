@@ -1,4 +1,4 @@
-import WordCard from '../../components/Words/WordCard';
+import WordCards from '../../modules/word-core/components/WordCards';
 import CenteredSpin from '../../components/common/CenteredSpin';
 
 import wordService from '../../services/words';
@@ -32,7 +32,7 @@ const WordInfo = () => {
                     <CenteredSpin />
                 ) : (
                     <>
-                        <WordCard word={word} visible={true} key={word._id} />
+                        <WordCards word={word} visible={true} key={word._id} />
                         <WordSideButtonGroup
                             wordId={word._id}
                             returnOption={{ showReturn: true, to: '..' }}

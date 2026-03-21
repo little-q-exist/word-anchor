@@ -1,7 +1,7 @@
 import { Flex } from 'antd';
 
-import SearchWord from '../../modules/vocabulary/component/SearchWord';
-import WordTable from '../../modules/vocabulary/component/WordTable';
+import SearchWord from '../../modules/vocabulary/components/SearchWord';
+import WordTable from '../../modules/vocabulary/components/WordTable';
 import useSearchWord from '../../modules/vocabulary/hooks/useSearchWord';
 
 const Words = () => {
