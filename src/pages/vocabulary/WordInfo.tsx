@@ -3,7 +3,7 @@ import CenteredSpin from '../../components/common/CenteredSpin';
 
 import wordService from '../../services/words';
 
-import WordSideButtonGroup from '../../components/Words/WordSideButtonGroup';
+import WordSideButtonGroup from '../../components/Words/WordSideButtonGroup/WordSideButtonGroup';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 

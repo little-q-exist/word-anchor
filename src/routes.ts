@@ -7,8 +7,8 @@ export default [
         route('login', 'pages/Login.tsx'),
         route('register', 'pages/Register.tsx'),
         ...prefix('words', [
-            index('pages/Words/Words.tsx'),
-            route(':id', 'pages/Words/WordInfo.tsx'),
+            index('pages/vocabulary/Words.tsx'),
+            route(':id', 'pages/vocabulary/WordInfo.tsx'),
         ]),
         route('learn', 'pages/Learn.tsx'),
         route('review', 'pages/Review.tsx'),
