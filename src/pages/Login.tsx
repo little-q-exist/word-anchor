@@ -8,7 +8,7 @@ import type { User } from '../types';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { login, logout } from '../features/userSlice';
-import FailedResult from '../components/common/FailedResult';
+import FailedResult from '../shared/components/FailedResult';
 import { LoginForm, type StatusType, type FieldType } from '../modules/auth/index';
 
 const Login = () => {

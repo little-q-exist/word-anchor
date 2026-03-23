@@ -11,9 +11,9 @@ import type { RootState } from '../../../../store';
 import { useNavigate } from 'react-router';
 import WordSideButtonGroup from '../../../word-core/components/WordSideButtonGroup/WordSideButtonGroup';
 import type { BriefWord, BriefWordWithLearnStatus } from '../../../../types';
-import LearnResult from '../../../../components/Words/LearnResult';
+import LearnResult from '../LearnResult/LearnResult';
 import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
-import CenteredSpin from '../../../../components/common/CenteredSpin';
+import CenteredSpin from '../../../../shared/components/CenteredSpin';
 import LearnProgress from './LearnProgress';
 import useLearnQueue from '../../hooks/LearnWord/useLearnQueue';
 

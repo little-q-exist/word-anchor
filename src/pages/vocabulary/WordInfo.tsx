@@ -1,5 +1,5 @@
 import WordCards from '../../modules/word-core/components/WordCards';
-import CenteredSpin from '../../components/common/CenteredSpin';
+import CenteredSpin from '../../shared/components/CenteredSpin';
 
 import wordService from '../../services/words';
 
