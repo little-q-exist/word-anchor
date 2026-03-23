@@ -1,19 +1,21 @@
 import { useMemo, useState } from 'react';
 
-import userServices from '../../services/users';
-import wordServices from '../../services/words';
+import userServices from '../../../../services/users';
+import wordServices from '../../../../services/words';
 
-import WordCards from '../../modules/word-core/components/WordCards';
-import { Button, Empty, Flex, message, Skeleton, Timeline } from 'antd';
+import WordCards from '../../../word-core/components/WordCards';
+import { Button, Empty, Flex, message, Skeleton } from 'antd';
 
 import { useSelector } from 'react-redux';
-import type { RootState } from '../../store';
+import type { RootState } from '../../../../store';
 import { useNavigate } from 'react-router';
-import WordSideButtonGroup from './WordSideButtonGroup/WordSideButtonGroup';
-import type { BriefWord, BriefWordWithLearnStatus } from '../../types';
-import LearnResult from './LearnResult';
+import WordSideButtonGroup from '../../../../components/Words/WordSideButtonGroup/WordSideButtonGroup';
+import type { BriefWord, BriefWordWithLearnStatus } from '../../../../types';
+import LearnResult from '../../../../components/Words/LearnResult';
 import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
-import CenteredSpin from '../common/CenteredSpin';
+import CenteredSpin from '../../../../components/common/CenteredSpin';
+import LearnProgress from './LearnProgress';
+import useLearnQueue from '../../hooks/LearnWord/useLearnQueue';
 
 type LearnWordInterface =
     | {
@@ -46,12 +48,22 @@ const LearnWord = (props: LearnWordInterface) => {
     const [messageApi, contextHolder] = message.useMessage();
 
     const [briefWords, setBriefWords] = useState(briefWordsWithStatus);
-    const [index, setIndex] = useState(0);
+
     const [shouldDisableButton, setShouldDisableButton] = useState(false);
-    const [wordToRepeat, setWordToRepeat] = useState<number[]>([]);
-    const [isRepeating, setIsRepeating] = useState(false);
+
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
-    const [isFinished, setIsFinished] = useState(false);
+
+    const { index, isRepeating, isFinished, toNextWord, addToRepeatQueue, handleRepeat } =
+        useLearnQueue(briefWords);
+
+    const navigateToNextWord = () => {
+        toNextWord();
+        setShouldShowInfo(false);
+    };
+
+    const markWordStatus = (wordId: string, status: BriefWordWithLearnStatus['status']) => {
+        setBriefWords((prev) => prev.map((prevWord) => (prevWord._id === wordId ? { ...prevWord, status } : prevWord)));
+    }
 
     const {
         data: detailedWordToShow,
@@ -81,22 +93,14 @@ const LearnWord = (props: LearnWordInterface) => {
             setShouldDisableButton(true);
             const shouldRepeat = familiarity < 4;
             if (shouldRepeat) {
-                setBriefWords((prev) =>
-                    prev.map((prevWord) =>
-                        prevWord._id === wordId ? { ...prevWord, status: 'failed' } : prevWord
-                    )
-                );
-                setWordToRepeat((queue) => {
-                    const targetIndex = briefWords.findIndex((w) => w._id === wordId);
-                    return targetIndex === -1 ? queue : queue.concat(targetIndex);
-                });
+                markWordStatus(wordId, 'failed');
+                addToRepeatQueue(wordId);
             } else {
-                setBriefWords((prev) =>
-                    prev.map((prevWord) =>
-                        prevWord._id === wordId ? { ...prevWord, status: 'passed' } : prevWord
-                    )
-                );
+                markWordStatus(wordId, 'passed');
             }
+        },
+        onSuccess({ shouldRepeat, wordId }) {
+            markWordStatus(wordId, shouldRepeat ? 'failed' : 'passed');
         },
         onError(error, _variables) {
             messageApi.error('Failed to update familiarity. Please try again.');
@@ -106,44 +110,13 @@ const LearnWord = (props: LearnWordInterface) => {
             if (!wordId) {
                 return;
             }
-            setWordToRepeat((queue) => {
-                const targetIndex = briefWords.findIndex((w) => w._id === wordId);
-                return targetIndex === -1 ? queue : queue.filter((i) => i !== targetIndex);
-            });
-            setBriefWords((prev) =>
-                prev.map((prevWord) =>
-                    prevWord._id === wordId ? { ...prevWord, status: 'idle' } : prevWord
-                )
-            );
+            addToRepeatQueue(wordId);
+            markWordStatus(wordId, 'idle');
         },
         onSettled() {
             setShouldDisableButton(false);
         },
     });
-
-    const navigateToNextWord = () => {
-        if (!isRepeating) {
-            if (index < briefWords.length - 1) {
-                setIndex(index + 1);
-            } else {
-                if (wordToRepeat.length > 0) {
-                    setIsRepeating(true);
-                    setIndex(wordToRepeat[0]);
-                } else {
-                    setIsFinished(true);
-                    return;
-                }
-            }
-        } else {
-            if (wordToRepeat.length > 0) {
-                setIndex(wordToRepeat[0]);
-            } else {
-                setIsFinished(true);
-                return;
-            }
-        }
-        setShouldShowInfo(false);
-    };
 
     const handleLearn = async (familiarity: number) => {
         if (!user) {
@@ -155,24 +128,8 @@ const LearnWord = (props: LearnWordInterface) => {
         }
 
         if (isRepeating) {
-            setWordToRepeat((queue) => {
-                const nextQueue = queue.slice(1);
-                if (familiarity < 4) {
-                    setBriefWords((prev) =>
-                        prev.map((prevWord, wordIndex) =>
-                            wordIndex === index ? { ...prevWord, status: 'failed' } : prevWord
-                        )
-                    );
-                    return nextQueue.concat(index);
-                } else {
-                    setBriefWords((prev) =>
-                        prev.map((prevWord, wordIndex) =>
-                            wordIndex === index ? { ...prevWord, status: 'passed' } : prevWord
-                        )
-                    );
-                    return nextQueue;
-                }
-            });
+            handleRepeat(familiarity);
+            markWordStatus(briefWords[index]._id, familiarity < 4 ? 'failed' : 'passed');
         } else {
             familiarityMutation.mutate({
                 userId: user._id,
@@ -181,21 +138,6 @@ const LearnWord = (props: LearnWordInterface) => {
             });
         }
         setShouldShowInfo(true);
-    };
-
-    const generateColor = (word: BriefWordWithLearnStatus, wordIndex: number) => {
-        if (wordIndex === index) {
-            return 'blue';
-        } else {
-            switch (word.status) {
-                case 'idle':
-                    return 'gray';
-                case 'passed':
-                    return 'green';
-                case 'failed':
-                    return 'red';
-            }
-        }
     };
 
     if (isFinished) {
@@ -225,15 +167,7 @@ const LearnWord = (props: LearnWordInterface) => {
         <>
             {contextHolder}
             <Flex style={{ height: '100%', marginTop: '1rem' }} vertical>
-                <Timeline
-                    orientation="horizontal"
-                    items={briefWords.map((word, wordIndex) => {
-                        return {
-                            content: <div>{word.english}</div>,
-                            color: generateColor(word, wordIndex),
-                        };
-                    })}
-                />
+                <LearnProgress briefWords={briefWords} index={index} key={index} />
                 <div style={{ flex: 1 }}>
                     {detailedWordQueryStatus === 'pending' ? (
                         <Skeleton />

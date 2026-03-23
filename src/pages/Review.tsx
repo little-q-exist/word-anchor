@@ -1,4 +1,4 @@
-import LearnWord from '../components/Words/LearnWord';
+import LearnWord from '../modules/word-learning/components/LearnWord/LearnWord';
 import wordServices from '../services/words';
 import { useQuery } from '@tanstack/react-query';
 import { Flex } from 'antd';
