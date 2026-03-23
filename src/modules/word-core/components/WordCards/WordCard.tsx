@@ -1,6 +1,6 @@
 import { Card } from 'antd';
-import { cardStyle } from '../styles/cardStyle';
-import { centerStyle } from '../../../shared/styles/centerStyle';
+import { cardStyle } from '../../styles/cardStyle';
+import { centerStyle } from '../../../../shared/styles/centerStyle';
 
 interface WordCardProps {
     children: React.ReactNode;

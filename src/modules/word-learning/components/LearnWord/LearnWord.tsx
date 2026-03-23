@@ -3,13 +3,13 @@ import { useMemo, useState } from 'react';
 import userServices from '../../../../services/users';
 import wordServices from '../../../../services/words';
 
-import WordCards from '../../../word-core/components/WordCards';
+import WordCards from '../../../word-core/components/WordCards/WordCards';
 import { Button, Empty, Flex, message, Skeleton } from 'antd';
 
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../../store';
 import { useNavigate } from 'react-router';
-import WordSideButtonGroup from '../../../../components/Words/WordSideButtonGroup/WordSideButtonGroup';
+import WordSideButtonGroup from '../../../word-core/components/WordSideButtonGroup/WordSideButtonGroup';
 import type { BriefWord, BriefWordWithLearnStatus } from '../../../../types';
 import LearnResult from '../../../../components/Words/LearnResult';
 import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
@@ -62,8 +62,10 @@ const LearnWord = (props: LearnWordInterface) => {
     };
 
     const markWordStatus = (wordId: string, status: BriefWordWithLearnStatus['status']) => {
-        setBriefWords((prev) => prev.map((prevWord) => (prevWord._id === wordId ? { ...prevWord, status } : prevWord)));
-    }
+        setBriefWords((prev) =>
+            prev.map((prevWord) => (prevWord._id === wordId ? { ...prevWord, status } : prevWord))
+        );
+    };
 
     const {
         data: detailedWordToShow,
