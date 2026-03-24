@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import type { RegisterFormFieldType, StatusType } from '../index';
-import userService from '../../../services/users';
+import authService from '../services/auth';
 
 export const useRegister = () => {
     const [status, setStatus] = useState<StatusType>('idle');
@@ -10,8 +10,7 @@ export const useRegister = () => {
     const register = async (values: RegisterFormFieldType) => {
         setStatus('loading');
         try {
-            await userService.register(values);
-            console.log('Success:', values);
+            await authService.register(values);
             setStatus('success');
         } catch (error: unknown) {
             console.error('Registration failed:', error);
@@ -31,7 +30,10 @@ export const useRegister = () => {
         }
     };
 
-    const resetStatus = () => setStatus('idle');
+    const reset = () => {
+        setStatus('idle');
+        setErrorMessage('');
+    };
 
-    return { register, status, errorMessage, resetStatus };
+    return { register, status, errorMessage, reset };
 };

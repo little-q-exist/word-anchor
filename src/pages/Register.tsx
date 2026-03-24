@@ -8,7 +8,7 @@ import ProtectedRoute from '../layout/ProtectedRoute/ProtectedRoute';
 import { RegisterForm, useRegister } from '../modules/auth/index';
 
 const Register = () => {
-    const { status, errorMessage, register, resetStatus } = useRegister();
+    const { status, errorMessage, register, reset } = useRegister();
 
     const renderContent = () => {
         switch (status) {
@@ -34,7 +34,7 @@ const Register = () => {
                                 type="primary"
                                 key="return"
                                 onClick={() => {
-                                    resetStatus();
+                                    reset();
                                 }}
                             >
                                 Try Again

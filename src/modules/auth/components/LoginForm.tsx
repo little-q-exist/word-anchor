@@ -1,15 +1,27 @@
-import { Button, Checkbox, Form, Input, type FormProps, type GetProp } from 'antd';
-import { Link } from 'react-router';
+import { Button, Checkbox, Form, Input, message, type FormProps } from 'antd';
+import { Link, useNavigate } from 'react-router';
 import type { LoginFormFieldType } from '../types';
 
 type LoginFormInterface = {
-    onFinish: GetProp<FormProps, 'onFinish'>;
-    onFinishFailed: GetProp<FormProps, 'onFinishFailed'>;
+    login: (values: LoginFormFieldType) => void;
 };
 
-export const LoginForm = ({ onFinish, onFinishFailed }: LoginFormInterface) => {
+export const LoginForm = ({ login }: LoginFormInterface) => {
+    const [messageApi, contextHolder] = message.useMessage();
+
+    const onFinish: FormProps<LoginFormFieldType>['onFinish'] = async (values) => {
+        messageApi.success('Login successful!');
+        login(values);
+    };
+
+    const onFinishFailed: FormProps<LoginFormFieldType>['onFinishFailed'] = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+        messageApi.error('Login failed!');
+    };
+
     return (
         <>
+            {contextHolder}
             <h2>login</h2>
             <Form
                 name="login"

@@ -3,8 +3,7 @@ import type { RegisterFormFieldType } from '../types';
 import userService from '../../../services/users';
 
 type RegisterFormInterface = {
-    // eslint-disable-next-line no-unused-vars
-    register: (_values: RegisterFormFieldType) => void;
+    register: (values: RegisterFormFieldType) => void;
 };
 
 export const RegisterForm = ({ register }: RegisterFormInterface) => {

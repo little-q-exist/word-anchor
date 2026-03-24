@@ -7,11 +7,13 @@ import FailedResult from '../../shared/components/FailedResult';
 
 interface ProtectedRouteProps {
     children?: React.ReactNode;
+    extra?: React.ReactNode;
     config?: ProtectedRouteConfig;
 }
 
 const ProtectedRoute = ({
     children,
+    extra,
     config = { requiredRole: 'user', mustLogin: true },
 }: ProtectedRouteProps) => {
     const navigate = useNavigate();
@@ -22,6 +24,7 @@ const ProtectedRoute = ({
             return (
                 <FailedResult message="You must be logged in to access this page.">
                     <Button onClick={() => navigate('/login')}>Go to Login</Button>
+                    {extra}
                 </FailedResult>
             );
         }
@@ -29,6 +32,7 @@ const ProtectedRoute = ({
             return (
                 <FailedResult message="You are already logged in.">
                     <Button onClick={() => navigate(-1)}>Go Back</Button>
+                    {extra}
                 </FailedResult>
             );
         }
