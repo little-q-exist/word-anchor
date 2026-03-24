@@ -9,15 +9,21 @@ interface ProtectedRouteProps {
     children?: React.ReactNode;
     extra?: React.ReactNode;
     config?: ProtectedRouteConfig;
+    disabled?: boolean;
 }
 
 const ProtectedRoute = ({
     children,
     extra,
     config = { requiredRole: 'user', mustLogin: true },
+    disabled = false,
 }: ProtectedRouteProps) => {
     const navigate = useNavigate();
     const user = useSelector((state: RootState) => state.user);
+    
+    if (disabled) {
+        return children || <Outlet />;
+    }
 
     if (config.requiredRole === 'user') {
         if ('mustLogin' in config && config.mustLogin && !user) {
