@@ -1,7 +1,7 @@
 import axios from 'axios';
-import type { NewUser, User } from '../../../types';
+import type { NewUser, User } from '@/types';
 
-import globalConfig from '../../../shared/services/config';
+import globalConfig from '@/shared/services/config';
 
 globalConfig();
 

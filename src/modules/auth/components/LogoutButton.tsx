@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { logout } from '../../../features/userSlice';
+import { logout } from '@/features/userSlice';
 
 interface LogoutButtonProps {
     extraFn: () => void;

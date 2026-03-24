@@ -1,21 +1,21 @@
 import { useMemo, useState } from 'react';
 
-import userServices from '../../../../services/users';
-import wordServices from '../../../../services/words';
+import userServices from '@/services/users';
+import wordServices from '@/services/words';
 
-import WordCards from '../../../word-core/components/WordCards/WordCards';
+import WordCards from '@modules/word-core/components/WordCards/WordCards';
 import { Button, Empty, Flex, message, Skeleton } from 'antd';
 
 import { useSelector } from 'react-redux';
-import type { RootState } from '../../../../store';
+import type { RootState } from '@/store';
 import { useNavigate } from 'react-router';
-import WordSideButtonGroup from '../../../word-core/components/WordSideButtonGroup/WordSideButtonGroup';
-import type { BriefWord, BriefWordWithLearnStatus } from '../../../../types';
+import WordSideButtonGroup from '@modules/word-core/components/WordSideButtonGroup/WordSideButtonGroup';
+import type { BriefWord, BriefWordWithLearnStatus } from '@/types';
 import LearnResult from '../LearnResult/LearnResult';
 import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
-import CenteredSpin from '../../../../shared/components/CenteredSpin';
+import CenteredSpin from '@/shared/components/CenteredSpin';
 import LearnProgress from './LearnProgress';
-import useLearnQueue from '../../hooks/LearnWord/useLearnQueue';
+import useLearnQueue from '@modules/word-learning/hooks/LearnWord/useLearnQueue';
 
 type LearnWordInterface =
     | {

@@ -1,6 +1,6 @@
 import { Flex, Button } from 'antd';
 import { useNavigate } from 'react-router';
-import type { BriefWordWithLearnStatus } from '../../../../types';
+import type { BriefWordWithLearnStatus } from '@/types';
 import LearnResultTable from './LearnResultTable';
 
 interface LearnResultProps {

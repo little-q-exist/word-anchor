@@ -1,8 +1,8 @@
 import { Spin, Table } from 'antd';
 import { Link } from 'react-router';
-import type { Word } from '../../../types';
+import type { Word } from '@/types';
 import { useCallback } from 'react';
-import wordServices from '../../../services/words';
+import wordServices from '@/services/words';
 import { useQuery } from '@tanstack/react-query';
 import type { UseSearchWordReturnType } from '../hooks/useSearchWord';
 

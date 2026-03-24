@@ -1,6 +1,6 @@
 import type { Input } from 'antd';
 import type { GetProps } from 'react-redux';
-import { useDebounce } from '../../../shared/hooks/useDebounce';
+import { useDebounce } from '@/shared/hooks/useDebounce';
 import { useState } from 'react';
 
 type SearchProps = GetProps<typeof Input.Search>;

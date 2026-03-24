@@ -3,7 +3,7 @@ import type { LoginFormFieldType, StatusType } from '../types';
 import authService from '../services/auth';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { login as loginAction } from '../../../features/userSlice';
+import { login as loginAction } from '@/features/userSlice';
 import { useNavigate } from 'react-router';
 
 const useLogin = () => {
@@ -20,7 +20,6 @@ const useLogin = () => {
             if (values.remember) {
                 localStorage.setItem('reciteWordAppUser', JSON.stringify(userToken));
             }
-            // TODO: 闪屏问题又出现了
             dispatch(loginAction(userToken));
             navigate('..');
         } catch (error: unknown) {

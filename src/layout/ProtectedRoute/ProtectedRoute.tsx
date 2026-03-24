@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router';
-import type { RootState } from '../../store';
+import type { RootState } from '@/store';
 import { Button } from 'antd';
 import type { ProtectedRouteConfig } from './types';
-import FailedResult from '../../shared/components/FailedResult';
+import FailedResult from '@/shared/components/FailedResult';
 
 interface ProtectedRouteProps {
     children?: React.ReactNode;
@@ -20,7 +20,7 @@ const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
     const navigate = useNavigate();
     const user = useSelector((state: RootState) => state.user);
-    
+
     if (disabled) {
         return children || <Outlet />;
     }

@@ -1,5 +1,5 @@
 import { Timeline } from 'antd';
-import type { BriefWordWithLearnStatus } from '../../../../types';
+import type { BriefWordWithLearnStatus } from '@/types';
 
 interface LearnProgressProps {
     briefWords: BriefWordWithLearnStatus[];

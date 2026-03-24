@@ -1,6 +1,6 @@
 import { Button, Checkbox, Form, Input, message, type FormProps } from 'antd';
 import type { RegisterFormFieldType } from '../types';
-import userService from '../../../services/users';
+import userService from '@/services/users';
 
 type RegisterFormInterface = {
     register: (values: RegisterFormFieldType) => void;

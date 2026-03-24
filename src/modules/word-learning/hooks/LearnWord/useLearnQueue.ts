@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { BriefWordWithLearnStatus } from '../../../../types';
+import type { BriefWordWithLearnStatus } from '@/types';
 
 const useLearnQueue = (briefWords: BriefWordWithLearnStatus[]) => {
     const [index, setIndex] = useState(0);
