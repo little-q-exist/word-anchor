@@ -1,9 +1,9 @@
-import WordCards from '../../modules/word-core/components/WordCards';
+import WordCards from '@/modules/word-core/components/WordCards/WordCards';
 import CenteredSpin from '../../shared/components/CenteredSpin';
 
 import wordService from '../../services/words';
 
-import WordSideButtonGroup from '../../components/Words/WordSideButtonGroup/WordSideButtonGroup';
+import WordSideButtonGroup from '@/modules/word-core/components/WordSideButtonGroup/WordSideButtonGroup';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 

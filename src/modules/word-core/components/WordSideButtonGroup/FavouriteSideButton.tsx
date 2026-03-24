@@ -1,10 +1,10 @@
 import { StarFilled, StarOutlined } from '@ant-design/icons';
-import type { RootState } from '../../../store';
+import type { RootState } from '@/store';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { FloatButton, message } from 'antd';
 import { useSelector } from 'react-redux';
-import userService from '../../../services/users';
-import type { UserLearningData } from '../../../types';
+import userService from '@/services/users';
+import type { UserLearningData } from '@/types';
 import type React from 'react';
 
 const iconStyle: React.CSSProperties = {

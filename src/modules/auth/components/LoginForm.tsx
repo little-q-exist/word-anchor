@@ -1,5 +1,5 @@
 import { Button, Checkbox, Form, Input, message, type FormProps } from 'antd';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import type { LoginFormFieldType } from '../types';
 
 type LoginFormInterface = {
