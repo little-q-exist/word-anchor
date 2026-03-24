@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import type { NewUser, User, UserLearningData, UserStats } from '../types';
+import type { User, UserLearningData, UserStats } from '../types';
 
-import globalConfig from './config';
+import globalConfig from '../shared/services/config';
 
 globalConfig();
 
@@ -20,11 +20,6 @@ const updateFamiliarity = async (
     const response = await axios.patch(`${APIURL}/${userId}/words/${wordId}/familiarity`, {
         familiarity,
     });
-    return response.data;
-};
-
-const register = async (user: NewUser) => {
-    const response = await axios.post(`${APIURL}/register`, user);
     return response.data;
 };
 
@@ -64,7 +59,6 @@ const getUsernameExistence = async (username: string): Promise<{ exists: boolean
 export default {
     getUserById,
     updateFamiliarity,
-    register,
     updateFavorite,
     getLearningData,
     getUserStats,
