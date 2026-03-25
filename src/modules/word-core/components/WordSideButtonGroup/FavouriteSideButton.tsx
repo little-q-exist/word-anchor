@@ -27,7 +27,10 @@ const FavouriteSideButton = ({ wordId }: FavouriteSideButtonInterface) => {
         queryKey: ['learningData', user?._id, wordId],
         queryFn: () => userService.getLearningData(user!._id, wordId, ['favorited']),
         enabled: !!user && !!wordId,
-        select: (data: UserLearningData) => data.favorited,
+        select: (data: UserLearningData) => {
+            if (!data) return false;
+            return data.favorited;
+        },
         refetchOnWindowFocus: false,
     });
 
