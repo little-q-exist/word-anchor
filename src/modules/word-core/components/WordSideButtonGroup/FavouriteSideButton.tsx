@@ -36,12 +36,14 @@ const FavouriteSideButton = ({ wordId }: FavouriteSideButtonInterface) => {
         onMutate: async (_variables, context) => {
             await context.client.cancelQueries({ queryKey: ['learningData', user?._id, wordId] });
             const previousData = context.client.getQueryData(['learningData', user?._id, wordId]);
-            context.client.setQueryData(
-                ['learningData', user?._id, wordId],
-                (old: UserLearningData) => {
-                    return { ...old, favorited: !old.favorited };
-                }
-            );
+            if (previousData) {
+                context.client.setQueryData(
+                    ['learningData', user?._id, wordId],
+                    (old: UserLearningData) => {
+                        return { ...old, favorited: !old.favorited };
+                    }
+                );
+            }
             return { previousData };
         },
         onError: (_error, _variables, onMutateResult, context) => {
