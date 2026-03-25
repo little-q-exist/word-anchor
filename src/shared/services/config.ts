@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AxiosError } from 'axios';
 
-import { SERVER_URL } from '../constant';
+import { SERVER_URL } from '@/constant';
 
 interface StandardResponse<T = unknown> {
     code: number;

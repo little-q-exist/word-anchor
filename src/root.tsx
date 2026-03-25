@@ -57,7 +57,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                     subTitle={`${error.data}`}
                     extra={[
                         <Button type="default" key="home">
-                            <Link to="..">Go Back</Link>
+                            <Link to="/">Go Back</Link>
                         </Button>,
                     ]}
                 ></Result>

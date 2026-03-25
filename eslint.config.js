@@ -29,7 +29,18 @@ export default defineConfig([
             },
         },
         rules: {
-            'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                {
+                    args: 'all',
+                    argsIgnorePattern: '^_',
+                    caughtErrors: 'all',
+                    caughtErrorsIgnorePattern: '^_',
+                    destructuredArrayIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    ignoreRestSiblings: true,
+                },
+            ],
         },
     },
 ]);
