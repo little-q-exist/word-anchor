@@ -10,8 +10,13 @@ export const LoginForm = ({ login }: LoginFormInterface) => {
     const [messageApi, contextHolder] = message.useMessage();
 
     const onFinish: FormProps<LoginFormFieldType>['onFinish'] = async (values) => {
-        messageApi.success('Login successful!');
-        login(values);
+        try {
+            await Promise.resolve(login(values));
+            messageApi.success('Login successful!');
+        } catch (error) {
+            console.error('Login error:', error);
+            messageApi.error('Login failed!');
+        }
     };
 
     const onFinishFailed: FormProps<LoginFormFieldType>['onFinishFailed'] = (errorInfo) => {

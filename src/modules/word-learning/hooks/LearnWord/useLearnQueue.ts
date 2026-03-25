@@ -40,7 +40,7 @@ const useLearnQueue = (briefWords: BriefWordWithLearnStatus[]) => {
     const handleRepeat = (familiarity: number) => {
         setWordToRepeat((queue) => {
             const nextQueue = queue.slice(1);
-            return familiarity < 4 ? queue.concat(index) : nextQueue;
+            return familiarity < 4 ? nextQueue.concat(index) : nextQueue;
         });
     };
 

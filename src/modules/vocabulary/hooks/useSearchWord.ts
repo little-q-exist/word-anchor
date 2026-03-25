@@ -1,8 +1,6 @@
-import type { Input } from 'antd';
-import type { GetProps } from 'react-redux';
+import { Input, type GetProps } from 'antd';
 import { useDebounce } from '@/shared/hooks/useDebounce';
 import { useState } from 'react';
-
 type SearchProps = GetProps<typeof Input.Search>;
 type SearchType = { type: 'Eng' | 'Zh'; value: string | undefined };
 

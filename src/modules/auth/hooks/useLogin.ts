@@ -25,20 +25,21 @@ const useLogin = () => {
         } catch (error: unknown) {
             if (error instanceof AxiosError) {
                 console.error('Login failed:', error);
-                if (error instanceof AxiosError) {
-                    if (
-                        typeof error.response?.data?.error === 'string' ||
-                        error.response?.data?.error instanceof String
-                    ) {
-                        setErrorMessage(
-                            error.response?.data?.error || error.message || 'Unknown error occurred'
-                        );
-                    } else {
-                        setErrorMessage(error.message || 'Unknown error occurred');
-                    }
+                if (
+                    typeof error.response?.data?.error === 'string' ||
+                    error.response?.data?.error instanceof String
+                ) {
+                    setErrorMessage(
+                        error.response?.data?.error || error.message || 'Unknown error occurred'
+                    );
+                } else {
+                    setErrorMessage(error.message || 'Unknown error occurred');
                 }
-                setStatus('failed');
+            } else {
+                console.error('Login failed with non-Axios error:', error);
+                setErrorMessage('An unexpected error occurred');
             }
+            setStatus('failed');
         }
     };
 

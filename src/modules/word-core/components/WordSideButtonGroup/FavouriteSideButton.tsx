@@ -72,7 +72,7 @@ const FavouriteSideButton = ({ wordId }: FavouriteSideButtonInterface) => {
     return (
         <>
             {contextHolder}
-            {(!isPending || !isError) && (
+            {!isPending && !isError && (
                 <FloatButton
                     onClick={handleFavorite}
                     icon={

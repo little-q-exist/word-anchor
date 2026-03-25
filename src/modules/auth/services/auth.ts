@@ -5,16 +5,17 @@ import globalConfig from '@/shared/services/config';
 
 globalConfig();
 
-const APIURL = `/login`;
+// Auth endpoints are intentionally different: login at `/login`, registration at `/users/register`.
+const LOGIN_API_URL = `/login`;
+const REGISTER_API_URL = `/users/register`;
 
 const login = async (user: NewUser): Promise<User> => {
-    const response = await axios.post(APIURL, user);
+    const response = await axios.post(LOGIN_API_URL, user);
     return response.data;
 };
 
 const register = async (user: NewUser) => {
-    // TODO
-    const response = await axios.post(`/users/register`, user);
+    const response = await axios.post(REGISTER_API_URL, user);
     return response.data;
 };
 
