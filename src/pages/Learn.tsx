@@ -1,4 +1,4 @@
-import wordServices from '../services/words';
+import wordServices from '../shared/services/words';
 
 import LearnWord from '../modules/word-learning/components/LearnWord/LearnWord';
 import { useQuery } from '@tanstack/react-query';

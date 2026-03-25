@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import type { NewWord, Word, BriefWordListWithMode } from '../types';
+import type { NewWord, Word, BriefWordListWithMode } from '../../types';
 
-import globalConfig from '../shared/services/config';
+import globalConfig from './config';
 
 globalConfig();
 

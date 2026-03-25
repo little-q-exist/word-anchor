@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
-import userServices from '@/services/users';
-import wordServices from '@/services/words';
+import userServices from '@/shared/services/users';
+import wordServices from '@/shared/services/words';
 
 import WordCards from '@modules/word-core/components/WordCards/WordCards';
 import { Button, Empty, Flex, message, Skeleton } from 'antd';

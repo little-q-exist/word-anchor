@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Flex, Space, Select, Input } from 'antd';
-import wordServices from '@/services/words';
+import wordServices from '@/shared/services/words';
 import type { UseSearchWordReturnType } from '../hooks/useSearchWord';
 
 interface SearchWordProps {

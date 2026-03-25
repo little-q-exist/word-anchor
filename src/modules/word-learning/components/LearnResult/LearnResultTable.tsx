@@ -1,6 +1,6 @@
 import { queryOptions, useQueries } from '@tanstack/react-query';
 import { Skeleton, Table } from 'antd';
-import wordService from '@/services/words';
+import wordService from '@/shared/services/words';
 import type { BriefWordWithLearnStatus } from '@/types';
 
 const { Column, ColumnGroup } = Table;

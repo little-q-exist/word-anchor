@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import type { User, UserLearningData, UserStats } from '../types';
+import type { User, UserLearningData, UserStats } from '../../types';
 
-import globalConfig from '../shared/services/config';
+import globalConfig from './config';
 
 globalConfig();
 

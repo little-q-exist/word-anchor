@@ -3,7 +3,7 @@ import type { RootState } from '@/store';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { FloatButton, message } from 'antd';
 import { useSelector } from 'react-redux';
-import userService from '@/services/users';
+import userService from '@/shared/services/users';
 import type { UserLearningData } from '@/types';
 import type React from 'react';
 
