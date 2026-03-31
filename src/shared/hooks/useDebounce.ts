@@ -1,6 +1,5 @@
 import { useCallback, useRef } from 'react';
 
-// eslint-disable-next-line no-unused-vars
 export const useDebounce = <T>(callback: (value: T) => void, delay: number) => {
     const timer = useRef<NodeJS.Timeout | null>(null);
 

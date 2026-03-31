@@ -135,8 +135,8 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
     };
 
     const { detailedWordQuery } = useDetailedWordQuery(
-        !!briefWords && briefWords.length !== 0 && !!briefWords[index]?._id,
-        briefWords[index]?._id
+        !!briefWords && briefWords.length !== 0 && !!briefWords[index]._id,
+        briefWords[index]._id
     );
     const familiarityMutation = useMutation({
         mutationFn: ({
