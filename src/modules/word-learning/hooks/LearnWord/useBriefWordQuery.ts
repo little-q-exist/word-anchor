@@ -5,7 +5,7 @@ import wordServices from '@/shared/services/words';
 
 const useBriefWordQuery = (enable: boolean, mode: 'learn' | 'review') => {
     const briefWordQuery = useQuery({
-        queryKey: ['learnWords', mode],
+        queryKey: ['briefWords', mode],
         queryFn: () =>
             mode === 'learn' ? wordServices.getWordToLearn() : wordServices.getWordToReview(),
         refetchOnWindowFocus: false,
