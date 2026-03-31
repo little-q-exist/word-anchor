@@ -23,9 +23,11 @@ const useBriefWordQuery = (enable: boolean, mode: 'learn' | 'review') => {
     const isBriefWordLoading = briefWordQuery.status === 'pending';
     const isBriefWordError = briefWordQuery.status === 'error';
     const canShowBriefWord = !!(briefWordQuery.status === 'success' && briefWordQuery.data);
+    const isBriefWordQueryEnabled = enable;
 
     return {
         briefWordsWithStatus,
+        isBriefWordQueryEnabled,
         isBriefWordLoading,
         isBriefWordError,
         canShowBriefWord,

@@ -36,8 +36,13 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
         removeCache,
     } = useWordCache(mode);
 
-    const { briefWordsWithStatus, isBriefWordLoading, isBriefWordError, canShowBriefWord } =
-        useBriefWordQuery(isCacheReady && !cachedBriefWords, mode);
+    const {
+        briefWordsWithStatus,
+        isBriefWordLoading,
+        isBriefWordError,
+        canShowBriefWord,
+        isBriefWordQueryEnabled,
+    } = useBriefWordQuery(isCacheReady && !cachedBriefWords, mode);
 
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
@@ -194,6 +199,10 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
         setShouldShowInfo(true);
     };
 
+    if (!isCacheReady || (isBriefWordQueryEnabled && isBriefWordLoading)) {
+        return <CenteredSpin />;
+    }
+
     if (isFinished) {
         return <LearnResult briefWords={briefWords} />;
     }
@@ -207,10 +216,6 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
                 />
             </Flex>
         );
-    }
-
-    if (!isCacheReady || isBriefWordLoading) {
-        return <CenteredSpin />;
     }
 
     if (isBriefWordError || detailedWordQuery.status === 'error') {

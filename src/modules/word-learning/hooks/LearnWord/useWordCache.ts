@@ -108,9 +108,11 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
             return;
         }
         try {
-            await localforage.removeItem(cacheWordKey);
-            await localforage.removeItem(cacheIndexKey);
-            await localforage.removeItem(cacheQueueKey);
+            await Promise.all([
+                localforage.removeItem(cacheWordKey),
+                localforage.removeItem(cacheIndexKey),
+                localforage.removeItem(cacheQueueKey),
+            ]);
         } catch (error) {
             console.error('Error occurred while removing item from localforage:', error);
         }

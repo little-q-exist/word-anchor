@@ -85,15 +85,6 @@ const useLearnQueue = (
         setWordToRepeat((prev) => sanitizeRepeatQueue(prev, maxIndex));
     }, [briefWords.length]);
 
-    useEffect(() => {
-        if (
-            (wordToRepeat.length === 0 && isRepeating) ||
-            (!isRepeating && index >= briefWords.length)
-        ) {
-            setIsFinished(true);
-        }
-    }, [briefWords.length, index, isRepeating, wordToRepeat.length]);
-
     const toNextWord = () => {
         if (!isRepeating) {
             if (index < briefWords.length - 1) {
@@ -102,11 +93,16 @@ const useLearnQueue = (
                 if (wordToRepeat.length > 0) {
                     setIsRepeating(true);
                     setIndex(wordToRepeat[0]);
+                } else {
+                    setIsFinished(true);
                 }
             }
-        }
-        if (isRepeating && wordToRepeat.length > 0) {
-            setIndex(wordToRepeat[0]);
+        } else {
+            if (wordToRepeat.length > 0) {
+                setIndex(wordToRepeat[0]);
+            } else {
+                setIsFinished(true);
+            }
         }
     };
 
