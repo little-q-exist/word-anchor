@@ -32,6 +32,13 @@ export interface BriefWordWithLearnStatus extends BriefWord {
     status: 'idle' | 'passed' | 'failed';
 }
 
+export interface LearnQueueSnapshot {
+    index: number;
+    isRepeating: boolean;
+    repeatQueue: number[];
+    updatedAt: number;
+}
+
 export interface BriefWordListWithMode {
     /**
      * List of brief word objects in the selected mode.

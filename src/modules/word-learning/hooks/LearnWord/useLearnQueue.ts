@@ -1,11 +1,89 @@
-import { useState } from 'react';
-import type { BriefWordWithLearnStatus } from '@/types';
+import { useEffect, useMemo, useState } from 'react';
+import type { BriefWordWithLearnStatus, LearnQueueSnapshot } from '@/types';
 
-const useLearnQueue = (briefWords: BriefWordWithLearnStatus[]) => {
-    const [index, setIndex] = useState(0);
-    const [wordToRepeat, setWordToRepeat] = useState<number[]>([]);
-    const [isRepeating, setIsRepeating] = useState(false);
+type LearnQueueInitialState = {
+    index?: number;
+    isRepeating?: boolean;
+    repeatQueue?: number[];
+};
+
+const sanitizeIndex = (index: number, maxIndex: number) => {
+    if (!Number.isFinite(index)) {
+        return 0;
+    }
+    if (index < 0) {
+        return 0;
+    }
+    if (index > maxIndex) {
+        return maxIndex;
+    }
+    return index;
+};
+
+const sanitizeRepeatQueue = (repeatQueue: number[], maxIndex: number) => {
+    return repeatQueue.filter(
+        (repeatIndex) =>
+            Number.isInteger(repeatIndex) && repeatIndex >= 0 && repeatIndex <= maxIndex
+    );
+};
+
+const getNormalizedInitialState = (
+    briefWords: BriefWordWithLearnStatus[],
+    initialState?: LearnQueueInitialState
+) => {
+    if (briefWords.length === 0) {
+        return { index: 0, isRepeating: false, repeatQueue: [] };
+    }
+
+    const maxIndex = briefWords.length - 1;
+    const repeatQueue = sanitizeRepeatQueue(initialState?.repeatQueue ?? [], maxIndex);
+    const index = sanitizeIndex(initialState?.index ?? 0, maxIndex);
+    const isRepeating = Boolean(initialState?.isRepeating) && repeatQueue.length > 0;
+
+    return { index, isRepeating, repeatQueue };
+};
+
+const useLearnQueue = (
+    briefWords: BriefWordWithLearnStatus[],
+    initialState?: LearnQueueInitialState,
+    hydrateKey?: string
+) => {
+    const normalizedInitialState = useMemo(
+        () => getNormalizedInitialState(briefWords, initialState),
+        [briefWords, initialState]
+    );
+
+    const [index, setIndex] = useState(normalizedInitialState.index);
+    const [wordToRepeat, setWordToRepeat] = useState<number[]>(normalizedInitialState.repeatQueue);
+    const [isRepeating, setIsRepeating] = useState(normalizedInitialState.isRepeating);
     const [isFinished, setIsFinished] = useState(false);
+    const [appliedHydrateKey, setAppliedHydrateKey] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        if (!hydrateKey || hydrateKey === appliedHydrateKey) {
+            return;
+        }
+
+        setIndex(normalizedInitialState.index);
+        setWordToRepeat(normalizedInitialState.repeatQueue);
+        setIsRepeating(normalizedInitialState.isRepeating);
+        setIsFinished(false);
+        setAppliedHydrateKey(hydrateKey);
+    }, [appliedHydrateKey, hydrateKey, normalizedInitialState]);
+
+    useEffect(() => {
+        if (briefWords.length === 0) {
+            setIndex(0);
+            setWordToRepeat([]);
+            setIsRepeating(false);
+            setIsFinished(false);
+            return;
+        }
+
+        const maxIndex = briefWords.length - 1;
+        setIndex((prev) => sanitizeIndex(prev, maxIndex));
+        setWordToRepeat((prev) => sanitizeRepeatQueue(prev, maxIndex));
+    }, [briefWords.length]);
 
     const toNextWord = () => {
         if (!isRepeating) {
@@ -17,7 +95,6 @@ const useLearnQueue = (briefWords: BriefWordWithLearnStatus[]) => {
                     setIndex(wordToRepeat[0]);
                 } else {
                     setIsFinished(true);
-                    return;
                 }
             }
         } else {
@@ -25,7 +102,6 @@ const useLearnQueue = (briefWords: BriefWordWithLearnStatus[]) => {
                 setIndex(wordToRepeat[0]);
             } else {
                 setIsFinished(true);
-                return;
             }
         }
     };
@@ -44,7 +120,25 @@ const useLearnQueue = (briefWords: BriefWordWithLearnStatus[]) => {
         });
     };
 
-    return { index, isRepeating, isFinished, toNextWord, addToRepeatQueue, handleRepeat };
+    const queueSnapshot: Omit<LearnQueueSnapshot, 'updatedAt'> = useMemo(
+        () => ({
+            index,
+            isRepeating,
+            repeatQueue: wordToRepeat,
+        }),
+        [index, isRepeating, wordToRepeat]
+    );
+
+    return {
+        index,
+        isRepeating,
+        isFinished,
+        repeatQueue: wordToRepeat,
+        queueSnapshot,
+        toNextWord,
+        addToRepeatQueue,
+        handleRepeat,
+    };
 };
 
 export default useLearnQueue;

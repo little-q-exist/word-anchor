@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import userServices from '@/shared/services/users';
-import wordServices from '@/shared/services/words';
 
 import WordCards from '@modules/word-core/components/WordCards/WordCards';
 import { Button, Empty, Flex, message, Skeleton } from 'antd';
@@ -10,51 +9,119 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { useNavigate } from 'react-router';
 import WordSideButtonGroup from '@modules/word-core/components/WordSideButtonGroup/WordSideButtonGroup';
-import type { BriefWord, BriefWordWithLearnStatus } from '@/types';
+import type { BriefWordWithLearnStatus } from '@/types';
 import LearnResult from '../LearnResult/LearnResult';
-import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import CenteredSpin from '@/shared/components/CenteredSpin';
 import LearnProgress from './LearnProgress';
 import useLearnQueue from '@modules/word-learning/hooks/LearnWord/useLearnQueue';
+import useWordCache from '@modules/word-learning/hooks/LearnWord/useWordCache';
+import useBriefWordQuery from '@modules/word-learning/hooks/LearnWord/useBriefWordQuery';
+import useDetailedWordQuery from '../../hooks/LearnWord/useDetailedWordQuery';
 
-type LearnWordInterface =
-    | {
-          isBriefWordLoading: false;
-          loadedWords: BriefWord[];
-          mode: 'learn' | 'review';
-      }
-    | {
-          isBriefWordLoading: true;
-      };
+type LearnWordInterface = {
+    mode: 'learn' | 'review';
+};
 
-const LearnWord = (props: LearnWordInterface) => {
-    const { isBriefWordLoading } = props;
-    const loadedWords = useMemo(() => {
-        return !isBriefWordLoading ? props.loadedWords : [];
-    }, [isBriefWordLoading, props]);
-
+const LearnWord = ({ mode }: LearnWordInterface) => {
     const user = useSelector((state: RootState) => state.user);
 
-    const briefWordsWithStatus: BriefWordWithLearnStatus[] = useMemo(() => {
-        return (
-            loadedWords.map((briefWord) => {
-                return { ...briefWord, status: 'idle' };
-            }) || []
-        );
-    }, [loadedWords]);
+    const {
+        cachedBriefWords,
+        cachedLastLearnedIndex,
+        cachedQueueSnapshot,
+        isCacheReady,
+        setWordCache,
+        setQueueCache,
+        removeCache,
+    } = useWordCache(mode);
+
+    const {
+        briefWordsWithStatus,
+        isBriefWordLoading,
+        isBriefWordError,
+        canShowBriefWord,
+        isBriefWordQueryEnabled,
+    } = useBriefWordQuery(isCacheReady && !cachedBriefWords, mode);
 
     const navigate = useNavigate();
-
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [briefWords, setBriefWords] = useState(briefWordsWithStatus);
+    const [briefWords, setBriefWords] = useState<BriefWordWithLearnStatus[]>([]);
+
+    useEffect(() => {
+        if (!isCacheReady || !cachedBriefWords) {
+            return;
+        }
+        setBriefWords(cachedBriefWords);
+    }, [cachedBriefWords, isCacheReady]);
+
+    useEffect(() => {
+        if (cachedBriefWords) {
+            return;
+        }
+
+        if (canShowBriefWord) {
+            setBriefWords(briefWordsWithStatus);
+            setWordCache(briefWordsWithStatus);
+        }
+    }, [briefWordsWithStatus, cachedBriefWords, canShowBriefWord, setWordCache]);
 
     const [shouldDisableButton, setShouldDisableButton] = useState(false);
-
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
 
-    const { index, isRepeating, isFinished, toNextWord, addToRepeatQueue, handleRepeat } =
-        useLearnQueue(briefWords);
+    const initialQueueState = useMemo(
+        () => ({
+            index: cachedQueueSnapshot?.index ?? cachedLastLearnedIndex ?? 0,
+            isRepeating: cachedQueueSnapshot?.isRepeating ?? false,
+            repeatQueue: cachedQueueSnapshot?.repeatQueue ?? [],
+        }),
+        [cachedLastLearnedIndex, cachedQueueSnapshot]
+    );
+
+    const queueHydrateKey = useMemo(() => {
+        if (!isCacheReady || briefWords.length === 0) {
+            return undefined;
+        }
+
+        const version = cachedQueueSnapshot?.updatedAt ?? cachedLastLearnedIndex ?? 'default';
+        return `${mode}-${version}-${briefWords.length}`;
+    }, [
+        briefWords.length,
+        cachedLastLearnedIndex,
+        cachedQueueSnapshot?.updatedAt,
+        isCacheReady,
+        mode,
+    ]);
+
+    const {
+        index,
+        isRepeating,
+        isFinished,
+        queueSnapshot,
+        toNextWord,
+        addToRepeatQueue,
+        handleRepeat,
+    } = useLearnQueue(briefWords, initialQueueState, queueHydrateKey);
+
+    useEffect(() => {
+        if (!isCacheReady || briefWords.length === 0 || isFinished) {
+            return;
+        }
+
+        setWordCache(briefWords);
+        setQueueCache(queueSnapshot);
+    }, [briefWords, isCacheReady, isFinished, queueSnapshot, setQueueCache, setWordCache]);
+
+    useEffect(() => {
+        if (!isCacheReady) {
+            return;
+        }
+
+        if (isFinished || (!isBriefWordLoading && briefWords.length === 0)) {
+            removeCache();
+        }
+    }, [briefWords.length, isBriefWordLoading, isCacheReady, isFinished, removeCache]);
 
     const navigateToNextWord = () => {
         toNextWord();
@@ -67,20 +134,10 @@ const LearnWord = (props: LearnWordInterface) => {
         );
     };
 
-    const {
-        data: detailedWordToShow,
-        isError,
-        status: detailedWordQueryStatus,
-    } = useQuery({
-        queryKey: ['word', briefWords[index]?._id],
-        queryFn: briefWords[index]?._id
-            ? () => wordServices.getById(briefWords[index]._id)
-            : skipToken,
-        enabled: briefWords.length !== 0 && !!briefWords[index]?._id,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-    });
-
+    const { detailedWordQuery } = useDetailedWordQuery(
+        !!briefWords && briefWords.length !== 0 && !!briefWords[index]._id,
+        briefWords[index]._id
+    );
     const familiarityMutation = useMutation({
         mutationFn: ({
             userId,
@@ -142,6 +199,10 @@ const LearnWord = (props: LearnWordInterface) => {
         setShouldShowInfo(true);
     };
 
+    if (!isCacheReady || (isBriefWordQueryEnabled && isBriefWordLoading)) {
+        return <CenteredSpin />;
+    }
+
     if (isFinished) {
         return <LearnResult briefWords={briefWords} />;
     }
@@ -157,11 +218,7 @@ const LearnWord = (props: LearnWordInterface) => {
         );
     }
 
-    if (isBriefWordLoading) {
-        return <CenteredSpin />;
-    }
-
-    if (isError) {
+    if (isBriefWordError || detailedWordQuery.status === 'error') {
         return <div>some error occurred</div>;
     }
 
@@ -171,14 +228,14 @@ const LearnWord = (props: LearnWordInterface) => {
             <Flex style={{ height: '100%', marginTop: '1rem' }} vertical>
                 <LearnProgress briefWords={briefWords} index={index} key={index} />
                 <div style={{ flex: 1 }}>
-                    {detailedWordQueryStatus === 'pending' ? (
-                        <Skeleton />
-                    ) : (
+                    {detailedWordQuery.status === 'success' ? (
                         <WordCards
-                            word={detailedWordToShow}
+                            word={detailedWordQuery.data}
                             visible={shouldShowInfo}
-                            key={detailedWordToShow._id}
+                            key={detailedWordQuery.data._id}
                         />
+                    ) : (
+                        <Skeleton />
                     )}
                 </div>
 
@@ -222,9 +279,9 @@ const LearnWord = (props: LearnWordInterface) => {
                         </Button>
                     )}
                 </Flex>
-                {detailedWordQueryStatus === 'success' && (
+                {detailedWordQuery.status === 'success' && (
                     <WordSideButtonGroup
-                        wordId={detailedWordToShow._id}
+                        wordId={detailedWordQuery.data._id}
                         returnOption={{ showReturn: false }}
                     />
                 )}
