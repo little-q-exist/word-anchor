@@ -114,23 +114,25 @@ const getLocalforageEntries = async (
             req.onerror = () => reject(req.error);
         });
 
-        const rows = await new Promise<Array<{ key: string; value: unknown }>>((resolve, reject) => {
-            const tx = openDb.transaction('keyvaluepairs', 'readonly');
-            const store = tx.objectStore('keyvaluepairs');
-            const cursor = store.openCursor();
-            const data: Array<{ key: string; value: unknown }> = [];
+        const rows = await new Promise<Array<{ key: string; value: unknown }>>(
+            (resolve, reject) => {
+                const tx = openDb.transaction('keyvaluepairs', 'readonly');
+                const store = tx.objectStore('keyvaluepairs');
+                const cursor = store.openCursor();
+                const data: Array<{ key: string; value: unknown }> = [];
 
-            cursor.onsuccess = () => {
-                const current = cursor.result;
-                if (!current) {
-                    resolve(data);
-                    return;
-                }
-                data.push({ key: String(current.key), value: current.value });
-                current.continue();
-            };
-            cursor.onerror = () => reject(cursor.error);
-        });
+                cursor.onsuccess = () => {
+                    const current = cursor.result;
+                    if (!current) {
+                        resolve(data);
+                        return;
+                    }
+                    data.push({ key: String(current.key), value: current.value });
+                    current.continue();
+                };
+                cursor.onerror = () => reject(cursor.error);
+            }
+        );
 
         openDb.close();
         return rows;
@@ -322,8 +324,9 @@ test.describe('learn/review cache e2e', () => {
         await expect(page.locator('main h1').first()).toHaveText(learnWord.english);
 
         const entries = await getLocalforageEntries(page);
-        const cachedLearnWords = entries.find((entry) => entry.key === `${user._id}-learn-briefWords`)
-            ?.value as Array<{ _id: string; english: string }>;
+        const cachedLearnWords = entries.find(
+            (entry) => entry.key === `${user._id}-learn-briefWords`
+        )?.value as Array<{ _id: string; english: string }>;
         const cachedReviewWords = entries.find(
             (entry) => entry.key === `${user._id}-review-briefWords`
         )?.value as Array<{ _id: string; english: string }>;
@@ -377,6 +380,7 @@ test.describe('learn/review cache e2e', () => {
         expect(learnCacheKeys.length).toBe(0);
 
         await page.reload();
+        await waitLearnWordVisible(page);
 
         const mainWordCount = await page.locator('main h1').count();
         if (mainWordCount > 0) {
