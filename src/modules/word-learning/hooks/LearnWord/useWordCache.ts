@@ -75,13 +75,16 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
 
     const setIndexCache = useCallback(
         async (index: number) => {
+            if (!userId || !mode) {
+                return;
+            }
             try {
                 await localforage.setItem(cacheIndexKey, index);
             } catch (error) {
                 console.error('Error occurred while setting index in localforage:', error);
             }
         },
-        [cacheIndexKey]
+        [cacheIndexKey, mode, userId]
     );
 
     const setQueueCache = useCallback(
