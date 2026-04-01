@@ -5,7 +5,7 @@ const useDetailedWordQuery = (enable: boolean, wordId?: string) => {
     const shouldFetch = enable && !!wordId;
 
     const detailedWordQuery = useQuery({
-        queryKey: shouldFetch ? ['word', wordId] : skipToken,
+        queryKey: ['word', wordId],
         queryFn: shouldFetch ? () => wordServices.getById(wordId!) : skipToken,
         enabled: shouldFetch,
         refetchOnWindowFocus: false,
