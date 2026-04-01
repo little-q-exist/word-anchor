@@ -47,7 +47,7 @@ Word Anchor 是一个用于英语词汇学习与复习的前端应用，基于 R
 
 ---
 
-## 前端持久化设计（新版）
+## 前端持久化设计
 
 学习与复习流程使用 `localforage` 持久化，核心实现在：
 
@@ -69,7 +69,7 @@ Word Anchor 是一个用于英语词汇学习与复习的前端应用，基于 R
 
 ---
 
-## 目录结构（重构后）
+## 目录结构
 
 ```text
 src/
@@ -115,7 +115,7 @@ npm run server
 >
 > `SERVER_URL = 'http://localhost:3000/api'`
 >
-> 如使用本地 mock 服务，请根据实际后端代理/端口配置调整。
+> 如使用本地 mock 服务，请调整 `db.json `。
 
 ---
 
@@ -131,18 +131,3 @@ npm run server
 - `npm run server`：启动 json-server（`db.json`）
 - `npm run format`：格式化 `src/**/*.ts(x)`
 
----
-
-## 测试说明
-
-当前端到端测试位于：
-
-- `src/test/learn-cache.e2e.spec.ts`
-
-覆盖学习缓存相关关键场景（含 localforage 缓存读写与学习流程连通性验证）。
-
----
-
-## 说明
-
-本仓库 README 已根据当前代码结构、持久化实现与依赖版本更新。
