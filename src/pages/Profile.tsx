@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import userService from '../shared/services/users';
 import { useQuery } from '@tanstack/react-query';
+import ProtectedRoute from '@/layout/ProtectedRoute/ProtectedRoute';
 
 const { Title } = Typography;
 
@@ -27,31 +28,33 @@ const Profile = () => {
     }
 
     return (
-        <Spin spinning={isPending}>
-            <div style={{ padding: '24px' }}>
-                <Title level={2}>我</Title>
-                <Row gutter={16} style={{ marginTop: '24px' }}>
-                    <Col span={12}>
-                        <Card>
-                            <Statistic
-                                title="今日学习/复习单词数"
-                                value={data?.todayCount || 0}
-                                suffix=" 个"
-                            />
-                        </Card>
-                    </Col>
-                    <Col span={12}>
-                        <Card>
-                            <Statistic
-                                title="累计学习单词数"
-                                value={data?.totalCount || 0}
-                                suffix=" 个"
-                            />
-                        </Card>
-                    </Col>
-                </Row>
-            </div>
-        </Spin>
+        <ProtectedRoute>
+            <Spin spinning={isPending}>
+                <div style={{ padding: '24px' }}>
+                    <Title level={2}>我 {user?.username ?? ''}</Title>
+                    <Row gutter={16} style={{ marginTop: '24px' }}>
+                        <Col span={12}>
+                            <Card>
+                                <Statistic
+                                    title="今日学习/复习单词数"
+                                    value={data?.todayCount || 0}
+                                    suffix=" 个"
+                                />
+                            </Card>
+                        </Col>
+                        <Col span={12}>
+                            <Card>
+                                <Statistic
+                                    title="累计学习单词数"
+                                    value={data?.totalCount || 0}
+                                    suffix=" 个"
+                                />
+                            </Card>
+                        </Col>
+                    </Row>
+                </div>
+            </Spin>
+        </ProtectedRoute>
     );
 };
 
