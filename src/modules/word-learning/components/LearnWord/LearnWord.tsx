@@ -36,6 +36,10 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
         removeCache,
     } = useWordCache(mode);
 
+    if (isCacheReady && !cachedBriefWords) {
+        console.log('ready', isCacheReady);
+        console.log('cachedBriefWords', cachedBriefWords);
+    }
     const {
         briefWordsWithStatus,
         isBriefWordLoading,

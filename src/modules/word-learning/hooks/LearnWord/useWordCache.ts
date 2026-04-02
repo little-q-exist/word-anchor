@@ -13,9 +13,9 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
     const [cachedQueueSnapshot, setCachedQueueSnapshot] = useState<LearnQueueSnapshot | null>(null);
     const [isCacheReady, setIsCacheReady] = useState(false);
 
-    const cacheWordKey = `${userId ?? 'guest'}-${mode}-briefWords`;
-    const cacheIndexKey = `${userId ?? 'guest'}-${mode}-lastLearnedIndex`;
-    const cacheQueueKey = `${userId ?? 'guest'}-${mode}-learnQueueSnapshot`;
+    const cacheWordKey = `${userId}-${mode}-briefWords`;
+    const cacheIndexKey = `${userId}-${mode}-lastLearnedIndex`;
+    const cacheQueueKey = `${userId}-${mode}-learnQueueSnapshot`;
 
     const getWordCache = useCallback(async (): Promise<BriefWordWithLearnStatus[] | null> => {
         if (!userId || !mode) {
@@ -141,8 +141,10 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
 
             setIsCacheReady(true);
         };
-        fetchCachedWords();
-    }, [getIndexCache, getQueueCache, getWordCache]);
+        if (userId && mode) {
+            fetchCachedWords();
+        }
+    }, [getIndexCache, getQueueCache, getWordCache, mode, userId]);
 
     return {
         cachedBriefWords,
