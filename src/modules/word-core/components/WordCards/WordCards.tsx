@@ -1,4 +1,4 @@
-import type { Word } from '@/types';
+import type { Word } from '@modules/word-core/types';
 
 import { Flex, Typography, Space, Skeleton } from 'antd';
 

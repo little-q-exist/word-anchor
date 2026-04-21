@@ -1,6 +1,6 @@
 import { type TabsProps, Tabs } from 'antd';
 import { useState } from 'react';
-import type { Word } from '@/types';
+import type { Word } from '@modules/word-core/types';
 import { centerStyle } from '@/shared/styles/centerStyle';
 
 const tabKeyTypes = {
