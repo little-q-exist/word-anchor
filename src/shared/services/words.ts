@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-import type { NewWord, Word, BriefWordListWithMode } from '../../types';
+import type { NewWord, Word } from '@modules/word-core/types';
+import type { BriefWordListWithMode } from '@modules/word-learning/types';
 
 import globalConfig from './config';
 

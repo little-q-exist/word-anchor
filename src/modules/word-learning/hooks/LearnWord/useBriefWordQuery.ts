@@ -1,4 +1,4 @@
-import type { BriefWordWithLearnStatus } from '@/types';
+import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import wordServices from '@/shared/services/words';

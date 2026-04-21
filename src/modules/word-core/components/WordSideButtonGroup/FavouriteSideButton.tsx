@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { FloatButton, message } from 'antd';
 import { useSelector } from 'react-redux';
 import userService from '@/shared/services/users';
-import type { UserLearningData } from '@/types';
+import type { UserLearningData } from '@modules/word-core/types';
 import type React from 'react';
 
 const iconStyle: React.CSSProperties = {

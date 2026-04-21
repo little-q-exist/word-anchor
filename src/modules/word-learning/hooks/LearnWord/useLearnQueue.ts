@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { BriefWordWithLearnStatus, LearnQueueSnapshot } from '@/types';
+import type { BriefWordWithLearnStatus, LearnQueueSnapshot } from '@modules/word-learning/types';
 
 type LearnQueueInitialState = {
     index?: number;
