@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-import type { User, UserLearningData, UserStats } from '../../types';
+import type {
+    LearningMode,
+    LearningSession,
+    UpsertLearningSessionBody,
+} from '@modules/word-learning/types';
+import type { User, UserStats } from '@modules/auth/types';
+import type { UserLearningData } from '@modules/word-core/types';
 
 import globalConfig from './config';
 
@@ -51,6 +57,28 @@ const getUserStats = async (userId: string): Promise<UserStats> => {
     return response.data;
 };
 
+const getLearningSession = async (
+    userId: string,
+    mode: LearningMode
+): Promise<LearningSession | null> => {
+    const response = await axios.get(`${APIURL}/${userId}/learning-sessions/${mode}`);
+    return response.data;
+};
+
+const upsertLearningSession = async (
+    userId: string,
+    mode: LearningMode,
+    payload: UpsertLearningSessionBody
+): Promise<LearningSession> => {
+    const response = await axios.put(`${APIURL}/${userId}/learning-sessions/${mode}`, payload);
+    return response.data;
+};
+
+const deleteLearningSession = async (userId: string, mode: LearningMode): Promise<null> => {
+    const response = await axios.delete(`${APIURL}/${userId}/learning-sessions/${mode}`);
+    return response.data;
+};
+
 const getUsernameExistence = async (username: string): Promise<{ exists: boolean }> => {
     const response = await axios.get(`${APIURL}/${username}/existence`);
     return response.data;
@@ -62,5 +90,8 @@ export default {
     updateFavorite,
     getLearningData,
     getUserStats,
+    getLearningSession,
+    upsertLearningSession,
+    deleteLearningSession,
     getUsernameExistence,
 };

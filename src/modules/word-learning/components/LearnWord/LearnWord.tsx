@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { useNavigate } from 'react-router';
 import WordSideButtonGroup from '@modules/word-core/components/WordSideButtonGroup/WordSideButtonGroup';
-import type { BriefWordWithLearnStatus } from '@/types';
+import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
 import LearnResult from '../LearnResult/LearnResult';
 import { useMutation } from '@tanstack/react-query';
 import CenteredSpin from '@/shared/components/CenteredSpin';
@@ -34,12 +34,9 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
         setWordCache,
         setQueueCache,
         removeCache,
+        syncSessionCache,
+        removeSessionCache,
     } = useWordCache(mode);
-
-    if (isCacheReady && !cachedBriefWords) {
-        console.log('ready', isCacheReady);
-        console.log('cachedBriefWords', cachedBriefWords);
-    }
     const {
         briefWordsWithStatus,
         isBriefWordLoading,
@@ -113,9 +110,23 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
             return;
         }
 
+        const queueSnapshotWithUpdatedAt = {
+            ...queueSnapshot,
+            updatedAt: Date.now(),
+        };
+
         setWordCache(briefWords);
         setQueueCache(queueSnapshot);
-    }, [briefWords, isCacheReady, isFinished, queueSnapshot, setQueueCache, setWordCache]);
+        syncSessionCache(briefWords, queueSnapshotWithUpdatedAt);
+    }, [
+        briefWords,
+        isCacheReady,
+        isFinished,
+        queueSnapshot,
+        setQueueCache,
+        setWordCache,
+        syncSessionCache,
+    ]);
 
     useEffect(() => {
         if (!isCacheReady) {
@@ -124,8 +135,16 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
 
         if (isFinished || (!isBriefWordLoading && briefWords.length === 0)) {
             removeCache();
+            removeSessionCache();
         }
-    }, [briefWords.length, isBriefWordLoading, isCacheReady, isFinished, removeCache]);
+    }, [
+        briefWords.length,
+        isBriefWordLoading,
+        isCacheReady,
+        isFinished,
+        removeCache,
+        removeSessionCache,
+    ]);
 
     const navigateToNextWord = () => {
         toNextWord();

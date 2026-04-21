@@ -1,8 +1,46 @@
 import type { RootState } from '@/store';
-import type { BriefWordWithLearnStatus, LearnQueueSnapshot } from '@/types';
+import type {
+    BriefWordWithLearnStatus,
+    LearnQueueSnapshot,
+    LearningSession,
+} from '@modules/word-learning/types';
+import axios from 'axios';
 import localforage from 'localforage';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import userServices from '@/shared/services/users';
+
+const DEVICE_ID_KEY = 'recite-word-device-id';
+
+const getOrCreateDeviceId = () => {
+    const existing = localStorage.getItem(DEVICE_ID_KEY);
+    if (existing) {
+        return existing;
+    }
+
+    const generated = `device-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    localStorage.setItem(DEVICE_ID_KEY, generated);
+    return generated;
+};
+
+const getSnapshotUpdatedAt = (snapshot: LearnQueueSnapshot | null) => {
+    return snapshot?.updatedAt ?? 0;
+};
+
+const shouldUseRemoteSession = (
+    remoteSession: LearningSession | null,
+    localWords: BriefWordWithLearnStatus[] | null,
+    localQueueSnapshot: LearnQueueSnapshot | null
+) => {
+    if (!remoteSession || remoteSession.words.length === 0) {
+        return false;
+    }
+    if (!localWords || localWords.length === 0) {
+        return true;
+    }
+
+    return remoteSession.queueSnapshot.updatedAt >= getSnapshotUpdatedAt(localQueueSnapshot);
+};
 
 const useWordCache = (mode: 'learn' | 'review' | undefined) => {
     const userId = useSelector((state: RootState) => state.user?._id);
@@ -11,6 +49,7 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
     );
     const [cachedLastLearnedIndex, setCachedLastLearnedIndex] = useState<number | null>(null);
     const [cachedQueueSnapshot, setCachedQueueSnapshot] = useState<LearnQueueSnapshot | null>(null);
+    const [cachedSessionVersion, setCachedSessionVersion] = useState<number | null>(null);
     const [isCacheReady, setIsCacheReady] = useState(false);
 
     const cacheWordKey = `${userId}-${mode}-briefWords`;
@@ -121,21 +160,97 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
         }
     }, [cacheWordKey, cacheIndexKey, cacheQueueKey, mode, userId]);
 
-    useEffect(() => {
-        const fetchCachedWords = async () => {
-            const cachedWord = await getWordCache();
-            if (cachedWord) {
-                setCachedBriefWords(cachedWord);
+    const syncSessionCache = useCallback(
+        async (briefWords: BriefWordWithLearnStatus[], snapshot: LearnQueueSnapshot) => {
+            if (!userId || !mode || briefWords.length === 0) {
+                return;
             }
 
-            const cachedQueue = await getQueueCache();
-            if (cachedQueue) {
-                setCachedQueueSnapshot(cachedQueue);
-                setCachedLastLearnedIndex(cachedQueue.index);
+            try {
+                const response = await userServices.upsertLearningSession(userId, mode, {
+                    words: briefWords,
+                    queueSnapshot: snapshot,
+                    version: cachedSessionVersion ?? undefined,
+                    deviceId: getOrCreateDeviceId(),
+                });
+                setCachedSessionVersion(response.version);
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response?.status === 409) {
+                    const latestSession = (
+                        error.response.data as { data?: { latest?: LearningSession } }
+                    )?.data?.latest;
+                    if (latestSession) {
+                        setCachedBriefWords(latestSession.words);
+                        setCachedQueueSnapshot(latestSession.queueSnapshot);
+                        setCachedLastLearnedIndex(latestSession.queueSnapshot.index);
+                        setCachedSessionVersion(latestSession.version);
+
+                        await Promise.all([
+                            localforage.setItem(cacheWordKey, latestSession.words),
+                            localforage.setItem(cacheQueueKey, latestSession.queueSnapshot),
+                            localforage.setItem(cacheIndexKey, latestSession.queueSnapshot.index),
+                        ]);
+                    }
+                    return;
+                }
+                console.error('Error occurred while syncing learning session:', error);
+            }
+        },
+        [cacheIndexKey, cacheQueueKey, cacheWordKey, cachedSessionVersion, mode, userId]
+    );
+
+    const removeSessionCache = useCallback(async () => {
+        if (!userId || !mode) {
+            return;
+        }
+
+        try {
+            await userServices.deleteLearningSession(userId, mode);
+            setCachedSessionVersion(null);
+        } catch (error) {
+            console.error('Error occurred while deleting learning session:', error);
+        }
+    }, [mode, userId]);
+
+    useEffect(() => {
+        const fetchCachedWords = async () => {
+            if (!userId || !mode) {
+                return;
+            }
+            const [cachedWord, cachedQueue, cachedIndex, remoteSession] = await Promise.all([
+                getWordCache(),
+                getQueueCache(),
+                getIndexCache(),
+                userServices.getLearningSession(userId, mode).catch(() => null),
+            ]);
+
+            const useRemote = shouldUseRemoteSession(remoteSession, cachedWord, cachedQueue);
+
+            if (useRemote && remoteSession) {
+                setCachedBriefWords(remoteSession.words);
+                setCachedQueueSnapshot(remoteSession.queueSnapshot);
+                setCachedLastLearnedIndex(remoteSession.queueSnapshot.index);
+                setCachedSessionVersion(remoteSession.version);
+
+                await Promise.all([
+                    localforage.setItem(cacheWordKey, remoteSession.words),
+                    localforage.setItem(cacheQueueKey, remoteSession.queueSnapshot),
+                    localforage.setItem(cacheIndexKey, remoteSession.queueSnapshot.index),
+                ]);
             } else {
-                const cachedIndex = await getIndexCache();
-                if (cachedIndex !== null) {
+                if (cachedWord) {
+                    setCachedBriefWords(cachedWord);
+                }
+
+                if (cachedQueue) {
+                    setCachedQueueSnapshot(cachedQueue);
+                    setCachedLastLearnedIndex(cachedQueue.index);
+                } else if (cachedIndex !== null) {
                     setCachedLastLearnedIndex(cachedIndex);
+                }
+
+                if (remoteSession) {
+                    setCachedSessionVersion(remoteSession.version);
                 }
             }
 
@@ -144,7 +259,16 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
         if (userId && mode) {
             fetchCachedWords();
         }
-    }, [getIndexCache, getQueueCache, getWordCache, mode, userId]);
+    }, [
+        cacheIndexKey,
+        cacheQueueKey,
+        cacheWordKey,
+        getIndexCache,
+        getQueueCache,
+        getWordCache,
+        mode,
+        userId,
+    ]);
 
     return {
         cachedBriefWords,
@@ -153,8 +277,11 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
         isCacheReady,
         setWordCache,
         removeCache,
+        syncSessionCache,
+        removeSessionCache,
         setIndexCache,
         setQueueCache,
+        cachedSessionVersion,
     };
 };
 
