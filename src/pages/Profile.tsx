@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Statistic, Card, Row, Col, Typography, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
-import userService from '../shared/services/users';
+import userService from '@modules/word-learning/services/users';
 import { useQuery } from '@tanstack/react-query';
 import ProtectedRoute from '@/layout/ProtectedRoute/ProtectedRoute';
 
