@@ -27,3 +27,6 @@ build
 .react-router
 
 test-results
+
+*.ps1
+.env
