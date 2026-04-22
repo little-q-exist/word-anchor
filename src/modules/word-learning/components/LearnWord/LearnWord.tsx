@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import userServices from '@/shared/services/users';
+import userServices from '@modules/word-learning/services/users';
 
 import WordCards from '@modules/word-core/components/WordCards/WordCards';
 import { Button, Empty, Flex, message, Skeleton } from 'antd';

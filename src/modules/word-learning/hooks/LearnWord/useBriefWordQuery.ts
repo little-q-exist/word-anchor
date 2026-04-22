@@ -1,7 +1,7 @@
 import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import wordServices from '@/shared/services/words';
+import wordServices from '@modules/word-learning/services/words';
 
 const useBriefWordQuery = (enable: boolean, mode: 'learn' | 'review') => {
     const briefWordQuery = useQuery({

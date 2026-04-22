@@ -1,5 +1,5 @@
 import { useQuery, skipToken } from '@tanstack/react-query';
-import wordServices from '@/shared/services/words';
+import wordServices from '@modules/word-core/services/words';
 
 const useDetailedWordQuery = (enable: boolean, wordId?: string) => {
     const shouldFetch = enable && !!wordId;

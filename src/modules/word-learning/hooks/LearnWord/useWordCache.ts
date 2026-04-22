@@ -8,7 +8,7 @@ import axios from 'axios';
 import localforage from 'localforage';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import userServices from '@/shared/services/users';
+import userServices from '@modules/word-learning/services/users';
 
 const DEVICE_ID_KEY = 'recite-word-device-id';
 
