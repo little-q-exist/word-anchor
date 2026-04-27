@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import userServices from '@/shared/services/users';
 
@@ -15,7 +15,6 @@ import { useMutation } from '@tanstack/react-query';
 import CenteredSpin from '@/shared/components/CenteredSpin';
 import LearnProgress from './LearnProgress';
 import useLearnQueue from '@modules/word-learning/hooks/LearnWord/useLearnQueue';
-import useWordCache from '@modules/word-learning/hooks/LearnWord/useWordCache';
 import useBriefWordQuery from '@modules/word-learning/hooks/LearnWord/useBriefWordQuery';
 import useDetailedWordQuery from '../../hooks/LearnWord/useDetailedWordQuery';
 
@@ -27,26 +26,12 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
     const user = useSelector((state: RootState) => state.user);
 
     const {
-        cachedBriefWords,
-        cachedLastLearnedIndex,
-        cachedQueueSnapshot,
-        isCacheReady,
-        setWordCache,
-        setQueueCache,
-        removeCache,
-    } = useWordCache(mode);
-
-    if (isCacheReady && !cachedBriefWords) {
-        console.log('ready', isCacheReady);
-        console.log('cachedBriefWords', cachedBriefWords);
-    }
-    const {
         briefWordsWithStatus,
         isBriefWordLoading,
         isBriefWordError,
         canShowBriefWord,
         isBriefWordQueryEnabled,
-    } = useBriefWordQuery(isCacheReady && !cachedBriefWords, mode);
+    } = useBriefWordQuery(undefined, mode);
 
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
@@ -54,78 +39,16 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
     const [briefWords, setBriefWords] = useState<BriefWordWithLearnStatus[]>([]);
 
     useEffect(() => {
-        if (!isCacheReady || !cachedBriefWords) {
-            return;
-        }
-        setBriefWords(cachedBriefWords);
-    }, [cachedBriefWords, isCacheReady]);
-
-    useEffect(() => {
-        if (cachedBriefWords) {
-            return;
-        }
-
         if (canShowBriefWord) {
             setBriefWords(briefWordsWithStatus);
-            setWordCache(briefWordsWithStatus);
         }
-    }, [briefWordsWithStatus, cachedBriefWords, canShowBriefWord, setWordCache]);
+    }, [briefWordsWithStatus, canShowBriefWord]);
 
     const [shouldDisableButton, setShouldDisableButton] = useState(false);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
 
-    const initialQueueState = useMemo(
-        () => ({
-            index: cachedQueueSnapshot?.index ?? cachedLastLearnedIndex ?? 0,
-            isRepeating: cachedQueueSnapshot?.isRepeating ?? false,
-            repeatQueue: cachedQueueSnapshot?.repeatQueue ?? [],
-        }),
-        [cachedLastLearnedIndex, cachedQueueSnapshot]
-    );
-
-    const queueHydrateKey = useMemo(() => {
-        if (!isCacheReady || briefWords.length === 0) {
-            return undefined;
-        }
-
-        const version = cachedQueueSnapshot?.updatedAt ?? cachedLastLearnedIndex ?? 'default';
-        return `${mode}-${version}-${briefWords.length}`;
-    }, [
-        briefWords.length,
-        cachedLastLearnedIndex,
-        cachedQueueSnapshot?.updatedAt,
-        isCacheReady,
-        mode,
-    ]);
-
-    const {
-        index,
-        isRepeating,
-        isFinished,
-        queueSnapshot,
-        toNextWord,
-        addToRepeatQueue,
-        handleRepeat,
-    } = useLearnQueue(briefWords, initialQueueState, queueHydrateKey);
-
-    useEffect(() => {
-        if (!isCacheReady || briefWords.length === 0 || isFinished) {
-            return;
-        }
-
-        setWordCache(briefWords);
-        setQueueCache(queueSnapshot);
-    }, [briefWords, isCacheReady, isFinished, queueSnapshot, setQueueCache, setWordCache]);
-
-    useEffect(() => {
-        if (!isCacheReady) {
-            return;
-        }
-
-        if (isFinished || (!isBriefWordLoading && briefWords.length === 0)) {
-            removeCache();
-        }
-    }, [briefWords.length, isBriefWordLoading, isCacheReady, isFinished, removeCache]);
+    const { index, isRepeating, isFinished, toNextWord, addToRepeatQueue, handleRepeat } =
+        useLearnQueue(briefWords);
 
     const navigateToNextWord = () => {
         toNextWord();
@@ -203,7 +126,7 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
         setShouldShowInfo(true);
     };
 
-    if (!isCacheReady || (isBriefWordQueryEnabled && isBriefWordLoading)) {
+    if (isBriefWordQueryEnabled && isBriefWordLoading) {
         return <CenteredSpin />;
     }
 

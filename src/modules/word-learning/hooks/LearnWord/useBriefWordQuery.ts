@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import wordServices from '@/shared/services/words';
 
-const useBriefWordQuery = (enable: boolean, mode: 'learn' | 'review') => {
+const useBriefWordQuery = (enable: boolean = true, mode: 'learn' | 'review') => {
     const briefWordQuery = useQuery({
         queryKey: ['briefWords', mode],
         queryFn: () =>
