@@ -1,16 +1,23 @@
 import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
-import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import wordServices from '@modules/word-learning/services/words';
+import useSuccessQuery from './useSuccessQuery';
+import { toNextStep } from '@/features/LearnWordSlice';
+import { useDispatch } from 'react-redux';
 
 const useBriefWordQuery = (enable: boolean = true, mode: 'learn' | 'review') => {
-    const briefWordQuery = useQuery({
-        queryKey: ['briefWords', mode],
-        queryFn: () =>
-            mode === 'learn' ? wordServices.getWordToLearn() : wordServices.getWordToReview(),
-        refetchOnWindowFocus: false,
-        enabled: enable,
-    });
+    const dispatch = useDispatch();
+    const briefWordQuery = useSuccessQuery(
+        {
+            queryKey: ['briefWords', mode],
+            queryFn: () =>
+                mode === 'learn' ? wordServices.getWordToLearn() : wordServices.getWordToReview(),
+            refetchOnWindowFocus: false,
+            enabled: enable,
+        },
+        'fetchingBriefWords',
+        () => dispatch(toNextStep())
+    );
     const briefWordsWithStatus: BriefWordWithLearnStatus[] = useMemo(() => {
         const loadedWords = briefWordQuery.data?.words || [];
         return (
