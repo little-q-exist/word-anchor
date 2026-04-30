@@ -13,11 +13,10 @@ const useLearningSessionQuery = (
     const learningSessionQuery = useSuccessQuery(
         queryOptions({
             queryKey: ['learningSession', userId, mode],
-            
             enabled: enable && !!userId,
             queryFn: () => learningSessionServices.getLearningSession(userId!, mode),
             refetchOnWindowFocus: false,
-        }) as ReturnType<typeof queryOptions>,
+        }),
         'fetchingSession',
         () => dispatch(toNextStep({ hasSession: true }))
     );

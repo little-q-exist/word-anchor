@@ -1,24 +1,31 @@
 import type { LearnWordStatus } from '@/features/LearnWordSlice';
 import type { RootState } from '@/store';
-import { queryOptions, useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useQuery, type UseQueryOptions, type QueryKey } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
-const useSuccessQuery = (
-    props: ReturnType<typeof queryOptions>,
+const useSuccessQuery = <
+    TQueryFnData = unknown,
+    TError = Error,
+    TData = TQueryFnData,
+    TQueryKey extends QueryKey = QueryKey,
+>(
+    props: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
     state: LearnWordStatus,
     onSuccess: () => unknown
 ) => {
+    const onSuccessRef = useRef(onSuccess);
+    onSuccessRef.current = onSuccess;
     const learnWordState = useSelector((state: RootState) => state.learnWordState);
-    const { data, isSuccess } = useQuery(props);
+    const query = useQuery(props);
 
     useEffect(() => {
-        if (isSuccess && state === learnWordState) {
-            onSuccess();
+        if (query.isSuccess && state === learnWordState) {
+            onSuccessRef.current();
         }
-    }, [isSuccess, learnWordState, onSuccess, state]);
+    }, [query.isSuccess, learnWordState, state]);
 
-    return { data, isSuccess };
+    return query;
 };
 
 export default useSuccessQuery;
