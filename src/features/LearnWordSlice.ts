@@ -3,7 +3,6 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 export type LearnWordStatus =
     | 'fetchingSession'
     | 'fetchingBriefWords'
-    | 'initLearnQueue'
     | 'fetchingDetailedWord'
     | 'ready'
     | 'error';
@@ -30,9 +29,6 @@ export const LearnWordSlice = createSlice({
                     }
                 }
                 case 'fetchingBriefWords': {
-                    return 'initLearnQueue';
-                }
-                case 'initLearnQueue': {
                     return 'fetchingDetailedWord';
                 }
                 case 'fetchingDetailedWord': {
