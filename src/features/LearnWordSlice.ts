@@ -22,25 +22,21 @@ export const LearnWordSlice = createSlice({
             switch (state) {
                 case 'fetchingSession': {
                     if (action.payload?.hasSession === true) {
-                        state = 'fetchingDetailedWord';
+                        return 'fetchingDetailedWord';
                     } else if (action.payload?.hasSession === false) {
-                        state = 'fetchingBriefWords';
+                        return 'fetchingBriefWords';
                     } else {
-                        state = 'error';
+                        return 'error';
                     }
-                    break;
                 }
                 case 'fetchingBriefWords': {
-                    state = 'initLearnQueue';
-                    break;
+                    return 'initLearnQueue';
                 }
                 case 'initLearnQueue': {
-                    state = 'fetchingDetailedWord';
-                    break;
+                    return 'fetchingDetailedWord';
                 }
                 case 'fetchingDetailedWord': {
-                    state = 'ready';
-                    break;
+                    return 'ready';
                 }
                 case 'ready':
                 case 'error': {
