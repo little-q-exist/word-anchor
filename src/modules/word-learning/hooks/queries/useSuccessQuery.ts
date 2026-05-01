@@ -12,7 +12,7 @@ const useSuccessQuery = <
 >(
     props: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
     state: LearnWordStatus,
-    onSuccess: () => unknown
+    onSuccess: (data: TData) => void
 ) => {
     const onSuccessRef = useRef(onSuccess);
     onSuccessRef.current = onSuccess;
@@ -20,10 +20,10 @@ const useSuccessQuery = <
     const query = useQuery(props);
 
     useEffect(() => {
-        if (query.isSuccess && state === learnWordState) {
-            onSuccessRef.current();
+        if (query.isSuccess && query.data !== undefined && state === learnWordState) {
+            onSuccessRef.current(query.data);
         }
-    }, [query.isSuccess, learnWordState, state]);
+    }, [query.isSuccess, query.data, learnWordState, state]);
 
     return query;
 };

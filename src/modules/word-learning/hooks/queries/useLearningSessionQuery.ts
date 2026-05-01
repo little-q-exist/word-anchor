@@ -16,7 +16,7 @@ const useLearningSessionQuery = (
             refetchOnWindowFocus: false,
         },
         'fetchingSession',
-        () => dispatch(toNextStep({ hasSession: true }))
+        (session) => dispatch(toNextStep({ hasSession: !!session }))
     );
 
     return { learningSessionQuery };
