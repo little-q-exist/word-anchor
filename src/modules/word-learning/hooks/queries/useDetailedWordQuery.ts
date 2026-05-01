@@ -4,7 +4,7 @@ import useSuccessQuery from './useSuccessQuery';
 import { toNextStep } from '@/features/LearnWordSlice';
 import { useDispatch } from 'react-redux';
 
-const useDetailedWordQuery = (enable: boolean, wordId?: string) => {
+const useDetailedWordQuery = (wordId?: string, enable: boolean = true) => {
     const dispatch = useDispatch();
     const shouldFetch = enable && !!wordId;
 

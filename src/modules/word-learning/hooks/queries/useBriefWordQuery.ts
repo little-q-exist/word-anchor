@@ -5,7 +5,7 @@ import useSuccessQuery from './useSuccessQuery';
 import { toNextStep } from '@/features/LearnWordSlice';
 import { useDispatch } from 'react-redux';
 
-const useBriefWordQuery = (enable: boolean = true, mode: 'learn' | 'review') => {
+const useBriefWordQuery = (mode: 'learn' | 'review', enable: boolean = true) => {
     const dispatch = useDispatch();
     const briefWordQuery = useSuccessQuery(
         {
