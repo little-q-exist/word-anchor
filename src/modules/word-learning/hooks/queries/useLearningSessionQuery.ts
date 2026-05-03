@@ -9,7 +9,8 @@ const useLearningSessionQuery = (
     enable: boolean = true
 ) => {
     const dispatch = useDispatch();
-    const learningSessionQuery = useSuccessQuery({
+    const learningSessionQuery = useSuccessQuery(
+        {
             queryKey: ['learningSession', userId, mode],
             enabled: enable && !!userId,
             queryFn: () => learningSessionServices.getLearningSession(userId!, mode),
@@ -19,7 +20,15 @@ const useLearningSessionQuery = (
         (session) => dispatch(toNextStep({ hasSession: !!session }))
     );
 
-    return { learningSessionQuery };
+    const learningSession = learningSessionQuery.data;
+    const isLearningSessionLoading = learningSessionQuery.status === 'pending';
+    const isLearningSessionError = learningSessionQuery.status === 'error';
+
+    return {
+        learningSession,
+        isLearningSessionLoading,
+        isLearningSessionError,
+    };
 };
 
 export default useLearningSessionQuery;

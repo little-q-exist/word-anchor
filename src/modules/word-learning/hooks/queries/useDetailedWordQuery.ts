@@ -20,7 +20,7 @@ const useDetailedWordQuery = (wordId?: string, enable: boolean = true) => {
         () => dispatch(toNextStep())
     );
 
-    return { detailedWordQuery };
+    return detailedWordQuery;
 };
 
 export default useDetailedWordQuery;

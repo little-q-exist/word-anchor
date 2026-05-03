@@ -12,18 +12,24 @@ const useSuccessQuery = <
 >(
     props: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
     state: LearnWordStatus,
-    onSuccess: (data: TData) => void
+    onSuccess?: (data: TData) => void,
+    onError?: (error: TError) => void
 ) => {
     const onSuccessRef = useRef(onSuccess);
     onSuccessRef.current = onSuccess;
+    const onErrorRef = useRef(onError);
+    onErrorRef.current = onError;
     const learnWordState = useSelector((state: RootState) => state.learnWordState);
     const query = useQuery(props);
 
     useEffect(() => {
-        if (query.isSuccess && query.data !== undefined && state === learnWordState) {
+        if (query.isSuccess && !!query.data && state === learnWordState && onSuccessRef.current) {
             onSuccessRef.current(query.data);
         }
-    }, [query.isSuccess, query.data, learnWordState, state]);
+        if (query.isError && onErrorRef.current) {
+            onErrorRef.current(query.error);
+        }
+    }, [query.isSuccess, query.data, query.isError, query.error, learnWordState, state]);
 
     return query;
 };

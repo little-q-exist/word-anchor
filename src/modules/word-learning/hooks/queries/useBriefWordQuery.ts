@@ -1,13 +1,13 @@
 import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
 import { useMemo } from 'react';
 import wordServices from '@modules/word-learning/services/words';
-import useSuccessQuery from './useSuccessQuery';
+import useResultQuery from './useSuccessQuery';
 import { toNextStep } from '@/features/LearnWordSlice';
 import { useDispatch } from 'react-redux';
 
 const useBriefWordQuery = (mode: 'learn' | 'review', enable: boolean = true) => {
     const dispatch = useDispatch();
-    const briefWordQuery = useSuccessQuery(
+    const briefWordQuery = useResultQuery(
         {
             queryKey: ['briefWords', mode],
             queryFn: () =>

@@ -14,9 +14,10 @@ import LearnResult from '../LearnResult/LearnResult';
 import { useMutation } from '@tanstack/react-query';
 import CenteredSpin from '@/shared/components/CenteredSpin';
 import LearnProgress from './LearnProgress';
-import useLearnQueue from '@modules/word-learning/hooks/LearnWord/useLearnQueue';
-import useBriefWordQuery from '@modules/word-learning/hooks/LearnWord/useBriefWordQuery';
-import useDetailedWordQuery from '../../hooks/LearnWord/useDetailedWordQuery';
+import useLearnQueue from '@/modules/word-learning/hooks/useLearnQueue';
+import useBriefWordQuery from '@/modules/word-learning/hooks/queries/useBriefWordQuery';
+import useDetailedWordQuery from '../../hooks/queries/useDetailedWordQuery';
+import useLearningSessionQuery from '../../hooks/queries/useLearningSessionQuery';
 
 type LearnWordInterface = {
     mode: 'learn' | 'review';
@@ -25,30 +26,44 @@ type LearnWordInterface = {
 const LearnWord = ({ mode }: LearnWordInterface) => {
     const user = useSelector((state: RootState) => state.user);
 
+    const navigate = useNavigate();
+    const [messageApi, contextHolder] = message.useMessage();
+
+    const [briefWords, setBriefWords] = useState<BriefWordWithLearnStatus[]>([]);
+    const [shouldDisableButton, setShouldDisableButton] = useState(false);
+    const [shouldShowInfo, setShouldShowInfo] = useState(false);
+
+    const { learningSession, isLearningSessionLoading } = useLearningSessionQuery(mode, user?._id);
+
     const {
         briefWordsWithStatus,
         isBriefWordLoading,
         isBriefWordError,
         canShowBriefWord,
         isBriefWordQueryEnabled,
-    } = useBriefWordQuery(undefined, mode);
-
-    const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
-
-    const [briefWords, setBriefWords] = useState<BriefWordWithLearnStatus[]>([]);
+    } = useBriefWordQuery(mode, !learningSession && !isLearningSessionLoading);
 
     useEffect(() => {
+        if (learningSession && learningSession.words) {
+            setBriefWords(learningSession.words);
+            return;
+        }
         if (canShowBriefWord) {
             setBriefWords(briefWordsWithStatus);
         }
-    }, [briefWordsWithStatus, canShowBriefWord]);
+    }, [briefWordsWithStatus, canShowBriefWord, learningSession]);
 
-    const [shouldDisableButton, setShouldDisableButton] = useState(false);
-    const [shouldShowInfo, setShouldShowInfo] = useState(false);
+    const learnQueueInitialState = learningSession?.queueSnapshot ?? undefined;
+
+    const learnQueueHydrateKey =
+        user?._id && briefWords.length > 0
+            ? `${mode}-${user?._id}-${briefWords.map((word) => word._id).join('-')}`
+            : undefined;
 
     const { index, isRepeating, isFinished, toNextWord, addToRepeatQueue, handleRepeat } =
-        useLearnQueue(briefWords);
+        useLearnQueue(briefWords, learnQueueInitialState, learnQueueHydrateKey);
+
+    const detailedWordQuery = useDetailedWordQuery(briefWords[index]?._id);
 
     const navigateToNextWord = () => {
         toNextWord();
@@ -61,10 +76,6 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
         );
     };
 
-    const { detailedWordQuery } = useDetailedWordQuery(
-        !!briefWords && briefWords.length !== 0 && !!briefWords[index]?._id,
-        briefWords[index]?._id
-    );
     const familiarityMutation = useMutation({
         mutationFn: ({
             userId,
