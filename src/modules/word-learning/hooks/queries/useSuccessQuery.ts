@@ -23,7 +23,7 @@ const useSuccessQuery = <
     const query = useQuery(props);
 
     useEffect(() => {
-        if (query.isSuccess && !!query.data && state === learnWordState && onSuccessRef.current) {
+        if (query.isSuccess && state === learnWordState && onSuccessRef.current) {
             onSuccessRef.current(query.data);
         }
         if (query.isError && onErrorRef.current) {
