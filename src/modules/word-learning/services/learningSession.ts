@@ -3,7 +3,7 @@ import axios from 'axios';
 import type {
     LearningMode,
     LearningSession,
-    UpsertLearningSessionBody,
+    LearnQueueSnapshot,
 } from '@modules/word-learning/types';
 
 import globalConfig from '@/shared/services/config';
@@ -12,7 +12,7 @@ globalConfig();
 
 const APIURL = `/users`;
 
-export const getLearningSession = async (
+const getLearningSession = async (
     userId: string,
     mode: LearningMode
 ): Promise<LearningSession | null> => {
@@ -20,22 +20,31 @@ export const getLearningSession = async (
     return response.data;
 };
 
-export const upsertLearningSession = async (
+const createLearningSession = async (
     userId: string,
-    mode: LearningMode,
-    payload: UpsertLearningSessionBody
+    mode: LearningMode
 ): Promise<LearningSession> => {
-    const response = await axios.put(`${APIURL}/${userId}/learning-sessions/${mode}`, payload);
+    const response = await axios.post(`${APIURL}/${userId}/learning-sessions/${mode}`);
     return response.data;
 };
 
-export const deleteLearningSession = async (userId: string, mode: LearningMode): Promise<null> => {
+const updateLearningSession = async (
+    userId: string,
+    mode: LearningMode,
+    payload: LearnQueueSnapshot
+): Promise<LearningSession> => {
+    const response = await axios.patch(`${APIURL}/${userId}/learning-sessions/${mode}`, payload);
+    return response.data;
+};
+
+const deleteLearningSession = async (userId: string, mode: LearningMode): Promise<null> => {
     const response = await axios.delete(`${APIURL}/${userId}/learning-sessions/${mode}`);
     return response.data;
 };
 
 export default {
     getLearningSession,
-    upsertLearningSession,
+    createLearningSession,
+    updateLearningSession,
     deleteLearningSession,
 };

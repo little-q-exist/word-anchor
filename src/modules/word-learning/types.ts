@@ -28,13 +28,6 @@ export interface LearningSession {
     updatedAt: string;
 }
 
-export interface UpsertLearningSessionBody {
-    words: BriefWordWithLearnStatus[];
-    queueSnapshot: LearnQueueSnapshot;
-    version?: number;
-    deviceId?: string;
-}
-
 export interface BriefWordListWithMode {
     /**
      * List of brief word objects in the selected mode.
