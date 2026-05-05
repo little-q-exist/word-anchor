@@ -2,12 +2,25 @@ import learningSessionServices from '@modules/word-learning/services/learningSes
 import useSuccessQuery from './useSuccessQuery';
 import { useDispatch } from 'react-redux';
 import { toNextStep } from '@/features/LearnWordSlice';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { LearningMode } from '../../types';
+import { message } from 'antd';
 
-const useLearningSessionQuery = (
-    mode: 'learn' | 'review',
-    userId?: string,
-    enable: boolean = true
-) => {
+const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: boolean = true) => {
+    const [messageApi] = message.useMessage();
+    const queryClient = useQueryClient();
+    const learnSessionMutation = useMutation({
+        mutationFn: ({ userId, mode }: { userId: string; mode: LearningMode }) =>
+            learningSessionServices.createLearningSession(userId, mode),
+        onSuccess: async (data) => {
+            queryClient.setQueryData(['learningSession', userId, mode], data);
+        },
+        onError(error) {
+            messageApi.error('Failed to create learning session. Please try again.');
+            console.error(error);
+        },
+    });
+
     const dispatch = useDispatch();
     const learningSessionQuery = useSuccessQuery(
         {
@@ -17,10 +30,17 @@ const useLearningSessionQuery = (
             refetchOnWindowFocus: false,
         },
         'fetchingSession',
-        (session) => dispatch(toNextStep({ hasSession: !!session }))
+        (session) => {
+            dispatch(toNextStep({ hasSession: !!session }));
+            console.log('session', session);
+            if (!session) {
+                learnSessionMutation.mutate({ userId: userId!, mode });
+            }
+        }
     );
 
     const learningSession = learningSessionQuery.data;
+    const isLearningSessionSuccess = learningSessionQuery.status === 'success';
     const isLearningSessionLoading = learningSessionQuery.status === 'pending';
     const isLearningSessionError = learningSessionQuery.status === 'error';
 
@@ -28,7 +48,8 @@ const useLearningSessionQuery = (
         learningSession,
         isLearningSessionLoading,
         isLearningSessionError,
+        isLearningSessionSuccess,
     };
 };
 
-export default useLearningSessionQuery;
+export default useLearningSession;

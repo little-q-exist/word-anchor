@@ -9,18 +9,17 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { useNavigate } from 'react-router';
 import WordSideButtonGroup from '@modules/word-core/components/WordSideButtonGroup/WordSideButtonGroup';
-import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
+import type { BriefWordWithLearnStatus, LearningMode } from '@modules/word-learning/types';
 import LearnResult from '../LearnResult/LearnResult';
 import { useMutation } from '@tanstack/react-query';
 import CenteredSpin from '@/shared/components/CenteredSpin';
 import LearnProgress from './LearnProgress';
 import useLearnQueue from '@/modules/word-learning/hooks/useLearnQueue';
-import useBriefWordQuery from '@/modules/word-learning/hooks/queries/useBriefWordQuery';
 import useDetailedWordQuery from '../../hooks/queries/useDetailedWordQuery';
-import useLearningSessionQuery from '../../hooks/queries/useLearningSessionQuery';
+import useLearningSession from '../../hooks/queries/useLearningSessionQuery';
 
 type LearnWordInterface = {
-    mode: 'learn' | 'review';
+    mode: LearningMode;
 };
 
 const LearnWord = ({ mode }: LearnWordInterface) => {
@@ -33,31 +32,24 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
     const [shouldDisableButton, setShouldDisableButton] = useState(false);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
 
-    const { learningSession, isLearningSessionLoading } = useLearningSessionQuery(mode, user?._id);
-
     const {
-        briefWordsWithStatus,
-        isBriefWordLoading,
-        isBriefWordError,
-        canShowBriefWord,
-        isBriefWordQueryEnabled,
-    } = useBriefWordQuery(mode, !learningSession && !isLearningSessionLoading);
+        learningSession,
+        isLearningSessionLoading,
+        isLearningSessionError,
+        isLearningSessionSuccess,
+    } = useLearningSession(mode, user?._id);
 
     useEffect(() => {
-        if (learningSession && learningSession.words) {
+        if (isLearningSessionSuccess && learningSession?.words) {
             setBriefWords(learningSession.words);
-            return;
         }
-        if (canShowBriefWord) {
-            setBriefWords(briefWordsWithStatus);
-        }
-    }, [briefWordsWithStatus, canShowBriefWord, learningSession]);
+    }, [learningSession, isLearningSessionSuccess]);
 
     const learnQueueInitialState = learningSession?.queueSnapshot ?? undefined;
 
     const learnQueueHydrateKey =
-        user?._id && briefWords.length > 0
-            ? `${mode}-${user?._id}-${briefWords.map((word) => word._id).join('-')}`
+        learnQueueInitialState && user?._id && briefWords.length > 0
+            ? `${mode}-${user?._id}`
             : undefined;
 
     const { index, isRepeating, isFinished, toNextWord, addToRepeatQueue, handleRepeat } =
@@ -137,15 +129,11 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
         setShouldShowInfo(true);
     };
 
-    if (isBriefWordQueryEnabled && isBriefWordLoading) {
+    if (isLearningSessionLoading) {
         return <CenteredSpin />;
     }
 
-    if (isFinished) {
-        return <LearnResult briefWords={briefWords} />;
-    }
-
-    if (!isBriefWordLoading && briefWords.length === 0) {
+    if (isLearningSessionSuccess && !learningSession) {
         return (
             <Flex style={{ height: '100%' }} justify="center" align="center">
                 <Empty
@@ -156,8 +144,12 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
         );
     }
 
-    if (isBriefWordError || detailedWordQuery.status === 'error') {
+    if (isLearningSessionError || detailedWordQuery.status === 'error') {
         return <div>some error occurred</div>;
+    }
+
+    if (isFinished) {
+        return <LearnResult briefWords={briefWords} />;
     }
 
     return (
