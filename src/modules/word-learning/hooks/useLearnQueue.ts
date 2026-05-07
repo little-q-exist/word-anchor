@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { BriefWordWithLearnStatus, LearnQueueSnapshot } from '@modules/word-learning/types';
+import type { BriefWordWithLearnStatus, QueueSnapshot } from '@modules/word-learning/types';
 
 type LearnQueueInitialState = {
     index?: number;
@@ -71,20 +71,6 @@ const useLearnQueue = (
         setAppliedHydrateKey(hydrateKey);
     }, [appliedHydrateKey, hydrateKey, normalizedInitialState]);
 
-    useEffect(() => {
-        if (briefWords.length === 0) {
-            setIndex(0);
-            setWordToRepeat([]);
-            setIsRepeating(false);
-            setIsFinished(false);
-            return;
-        }
-
-        const maxIndex = briefWords.length - 1;
-        setIndex((prev) => sanitizeIndex(prev, maxIndex));
-        setWordToRepeat((prev) => sanitizeRepeatQueue(prev, maxIndex));
-    }, [briefWords.length]);
-
     const toNextWord = () => {
         if (!isRepeating) {
             if (index < briefWords.length - 1) {
@@ -120,7 +106,7 @@ const useLearnQueue = (
         });
     };
 
-    const queueSnapshot: Omit<LearnQueueSnapshot, 'updatedAt'> = useMemo(
+    const queueSnapshot: QueueSnapshot = useMemo(
         () => ({
             index,
             isRepeating,

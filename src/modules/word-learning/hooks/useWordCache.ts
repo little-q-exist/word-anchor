@@ -1,7 +1,7 @@
 import type { RootState } from '@/store';
 import type {
     BriefWordWithLearnStatus,
-    LearnQueueSnapshot,
+    QueueSnapshot,
     LearningSession,
 } from '@modules/word-learning/types';
 import axios from 'axios';
@@ -23,14 +23,14 @@ const getOrCreateDeviceId = () => {
     return generated;
 };
 
-const getSnapshotUpdatedAt = (snapshot: LearnQueueSnapshot | null) => {
+const getSnapshotUpdatedAt = (snapshot: QueueSnapshot | null) => {
     return snapshot?.updatedAt ?? 0;
 };
 
 const shouldUseRemoteSession = (
     remoteSession: LearningSession | null,
     localWords: BriefWordWithLearnStatus[] | null,
-    localQueueSnapshot: LearnQueueSnapshot | null
+    localQueueSnapshot: QueueSnapshot | null
 ) => {
     if (!remoteSession || remoteSession.words.length === 0) {
         return false;
@@ -48,7 +48,7 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
         null
     );
     const [cachedLastLearnedIndex, setCachedLastLearnedIndex] = useState<number | null>(null);
-    const [cachedQueueSnapshot, setCachedQueueSnapshot] = useState<LearnQueueSnapshot | null>(null);
+    const [cachedQueueSnapshot, setCachedQueueSnapshot] = useState<QueueSnapshot | null>(null);
     const [cachedSessionVersion, setCachedSessionVersion] = useState<number | null>(null);
     const [isCacheReady, setIsCacheReady] = useState(false);
 
@@ -82,12 +82,12 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
         }
     }, [cacheIndexKey, mode, userId]);
 
-    const getQueueCache = useCallback(async (): Promise<LearnQueueSnapshot | null> => {
+    const getQueueCache = useCallback(async (): Promise<QueueSnapshot | null> => {
         if (!userId || !mode) {
             return null;
         }
         try {
-            const cachedQueue = await localforage.getItem<LearnQueueSnapshot>(cacheQueueKey);
+            const cachedQueue = await localforage.getItem<QueueSnapshot>(cacheQueueKey);
             return cachedQueue ?? null;
         } catch (error) {
             console.error('Error occurred while getting queue snapshot from localforage:', error);
@@ -127,12 +127,12 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
     );
 
     const setQueueCache = useCallback(
-        async (snapshot: Omit<LearnQueueSnapshot, 'updatedAt'>) => {
+        async (snapshot: Omit<QueueSnapshot, 'updatedAt'>) => {
             if (!userId || !mode) {
                 return;
             }
             try {
-                const queueSnapshot: LearnQueueSnapshot = {
+                const queueSnapshot: QueueSnapshot = {
                     ...snapshot,
                     updatedAt: Date.now(),
                 };
@@ -161,7 +161,7 @@ const useWordCache = (mode: 'learn' | 'review' | undefined) => {
     }, [cacheWordKey, cacheIndexKey, cacheQueueKey, mode, userId]);
 
     const syncSessionCache = useCallback(
-        async (briefWords: BriefWordWithLearnStatus[], snapshot: LearnQueueSnapshot) => {
+        async (briefWords: BriefWordWithLearnStatus[], snapshot: QueueSnapshot) => {
             if (!userId || !mode || briefWords.length === 0) {
                 return;
             }

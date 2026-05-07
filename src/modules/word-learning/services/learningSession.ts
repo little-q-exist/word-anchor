@@ -1,10 +1,6 @@
 import axios from 'axios';
 
-import type {
-    LearningMode,
-    LearningSession,
-    LearnQueueSnapshot,
-} from '@modules/word-learning/types';
+import type { LearningMode, LearningSession, QueueSnapshot } from '@modules/word-learning/types';
 
 import globalConfig from '@/shared/services/config';
 
@@ -31,7 +27,7 @@ const createLearningSession = async (
 const updateLearningSession = async (
     userId: string,
     mode: LearningMode,
-    payload: LearnQueueSnapshot
+    payload: { queueSnapshot: QueueSnapshot; version: number }
 ): Promise<LearningSession> => {
     const response = await axios.patch(`${APIURL}/${userId}/learning-sessions/${mode}`, payload);
     return response.data;

@@ -7,11 +7,11 @@ export interface BriefWordWithLearnStatus extends BriefWord {
     status: 'idle' | 'passed' | 'failed';
 }
 
-export interface LearnQueueSnapshot {
+export interface QueueSnapshot {
     index: number;
     isRepeating: boolean;
     repeatQueue: number[];
-    updatedAt: number;
+    version: string;
 }
 
 export type LearningMode = 'learn' | 'review';
@@ -21,7 +21,7 @@ export interface LearningSession {
     userId: string;
     mode: LearningMode;
     words: BriefWordWithLearnStatus[];
-    queueSnapshot: LearnQueueSnapshot;
+    queueSnapshot: QueueSnapshot;
     version: number;
     updatedByDevice?: string;
     createdAt: string;
