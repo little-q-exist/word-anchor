@@ -27,7 +27,7 @@ const createLearningSession = async (
 const updateLearningSession = async (
     userId: string,
     mode: LearningMode,
-    payload: { queueSnapshot: QueueSnapshot; version: number }
+    payload: { queueSnapshot: QueueSnapshot }
 ): Promise<LearningSession> => {
     const response = await axios.patch(`${APIURL}/${userId}/learning-sessions/${mode}`, payload);
     return response.data;
