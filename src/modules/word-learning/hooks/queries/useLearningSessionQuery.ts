@@ -39,17 +39,7 @@ const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: b
         }
     );
 
-    const learningSession = learningSessionQuery.data;
-    const isLearningSessionSuccess = learningSessionQuery.status === 'success';
-    const isLearningSessionLoading = learningSessionQuery.status === 'pending';
-    const isLearningSessionError = learningSessionQuery.status === 'error';
-
-    return {
-        learningSession,
-        isLearningSessionLoading,
-        isLearningSessionError,
-        isLearningSessionSuccess,
-    };
+    return learningSessionQuery;
 };
 
 export default useLearningSession;
