@@ -41,7 +41,6 @@ const Home = () => {
                     position: 'relative',
                 }}
             >
-                {/* Background Decoration */}
                 <div
                     style={{
                         position: 'absolute',

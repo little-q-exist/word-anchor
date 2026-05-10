@@ -1,3 +1,11 @@
+/*
+* This hook has type issues.
+* - updatedAt
+* - version
+* - deviceId
+* - upsertLearningSession method
+*/
+
 import type { RootState } from '@/store';
 import type {
     BriefWordWithLearnStatus,

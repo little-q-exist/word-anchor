@@ -5,7 +5,6 @@ import globalConfig from '@/shared/services/config';
 
 globalConfig();
 
-// Auth endpoints are intentionally different: login at `/login`, registration at `/users/register`.
 const LOGIN_API_URL = `/login`;
 const REGISTER_API_URL = `/users/register`;
 
