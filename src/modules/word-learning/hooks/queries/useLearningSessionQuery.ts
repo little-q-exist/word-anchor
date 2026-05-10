@@ -4,10 +4,8 @@ import { useDispatch } from 'react-redux';
 import { toNextStep } from '@/features/LearnWordSlice';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { LearningMode } from '../../types';
-import { message } from 'antd';
 
 const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: boolean = true) => {
-    const [messageApi] = message.useMessage();
     const queryClient = useQueryClient();
     const learnSessionMutation = useMutation({
         mutationFn: ({ userId, mode }: { userId: string; mode: LearningMode }) =>
@@ -16,7 +14,6 @@ const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: b
             queryClient.setQueryData(['learningSession', userId, mode], data);
         },
         onError(error) {
-            messageApi.error('Failed to create learning session. Please try again.');
             console.error(error);
         },
     });
