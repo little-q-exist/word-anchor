@@ -79,7 +79,7 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
         return <CenteredSpin />;
     }
 
-    if (isLearningSessionSuccess && !learningSession) {
+    if (isLearningSessionSuccess && learningSession?.words && learningSession?.words.length === 0) {
         return (
             <Flex style={{ height: '100%' }} justify="center" align="center">
                 <Empty
