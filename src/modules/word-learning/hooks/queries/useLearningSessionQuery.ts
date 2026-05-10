@@ -29,7 +29,6 @@ const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: b
         'fetchingSession',
         (session) => {
             dispatch(toNextStep({ hasSession: !!session }));
-            console.log('session', session);
             if (!session) {
                 learnSessionMutation.mutate({ userId: userId!, mode });
             }

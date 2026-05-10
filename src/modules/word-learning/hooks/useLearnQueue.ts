@@ -6,7 +6,6 @@ import type {
 } from '@modules/word-learning/types';
 import { useMutation } from '@tanstack/react-query';
 import learningSessionServices from '@modules/word-learning/services/learningSession';
-import { useWhyDidYouUpdate } from 'use-why-did-you-update';
 
 interface HydrateQueue {
     initialState: QueueSnapshot;
@@ -76,10 +75,7 @@ const useLearnQueue = (briefWords?: BriefWordWithLearnStatus[], hydrateQueue?: H
         });
     };
 
-    useWhyDidYouUpdate('queueSnapshot', { hydrateQueue, index, isRepeating, repeatQueue, version });
-
     const queueSnapshot: QueueSnapshot | undefined = useMemo(() => {
-        console.info('queueSnapshot created');
         return hydrateQueue
             ? {
                   index,
