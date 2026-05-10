@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { NewUser, User } from '@/types';
+import type { NewUser, User } from '@modules/auth/types';
 
 import globalConfig from '@/shared/services/config';
 

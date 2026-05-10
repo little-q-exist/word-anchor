@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import userServices from '@/shared/services/users';
+import userServices from '@modules/word-learning/services/users';
 
 import WordCards from '@modules/word-core/components/WordCards/WordCards';
 import { Button, Empty, Flex, message, Skeleton } from 'antd';
@@ -9,123 +9,67 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { useNavigate } from 'react-router';
 import WordSideButtonGroup from '@modules/word-core/components/WordSideButtonGroup/WordSideButtonGroup';
-import type { BriefWordWithLearnStatus } from '@/types';
+import type { BriefWordWithLearnStatus, LearningMode } from '@modules/word-learning/types';
 import LearnResult from '../LearnResult/LearnResult';
 import { useMutation } from '@tanstack/react-query';
 import CenteredSpin from '@/shared/components/CenteredSpin';
 import LearnProgress from './LearnProgress';
-import useLearnQueue from '@modules/word-learning/hooks/LearnWord/useLearnQueue';
-import useWordCache from '@modules/word-learning/hooks/LearnWord/useWordCache';
-import useBriefWordQuery from '@modules/word-learning/hooks/LearnWord/useBriefWordQuery';
-import useDetailedWordQuery from '../../hooks/LearnWord/useDetailedWordQuery';
+import useLearnQueue from '@/modules/word-learning/hooks/useLearnQueue';
+import useDetailedWordQuery from '../../hooks/queries/useDetailedWordQuery';
+import useLearningSession from '../../hooks/queries/useLearningSessionQuery';
 
-type LearnWordInterface = {
-    mode: 'learn' | 'review';
-};
-
-const LearnWord = ({ mode }: LearnWordInterface) => {
+const LearnWord = ({ mode }: { mode: LearningMode }) => {
     const user = useSelector((state: RootState) => state.user);
-
-    const {
-        cachedBriefWords,
-        cachedLastLearnedIndex,
-        cachedQueueSnapshot,
-        isCacheReady,
-        setWordCache,
-        setQueueCache,
-        removeCache,
-    } = useWordCache(mode);
-
-    if (isCacheReady && !cachedBriefWords) {
-        console.log('ready', isCacheReady);
-        console.log('cachedBriefWords', cachedBriefWords);
-    }
-    const {
-        briefWordsWithStatus,
-        isBriefWordLoading,
-        isBriefWordError,
-        canShowBriefWord,
-        isBriefWordQueryEnabled,
-    } = useBriefWordQuery(isCacheReady && !cachedBriefWords, mode);
 
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [briefWords, setBriefWords] = useState<BriefWordWithLearnStatus[]>([]);
-
-    useEffect(() => {
-        if (!isCacheReady || !cachedBriefWords) {
-            return;
-        }
-        setBriefWords(cachedBriefWords);
-    }, [cachedBriefWords, isCacheReady]);
-
-    useEffect(() => {
-        if (cachedBriefWords) {
-            return;
-        }
-
-        if (canShowBriefWord) {
-            setBriefWords(briefWordsWithStatus);
-            setWordCache(briefWordsWithStatus);
-        }
-    }, [briefWordsWithStatus, cachedBriefWords, canShowBriefWord, setWordCache]);
-
+    const [briefWords, setBriefWords] = useState<BriefWordWithLearnStatus[] | undefined>(undefined);
     const [shouldDisableButton, setShouldDisableButton] = useState(false);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
 
-    const initialQueueState = useMemo(
-        () => ({
-            index: cachedQueueSnapshot?.index ?? cachedLastLearnedIndex ?? 0,
-            isRepeating: cachedQueueSnapshot?.isRepeating ?? false,
-            repeatQueue: cachedQueueSnapshot?.repeatQueue ?? [],
-        }),
-        [cachedLastLearnedIndex, cachedQueueSnapshot]
+    const {
+        data: learningSession,
+        isLoading: isLearningSessionLoading,
+        isError: isLearningSessionError,
+        isSuccess: isLearningSessionSuccess,
+    } = useLearningSession(mode, user?._id);
+
+    useEffect(() => {
+        if (isLearningSessionSuccess && learningSession?.words) {
+            setBriefWords(learningSession.words);
+        }
+    }, [learningSession, isLearningSessionSuccess]);
+
+    const learnQueueInitialState = useMemo(
+        () => learningSession?.queueSnapshot ?? undefined,
+        [learningSession?.queueSnapshot]
     );
 
-    const queueHydrateKey = useMemo(() => {
-        if (!isCacheReady || briefWords.length === 0) {
-            return undefined;
-        }
+    const learnQueueHydrateKey = useMemo(
+        () => (learningSession ? `${mode}-${user?._id}` : undefined),
+        [learningSession, mode, user?._id]
+    );
 
-        const version = cachedQueueSnapshot?.updatedAt ?? cachedLastLearnedIndex ?? 'default';
-        return `${mode}-${version}-${briefWords.length}`;
-    }, [
-        briefWords.length,
-        cachedLastLearnedIndex,
-        cachedQueueSnapshot?.updatedAt,
-        isCacheReady,
-        mode,
-    ]);
+    const hydrateQueue = useMemo(
+        () =>
+            learnQueueInitialState && learnQueueHydrateKey
+                ? { initialState: learnQueueInitialState, hydrateKey: learnQueueHydrateKey }
+                : undefined,
+        [learnQueueHydrateKey, learnQueueInitialState]
+    );
 
     const {
         index,
         isRepeating,
         isFinished,
-        queueSnapshot,
         toNextWord,
         addToRepeatQueue,
         handleRepeat,
-    } = useLearnQueue(briefWords, initialQueueState, queueHydrateKey);
+        syncQueueSnapshot,
+    } = useLearnQueue(briefWords, hydrateQueue);
 
-    useEffect(() => {
-        if (!isCacheReady || briefWords.length === 0 || isFinished) {
-            return;
-        }
-
-        setWordCache(briefWords);
-        setQueueCache(queueSnapshot);
-    }, [briefWords, isCacheReady, isFinished, queueSnapshot, setQueueCache, setWordCache]);
-
-    useEffect(() => {
-        if (!isCacheReady) {
-            return;
-        }
-
-        if (isFinished || (!isBriefWordLoading && briefWords.length === 0)) {
-            removeCache();
-        }
-    }, [briefWords.length, isBriefWordLoading, isCacheReady, isFinished, removeCache]);
+    const detailedWordQuery = useDetailedWordQuery(briefWords?.[index]?._id);
 
     const navigateToNextWord = () => {
         toNextWord();
@@ -133,15 +77,16 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
     };
 
     const markWordStatus = (wordId: string, status: BriefWordWithLearnStatus['status']) => {
-        setBriefWords((prev) =>
-            prev.map((prevWord) => (prevWord._id === wordId ? { ...prevWord, status } : prevWord))
-        );
+        setBriefWords((prev) => {
+            if (!prev) {
+                return prev;
+            }
+            return prev.map((prevWord) =>
+                prevWord._id === wordId ? { ...prevWord, status } : prevWord
+            );
+        });
     };
 
-    const { detailedWordQuery } = useDetailedWordQuery(
-        !!briefWords && briefWords.length !== 0 && !!briefWords[index]?._id,
-        briefWords[index]?._id
-    );
     const familiarityMutation = useMutation({
         mutationFn: ({
             userId,
@@ -189,6 +134,9 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
             }, 3000);
             return;
         }
+        if (!briefWords) {
+            return;
+        }
 
         if (isRepeating) {
             handleRepeat(familiarity);
@@ -200,18 +148,15 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
                 familiarity,
             });
         }
+        syncQueueSnapshot(user._id, mode);
         setShouldShowInfo(true);
     };
 
-    if (!isCacheReady || (isBriefWordQueryEnabled && isBriefWordLoading)) {
+    if (isLearningSessionLoading) {
         return <CenteredSpin />;
     }
 
-    if (isFinished) {
-        return <LearnResult briefWords={briefWords} />;
-    }
-
-    if (!isBriefWordLoading && briefWords.length === 0) {
+    if (isLearningSessionSuccess && !learningSession) {
         return (
             <Flex style={{ height: '100%' }} justify="center" align="center">
                 <Empty
@@ -222,15 +167,19 @@ const LearnWord = ({ mode }: LearnWordInterface) => {
         );
     }
 
-    if (isBriefWordError || detailedWordQuery.status === 'error') {
+    if (isLearningSessionError || detailedWordQuery.status === 'error') {
         return <div>some error occurred</div>;
+    }
+
+    if (isFinished && !!briefWords) {
+        return <LearnResult briefWords={briefWords} />;
     }
 
     return (
         <>
             {contextHolder}
             <Flex style={{ height: '100%', marginTop: '1rem' }} vertical>
-                <LearnProgress briefWords={briefWords} index={index} key={index} />
+                {briefWords && <LearnProgress briefWords={briefWords} index={index} key={index} />}
                 <div style={{ flex: 1 }}>
                     {detailedWordQuery.status === 'success' ? (
                         <WordCards

@@ -3,8 +3,9 @@ import type { RootState } from '@/store';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { FloatButton, message } from 'antd';
 import { useSelector } from 'react-redux';
-import userService from '@/shared/services/users';
-import type { UserLearningData } from '@/types';
+import wordCoreUserService from '@modules/word-core/services/users';
+import wordLearningUserService from '@modules/word-learning/services/users';
+import type { UserLearningData } from '@modules/word-core/types';
 import type React from 'react';
 
 const iconStyle: React.CSSProperties = {
@@ -25,7 +26,7 @@ const FavouriteSideButton = ({ wordId }: FavouriteSideButtonInterface) => {
         isError,
     } = useQuery({
         queryKey: ['learningData', user?._id, wordId],
-        queryFn: () => userService.getLearningData(user!._id, wordId, ['favorited']),
+        queryFn: () => wordLearningUserService.getLearningData(user!._id, wordId, ['favorited']),
         enabled: !!user && !!wordId,
         select: (data: UserLearningData) => {
             if (!data) return false;
@@ -35,7 +36,8 @@ const FavouriteSideButton = ({ wordId }: FavouriteSideButtonInterface) => {
     });
 
     const favoritedMutation = useMutation({
-        mutationFn: ({ userId }: { userId: string }) => userService.updateFavorite(userId, wordId),
+        mutationFn: ({ userId }: { userId: string }) =>
+            wordCoreUserService.updateFavorite(userId, wordId),
         onMutate: async (_variables, context) => {
             await context.client.cancelQueries({ queryKey: ['learningData', user?._id, wordId] });
             const previousData = context.client.getQueryData(['learningData', user?._id, wordId]);
