@@ -21,12 +21,14 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
     const [briefWords, setBriefWords] = useState<BriefWordWithLearnStatus[] | undefined>(undefined);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
 
+    const { learningSessionQuery, noWordReturned } = useLearningSession(mode, user?._id);
+
     const {
         data: learningSession,
         isLoading: isLearningSessionLoading,
         isError: isLearningSessionError,
         isSuccess: isLearningSessionSuccess,
-    } = useLearningSession(mode, user?._id);
+    } = learningSessionQuery;
 
     useEffect(() => {
         if (isLearningSessionSuccess && learningSession?.words) {
@@ -79,7 +81,7 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
         return <CenteredSpin />;
     }
 
-    if (isLearningSessionSuccess && learningSession?.words && learningSession?.words.length === 0) {
+    if (isLearningSessionSuccess && noWordReturned && learningSession === null) {
         return (
             <Flex style={{ height: '100%' }} justify="center" align="center">
                 <Empty
