@@ -1,133 +1,156 @@
-# Word Anchor
+# WordAnchor — 用科学的方法记住每一个单词
 
-Word Anchor 是一个用于英语词汇学习与复习的前端应用，基于 React Router 7 + React 19 构建，提供「学习 / 复习 / 词库检索 / 用户认证」等核心能力。
+基于**间隔重复算法（SM-2）**的英语词汇学习应用。通过智能复习调度和上下文记忆法，帮助你高效、持久地掌握英语单词。
 
-近期版本已完成前端学习流的重大重构：
+## 功能
 
-- 引入 `@tanstack/react-query`，统一服务端数据请求与缓存管理。
-- 引入 `localforage`，将学习队列与进度缓存从单一 `localStorage` 升级为 IndexedDB 持久化方案。
-- 代码结构重构为模块化分层（`src/modules/*`），按业务域组织认证、词库、学习流程。
-
----
-
-## 核心功能
-
-- 用户登录 / 注册
-- 单词学习（Learn）
-- 到期复习（Review）
-- 词库检索与详情查看（Words / WordInfo）
-- 学习数据统计（Profile）
-
----
+- **智能学习与复习** — 基于 SuperMemo SM-2 算法，根据你对每个单词的掌握程度自动计算最佳复习时间
+- **学习队列管理** — 答错的单词自动加入重学队列，确保每个单词都能真正掌握
+- **进度追踪** — 可视化学习进度时间线，清晰展示当前、已完成和待学习的单词状态
+- **词汇浏览** — 支持按英文、中文释义和标签搜索单词，快速查阅词汇库
+- **收藏单词** — 收藏重点单词，方便集中复习
+- **用户系统** — JWT 认证，支持注册、登录和个人统计数据查看
+- **学习会话持久化** — 学习进度实时保存，刷新页面或重新打开后可从中断处继续
 
 ## 技术栈
 
-### 前端框架与工程化
+前端基于 **React 19** + **React Router 7**（全栈 SSR）构建，使用 **TypeScript** 开发，**Vite** 作为构建工具。UI 组件库采用 **Ant Design 6**，服务端状态管理使用 **TanStack React Query**，认证状态使用 **Redux Toolkit** 管理，HTTP 请求基于 **Axios**。端到端测试使用 **Playwright**。
 
-- React 19
-- React Router 7（SPA 模式，`ssr: false`）
-- TypeScript
-- Vite
+后端使用 **Express 5** + **TypeScript**，数据库为 **MongoDB**（通过 **Mongoose** 建模），认证采用 **JWT** + **bcrypt** 密码哈希，API 文档基于 **Swagger**。
 
-### 状态与数据层
-
-- Redux Toolkit（用户登录态等全局状态）
-- TanStack React Query（接口请求与缓存）
-- Axios（统一请求配置与拦截）
-
-### 持久化与存储
-
-- localStorage：登录用户信息（`reciteWordAppUser`）
-- localforage（IndexedDB）：学习流程缓存（learn/review）
-
-### UI 与测试
-
-- Ant Design + @ant-design/icons
-- Playwright（E2E）
-
----
-
-## 前端持久化设计
-
-学习与复习流程使用 `localforage` 持久化，核心实现在：
-
-- `src/modules/word-learning/hooks/LearnWord/useWordCache.ts`
-
-按 `userId + mode` 生成缓存键，支持按用户隔离与 learn/review 双模式隔离：
-
-- `${userId}-learn-briefWords` / `${userId}-review-briefWords`
-- `${userId}-learn-lastLearnedIndex` / `${userId}-review-lastLearnedIndex`
-- `${userId}-learn-learnQueueSnapshot` / `${userId}-review-learnQueueSnapshot`
-
-缓存内容包括：
-
-- 词条列表及学习状态（`BriefWordWithLearnStatus[]`）
-- 最近学习索引
-- 学习队列快照（`index`、`isRepeating`、`repeatQueue`、`updatedAt`）
-
-这使得页面刷新、路由切换后可恢复学习上下文，并降低短时网络波动对学习体验的影响。
-
----
+间隔重复核心使用 **SuperMemo SM-2 算法**，根据用户对单词的熟悉度评分（0-5）动态计算 easeFactor、间隔天数和复习次数。
 
 ## 目录结构
 
-```text
-src/
-├── modules/
-│   ├── auth/                 # 登录/注册相关组件、hooks、services
-│   ├── vocabulary/           # 词库搜索与列表
-│   ├── word-core/            # 单词通用组件（卡片、侧边按钮等）
-│   └── word-learning/        # 学习/复习主流程与缓存逻辑
-├── pages/                    # 路由页面（Home/Learn/Review/Login/Register/Profile）
-├── shared/                   # 通用 services/hooks/components
-├── features/                 # Redux slices
-├── routes.ts                 # React Router 路由定义
-├── store.ts                  # Redux store
-└── types.ts                  # 全局类型
+```
+recite-word/
+├── public/                          # 静态资源
+├── src/
+│   ├── entry.client.tsx             # 浏览器端入口
+│   ├── root.tsx                     # 根布局与 App 组件
+│   ├── routes.ts                    # 路由配置（扁平路由）
+│   ├── store.ts                     # Redux Store 配置
+│   ├── constant.ts                  # 常量配置（API 地址等）
+│   ├── features/
+│   │   └── userSlice.ts             # 用户状态切片（登录/登出）
+│   ├── layout/
+│   │   ├── Layout.tsx               # 应用主布局（Header + Menu + Content）
+│   │   └── ProtectedRoute/          # 路由鉴权守卫
+│   ├── modules/
+│   │   ├── auth/                    # 认证模块（登录/注册）
+│   │   ├── home/                    # 首页模块
+│   │   ├── vocabulary/              # 词汇浏览模块（搜索/详情）
+│   │   ├── word-core/               # 单词核心组件（跨模块复用）
+│   │   └── word-learning/           # 学习/复习模块（核心业务）
+│   ├── pages/                       # 页面组件
+│   │   ├── Home.tsx                 # 首页
+│   │   ├── Login.tsx                # 登录页
+│   │   ├── Register.tsx             # 注册页
+│   │   ├── Learn.tsx                # 学习模式页
+│   │   ├── Review.tsx               # 复习模式页
+│   │   ├── Profile.tsx              # 个人中心页
+│   │   └── vocabulary/              # 词汇相关页面
+│   ├── shared/                      # 共享组件/Hooks/样式
+│   └── test/                        # E2E 测试
+├── db.json                          # json-server 种子数据（原型用）
+├── vite.config.ts
+├── tsconfig.json
+├── react-router.config.ts
+├── playwright.config.ts
+└── package.json
 ```
 
----
+### 核心文件说明
 
-## 快速开始
+| 文件 | 用途 |
+|------|------|
+| `src/modules/word-learning/hooks/useLearnQueue.ts` | 学习队列引擎：管理单词索引、重学队列、进度计算，通过乐观锁版本号与后端同步快照 |
+| `src/modules/word-learning/components/LearnWord/LearnWord.tsx` | 学习流程编排：串联会话初始化 → 队列消费 → 单词卡片展示 → 结果页面 |
+| `src/modules/word-learning/components/LearnWord/LearnWordButtons.tsx` | 熟悉度评分按钮（认识/不熟悉/不认识），触发后端 SM-2 算法更新学习数据 |
+| `src/modules/word-learning/components/LearnWord/LearnProgress.tsx` | 学习进度时间线组件，用颜色编码标识单词状态 |
+| `src/modules/word-learning/queries/useLearningSessionQuery.ts` | 学习会话查询 Hook，自动获取或懒创建学习会话 |
+| `src/shared/services/config.ts` | Axios 拦截器配置：JWT 令牌注入、响应数据标准化解包 |
+| `src/layout/ProtectedRoute/ProtectedRoute.tsx` | 路由鉴权守卫，未登录自动跳转登录页 |
 
-### 1) 环境要求
+后端项目位于 `recite-word-server/`，其核心文件：
 
-- Node.js（建议 20+）
-- npm
+| 文件 | 用途 |
+|------|------|
+| `src/modules/learn/services/SM-2.ts` | SuperMemo SM-2 算法实现：根据质量评分计算 easeFactor、间隔天数和重复次数 |
+| `src/modules/learn/services/learn.ts` | 学习业务逻辑：待学习/待复习单词筛选、学习数据更新编排 |
+| `src/modules/learn/controllers/learningSession.ts` | 学习会话 CRUD，支持乐观锁并发控制 |
+| `src/shared/middleware.ts` | JWT 认证中间件、错误处理中间件、请求日志 |
 
-### 2) 安装依赖
+## 贡献指南
+
+### 环境要求
+
+- **Node.js** >= 18
+- **npm** >= 9
+- **MongoDB** 实例（本地或 Atlas）
+
+### 拉取代码
 
 ```bash
+# 克隆前端仓库
+git clone <frontend-repo-url>
+cd recite-word
+
+# 克隆后端仓库
+git clone <backend-repo-url> recite-word-server
+cd recite-word-server
+```
+
+### 安装依赖
+
+```bash
+# 前端依赖
+cd recite-word
+npm install
+
+# 后端依赖
+cd ../recite-word-server
 npm install
 ```
 
-### 3) 本地开发
+### 配置环境变量
 
-```bash
-# 前端开发服务
-npm run dev
+在 `recite-word-server` 目录下创建 `.env` 文件：
 
-# Mock 数据服务（可选）
-npm run server
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+PORT=3000
 ```
 
-> 默认前端 API 地址定义在 `src/constant.ts`：
->
-> `SERVER_URL = 'http://localhost:3000/api'`
->
-> 如使用本地 mock 服务，请调整 `db.json `。
+### 启动开发环境
 
----
+```bash
+# 启动后端（端口 3000）
+cd recite-word-server
+npm run dev
 
-## 可用脚本
+# 新终端，启动前端（端口 5173）
+cd recite-word
+npm run dev
+```
 
-- `npm run dev`：启动开发环境
-- `npm run build`：构建生产包
-- `npm run start`：启动生产构建产物
-- `npm run lint`：执行 ESLint
-- `npm run typecheck`：生成路由类型并执行 TypeScript 检查
-- `npm run test:e2e`：执行 Playwright E2E
-- `npm run test:e2e:headed`：有头模式执行 E2E
-- `npm run server`：启动 json-server（`db.json`）
-- `npm run format`：格式化 `src/**/*.ts(x)`
+### 运行测试
 
+```bash
+cd recite-word
+npm run test:e2e          # Playwright E2E 测试（无头模式）
+npm run test:e2e:headed   # 有头模式
+```
+
+### 代码规范
+
+```bash
+npm run lint              # ESLint 检查
+npm run typecheck         # TypeScript 类型检查
+npm run format            # Prettier 格式化
+```
+
+## 许可证
+
+本项目遵循 [MIT License](https://opensource.org/licenses/MIT) 开源协议。
