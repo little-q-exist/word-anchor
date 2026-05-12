@@ -61,8 +61,7 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
         toNextWord,
         addToRepeatQueue,
         handleRepeat,
-        syncQueueSnapshot,
-    } = useLearnQueue(briefWords, hydrateQueue);
+    } = useLearnQueue(briefWords, hydrateQueue, user?._id, mode);
 
     const detailedWordQuery = useDetailedWordQuery(briefWords?.[index]?._id);
 
@@ -120,13 +119,11 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
                 briefWords={briefWords}
                 currentIndex={index}
                 isRepeating={isRepeating}
-                mode={mode}
                 showInfo={shouldShowInfo}
                 onShowInfoChange={setShouldShowInfo}
                 onMarkWordStatus={markWordStatus}
                 onAddToRepeatQueue={addToRepeatQueue}
                 onHandleRepeat={handleRepeat}
-                onSyncQueueSnapshot={syncQueueSnapshot}
                 onNextWord={toNextWord}
             />
             {detailedWordQuery.status === 'success' && (

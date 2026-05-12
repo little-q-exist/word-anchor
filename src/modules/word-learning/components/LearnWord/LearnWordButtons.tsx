@@ -3,20 +3,18 @@ import { Button, Flex, message } from 'antd';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import userServices from '@modules/word-learning/services/users';
-import type { BriefWordWithLearnStatus, LearningMode } from '@modules/word-learning/types';
+import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
 
 interface LearnWordButtonsProps {
     userId?: string;
     briefWords: BriefWordWithLearnStatus[] | undefined;
     currentIndex: number;
     isRepeating: boolean;
-    mode: LearningMode;
     showInfo: boolean;
     onShowInfoChange: (visible: boolean) => void;
     onMarkWordStatus: (wordId: string, status: BriefWordWithLearnStatus['status']) => void;
     onAddToRepeatQueue: (wordId: string) => void;
     onHandleRepeat: (familiarity: number) => void;
-    onSyncQueueSnapshot: (userId: string, mode: LearningMode) => void;
     onNextWord: () => void;
 }
 
@@ -25,13 +23,11 @@ const LearnWordButtons = ({
     briefWords,
     currentIndex,
     isRepeating,
-    mode,
     showInfo,
     onShowInfoChange,
     onMarkWordStatus,
     onAddToRepeatQueue,
     onHandleRepeat,
-    onSyncQueueSnapshot,
     onNextWord,
 }: LearnWordButtonsProps) => {
     const navigate = useNavigate();
@@ -99,7 +95,6 @@ const LearnWordButtons = ({
                 familiarity,
             });
         }
-        onSyncQueueSnapshot(userId, mode);
         onShowInfoChange(true);
     };
 

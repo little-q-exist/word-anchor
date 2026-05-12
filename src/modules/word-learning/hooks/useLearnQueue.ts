@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
     BriefWordWithLearnStatus,
     LearningMode,
@@ -12,7 +12,12 @@ interface HydrateQueue {
     hydrateKey: string;
 }
 
-const useLearnQueue = (briefWords?: BriefWordWithLearnStatus[], hydrateQueue?: HydrateQueue) => {
+const useLearnQueue = (
+    briefWords?: BriefWordWithLearnStatus[],
+    hydrateQueue?: HydrateQueue,
+    userId?: string,
+    mode?: LearningMode,
+) => {
     const [index, setIndex] = useState(0);
     const [repeatQueue, setRepeatQueue] = useState<number[]>([]);
     const [isRepeating, setIsRepeating] = useState(false);
@@ -20,6 +25,8 @@ const useLearnQueue = (briefWords?: BriefWordWithLearnStatus[], hydrateQueue?: H
 
     const [isFinished, setIsFinished] = useState(false);
     const [appliedHydrateKey, setAppliedHydrateKey] = useState<string | undefined>(undefined);
+
+    const isUserActionRef = useRef(false);
 
     useEffect(() => {
         if (!hydrateQueue || hydrateQueue.hydrateKey === appliedHydrateKey) {
@@ -34,10 +41,11 @@ const useLearnQueue = (briefWords?: BriefWordWithLearnStatus[], hydrateQueue?: H
         setAppliedHydrateKey(hydrateQueue.hydrateKey);
     }, [appliedHydrateKey, hydrateQueue]);
 
-    const toNextWord = () => {
+    const toNextWord = useCallback(() => {
         if (!briefWords) {
             return;
         }
+        isUserActionRef.current = true;
         if (!isRepeating) {
             if (index < briefWords.length - 1) {
                 setIndex(index + 1);
@@ -56,24 +64,26 @@ const useLearnQueue = (briefWords?: BriefWordWithLearnStatus[], hydrateQueue?: H
                 setIsFinished(true);
             }
         }
-    };
+    }, [briefWords, index, isRepeating, repeatQueue]);
 
-    const addToRepeatQueue = (wordId: string) => {
+    const addToRepeatQueue = useCallback((wordId: string) => {
         if (!briefWords) {
             return;
         }
+        isUserActionRef.current = true;
         setRepeatQueue((queue) => {
             const targetIndex = briefWords.findIndex((w) => w._id === wordId);
             return targetIndex === -1 ? queue : queue.concat(targetIndex);
         });
-    };
+    }, [briefWords]);
 
-    const handleRepeat = (familiarity: number) => {
+    const handleRepeat = useCallback((familiarity: number) => {
+        isUserActionRef.current = true;
         setRepeatQueue((queue) => {
             const nextQueue = queue.slice(1);
             return familiarity < 4 ? nextQueue.concat(index) : nextQueue;
         });
-    };
+    }, [index]);
 
     const queueSnapshot: QueueSnapshot | undefined = useMemo(() => {
         return hydrateQueue
@@ -88,16 +98,16 @@ const useLearnQueue = (briefWords?: BriefWordWithLearnStatus[], hydrateQueue?: H
 
     const { mutate: queueSnapshotMutate } = useMutation({
         mutationFn: ({
-            userId,
-            mode,
-            queueSnapshot,
+            userId: mutUserId,
+            mode: mutMode,
+            queueSnapshot: mutQueueSnapshot,
         }: {
             userId: string;
             mode: LearningMode;
             queueSnapshot: QueueSnapshot;
         }) =>
-            learningSessionServices.updateLearningSession(userId, mode, {
-                queueSnapshot,
+            learningSessionServices.updateLearningSession(mutUserId, mutMode, {
+                queueSnapshot: mutQueueSnapshot,
             }),
         onSuccess(learningSession) {
             setIndex(learningSession.queueSnapshot.index);
@@ -110,15 +120,20 @@ const useLearnQueue = (briefWords?: BriefWordWithLearnStatus[], hydrateQueue?: H
         },
     });
 
-    const syncQueueSnapshot = useCallback(
-        (userId: string, mode: LearningMode) => {
-            if (!queueSnapshot) {
-                return;
-            }
-            queueSnapshotMutate({ userId, mode, queueSnapshot });
-        },
-        [queueSnapshot, queueSnapshotMutate]
-    );
+    const syncQueueSnapshot = useCallback(() => {
+        if (!queueSnapshot || !userId || !mode) {
+            return;
+        }
+        queueSnapshotMutate({ userId, mode, queueSnapshot });
+    }, [queueSnapshot, queueSnapshotMutate, userId, mode]);
+
+    useEffect(() => {
+        if (!isUserActionRef.current) {
+            return;
+        }
+        isUserActionRef.current = false;
+        syncQueueSnapshot();
+    }, [queueSnapshot, syncQueueSnapshot]);
 
     return {
         index,
@@ -129,7 +144,6 @@ const useLearnQueue = (briefWords?: BriefWordWithLearnStatus[], hydrateQueue?: H
         toNextWord,
         addToRepeatQueue,
         handleRepeat,
-        syncQueueSnapshot,
     };
 };
 
