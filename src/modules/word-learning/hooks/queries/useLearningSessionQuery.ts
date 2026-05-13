@@ -1,12 +1,12 @@
 import learningSessionServices from '@modules/word-learning/services/learningSession';
 import useSuccessQuery from './useSuccessQuery';
-import { useDispatch } from 'react-redux';
-import { toNextStep } from '@/features/LearnWordSlice';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRef } from 'react';
 import type { LearningMode } from '../../types';
 
 const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: boolean = true) => {
     const queryClient = useQueryClient();
+    const hasMutated = useRef(false);
     const learnSessionMutation = useMutation({
         mutationFn: ({ userId, mode }: { userId: string; mode: LearningMode }) =>
             learningSessionServices.createLearningSession(userId, mode),
@@ -18,7 +18,6 @@ const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: b
         },
     });
 
-    const dispatch = useDispatch();
     const learningSessionQuery = useSuccessQuery(
         {
             queryKey: ['learningSession', userId, mode],
@@ -26,11 +25,9 @@ const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: b
             queryFn: () => learningSessionServices.getLearningSession(userId!, mode),
             refetchOnWindowFocus: false,
         },
-        'fetchingSession',
         (session) => {
-            dispatch(toNextStep({ hasSession: !!session }));
-            console.log('session', session);
-            if (!session) {
+            if (!session && !hasMutated.current) {
+                hasMutated.current = true;
                 learnSessionMutation.mutate({ userId: userId!, mode });
             }
         }

@@ -1,11 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './features/userSlice';
-import learnWordReducer from './features/LearnWordSlice';
 
 export const store = configureStore({
     reducer: {
         user: userReducer,
-        learnWordState: learnWordReducer,
     },
 });
 
