@@ -85,8 +85,8 @@ recite-word/
 
 ### 环境要求
 
-- **Node.js** >= 18
-- **npm** >= 9
+- **Node.js** >= 22
+- **npm** >= 11
 - **MongoDB** 实例（本地或 Atlas）
 
 ### 拉取代码
