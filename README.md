@@ -52,7 +52,7 @@ recite-word/
 │   │   └── vocabulary/              # 词汇相关页面
 │   ├── shared/                      # 共享组件/Hooks/样式
 │   └── test/                        # E2E 测试
-├── db.json                          # json-server 种子数据（原型用）
+├── db.json                          # json-server 种子数据
 ├── vite.config.ts
 ├── tsconfig.json
 ├── react-router.config.ts
