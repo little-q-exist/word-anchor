@@ -2,7 +2,7 @@ import learningSessionServices from '@modules/word-learning/services/learningSes
 import useSuccessQuery from './useSuccessQuery';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
-import type { LearningMode } from '../../types';
+import type { LearningMode } from '@modules/word-learning/types';
 
 const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: boolean = true) => {
     const queryClient = useQueryClient();
@@ -33,7 +33,7 @@ const useLearningSession = (mode: 'learn' | 'review', userId?: string, enable: b
         }
     );
 
-    return learningSessionQuery;
+    return { learningSessionQuery, noWordReturned: hasMutated.current };
 };
 
 export default useLearningSession;
