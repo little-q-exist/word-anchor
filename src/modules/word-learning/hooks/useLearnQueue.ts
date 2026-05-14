@@ -12,6 +12,16 @@ interface HydrateQueue {
     hydrateKey: string;
 }
 
+function isSnapshotEqual(a: QueueSnapshot, b: QueueSnapshot): boolean {
+    return (
+        a.index === b.index &&
+        a.isRepeating === b.isRepeating &&
+        a.version === b.version &&
+        a.repeatQueue.length === b.repeatQueue.length &&
+        a.repeatQueue.every((v, i) => v === b.repeatQueue[i])
+    );
+}
+
 const useLearnQueue = (
     briefWords?: BriefWordWithLearnStatus[],
     hydrateQueue?: HydrateQueue,
@@ -26,26 +36,12 @@ const useLearnQueue = (
     const [isFinished, setIsFinished] = useState(false);
     const [appliedHydrateKey, setAppliedHydrateKey] = useState<string | undefined>(undefined);
 
-    const isUserActionRef = useRef(false);
-
-    useEffect(() => {
-        if (!hydrateQueue || hydrateQueue.hydrateKey === appliedHydrateKey) {
-            return;
-        }
-
-        setIndex(hydrateQueue.initialState.index);
-        setRepeatQueue(hydrateQueue.initialState.repeatQueue);
-        setIsRepeating(hydrateQueue.initialState.isRepeating);
-        setVersion(hydrateQueue.initialState.version);
-        setIsFinished(false);
-        setAppliedHydrateKey(hydrateQueue.hydrateKey);
-    }, [appliedHydrateKey, hydrateQueue]);
+    const lastSyncedRef = useRef<QueueSnapshot | undefined>(undefined);
 
     const toNextWord = useCallback(() => {
         if (!briefWords) {
             return;
         }
-        isUserActionRef.current = true;
         if (!isRepeating) {
             if (index < briefWords.length - 1) {
                 setIndex(index + 1);
@@ -70,7 +66,6 @@ const useLearnQueue = (
         if (!briefWords) {
             return;
         }
-        isUserActionRef.current = true;
         setRepeatQueue((queue) => {
             const targetIndex = briefWords.findIndex((w) => w._id === wordId);
             return targetIndex === -1 ? queue : queue.concat(targetIndex);
@@ -78,7 +73,6 @@ const useLearnQueue = (
     }, [briefWords]);
 
     const handleRepeat = useCallback((familiarity: number) => {
-        isUserActionRef.current = true;
         setRepeatQueue((queue) => {
             const nextQueue = queue.slice(1);
             return familiarity < 4 ? nextQueue.concat(index) : nextQueue;
@@ -110,6 +104,7 @@ const useLearnQueue = (
                 queueSnapshot: mutQueueSnapshot,
             }),
         onSuccess(learningSession) {
+            lastSyncedRef.current = learningSession.queueSnapshot;
             setIndex(learningSession.queueSnapshot.index);
             setIsRepeating(learningSession.queueSnapshot.isRepeating);
             setRepeatQueue(learningSession.queueSnapshot.repeatQueue);
@@ -128,12 +123,33 @@ const useLearnQueue = (
     }, [queueSnapshot, queueSnapshotMutate, userId, mode]);
 
     useEffect(() => {
-        if (!isUserActionRef.current) {
+        if (!queueSnapshot) {
             return;
         }
-        isUserActionRef.current = false;
+        if (!lastSyncedRef.current) {
+            lastSyncedRef.current = queueSnapshot;
+            return;
+        }
+        if (isSnapshotEqual(lastSyncedRef.current, queueSnapshot)) {
+            return;
+        }
+        lastSyncedRef.current = queueSnapshot;
         syncQueueSnapshot();
     }, [queueSnapshot, syncQueueSnapshot]);
+
+    useEffect(() => {
+        if (!hydrateQueue || hydrateQueue.hydrateKey === appliedHydrateKey) {
+            return;
+        }
+
+        setIndex(hydrateQueue.initialState.index);
+        setRepeatQueue(hydrateQueue.initialState.repeatQueue);
+        setIsRepeating(hydrateQueue.initialState.isRepeating);
+        setVersion(hydrateQueue.initialState.version);
+        setIsFinished(false);
+        setAppliedHydrateKey(hydrateQueue.hydrateKey);
+        lastSyncedRef.current = hydrateQueue.initialState;
+    }, [appliedHydrateKey, hydrateQueue]);
 
     return {
         index,
