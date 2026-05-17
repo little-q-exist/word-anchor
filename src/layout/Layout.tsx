@@ -55,7 +55,13 @@ const BackgroundLayout = () => {
 
     return (
         <Layout style={{ height: '100%', backgroundColor: token.colorBgLayout }}>
-            <Header style={{ display: 'flex', alignItems: 'center', height: 56, backgroundColor: token.colorBgContainer }}>
+            <Header
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    backgroundColor: token.colorBgContainer,
+                }}
+            >
                 <Link to="..">
                     <Flex align="center" gap={'small'}>
                         <BookOutlined style={{ fontSize: '1.5rem' }} />
