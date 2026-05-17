@@ -1,4 +1,4 @@
-import { Avatar, Flex, Layout, Menu, type MenuProps } from 'antd';
+import { Avatar, Flex, Layout, Menu, theme, type MenuProps } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import type { RootState } from '../store';
@@ -14,12 +14,13 @@ const BackgroundLayout = () => {
     const user = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const location = useLocation();
+    const { token } = theme.useToken();
 
     const loginItem: MenuItem = { label: <NavLink to={`/login`}>LOGIN</NavLink>, key: '/login' };
 
     const userItem: MenuItem = {
         label: (
-            <Avatar style={{ backgroundColor: '#1677ff' }}>
+            <Avatar style={{ backgroundColor: token.colorPrimary }}>
                 {user ? user.username.slice(0, 3) : 'User'}
             </Avatar>
         ),
@@ -53,8 +54,8 @@ const BackgroundLayout = () => {
     ];
 
     return (
-        <Layout style={{ height: '100%' }}>
-            <Header style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff' }}>
+        <Layout style={{ height: '100%', backgroundColor: token.colorBgLayout }}>
+            <Header style={{ display: 'flex', alignItems: 'center', height: 56, backgroundColor: token.colorBgContainer }}>
                 <Link to="..">
                     <Flex align="center" gap={'small'}>
                         <BookOutlined style={{ fontSize: '1.5rem' }} />
@@ -70,7 +71,7 @@ const BackgroundLayout = () => {
                     selectedKeys={[location.pathname]}
                 />
             </Header>
-            <Content style={{ padding: '0 1.5rem' }}>
+            <Content style={{ padding: `0 ${token.paddingXXL}px` }}>
                 <Outlet />
             </Content>
         </Layout>
