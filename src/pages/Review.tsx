@@ -5,7 +5,7 @@ import { Flex } from 'antd';
 const Review = () => {
     return (
         <ProtectedRoute>
-            <Flex vertical justify="center" style={{ height: '100%' }}>
+            <Flex vertical justify="center" style={{ height: '100%', padding: 24 }}>
                 <LearnWord mode={'review'} />
             </Flex>
         </ProtectedRoute>

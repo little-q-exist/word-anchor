@@ -17,7 +17,7 @@ const Words = () => {
         setSearchType,
     } = useSearchWord();
     return (
-        <Flex style={{ margin: '1rem 0' }} vertical gap="small">
+        <Flex style={{ padding: '24px 0', height: '100%' }} vertical gap="small">
             <SearchWord
                 searchType={searchType}
                 setSearchType={setSearchType}
