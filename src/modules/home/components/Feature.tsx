@@ -1,4 +1,4 @@
-import { Col, Flex, Row, Typography } from 'antd';
+import { Col, Flex, Row, Typography, theme } from 'antd';
 import { RocketOutlined, ReadOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -8,13 +8,14 @@ interface FeatureProps {
 }
 
 const Feature = ({ isLoggedIn }: FeatureProps) => {
+    const { token } = theme.useToken();
     return (
         !isLoggedIn && (
             <div
                 style={{
-                    borderTop: '1px solid #f0f0f0',
-                    padding: '3rem 2rem',
-                    background: '#fafafa',
+                    borderTop: `1px solid ${token.colorSplit}`,
+                    padding: '48px 32px',
+                    background: token.colorBgContainer,
                     zIndex: 1,
                 }}
             >
@@ -26,7 +27,7 @@ const Feature = ({ isLoggedIn }: FeatureProps) => {
                     <Col xs={24} sm={8}>
                         <Flex gap="middle" align="flex-start">
                             <RocketOutlined
-                                style={{ fontSize: '1.5rem', color: '#1677ff', marginTop: 4 }}
+                                style={{ fontSize: '1.5rem', color: token.colorPrimary, marginTop: 4 }}
                             />
                             <div>
                                 <Text strong style={{ fontSize: '1.1rem', display: 'block' }}>
@@ -41,7 +42,7 @@ const Feature = ({ isLoggedIn }: FeatureProps) => {
                     <Col xs={24} sm={8}>
                         <Flex gap="middle" align="flex-start">
                             <ReadOutlined
-                                style={{ fontSize: '1.5rem', color: '#1677ff', marginTop: 4 }}
+                                style={{ fontSize: '1.5rem', color: token.colorPrimary, marginTop: 4 }}
                             />
                             <div>
                                 <Text strong style={{ fontSize: '1.1rem', display: 'block' }}>
@@ -60,7 +61,7 @@ const Feature = ({ isLoggedIn }: FeatureProps) => {
                                     width: 24,
                                     height: 24,
                                     borderRadius: '50%',
-                                    border: '2px solid #1677ff',
+                                    border: `2px solid ${token.colorPrimary}`,
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -72,7 +73,7 @@ const Feature = ({ isLoggedIn }: FeatureProps) => {
                                         width: 8,
                                         height: 8,
                                         borderRadius: '50%',
-                                        background: '#1677ff',
+                                        background: token.colorPrimary,
                                     }}
                                 />
                             </div>
