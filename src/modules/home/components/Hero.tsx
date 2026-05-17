@@ -1,4 +1,4 @@
-import { Button, Flex, Space, Typography } from 'antd';
+import { Button, Flex, Space, Typography, theme } from 'antd';
 import { CalendarOutlined, ThunderboltOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Link } from 'react-router';
 
@@ -16,6 +16,7 @@ interface HeroProps {
 }
 
 const Hero = ({ title, isLoggedIn }: HeroProps) => {
+    const { token } = theme.useToken();
     return (
         <Flex
             vertical
@@ -40,14 +41,14 @@ const Hero = ({ title, isLoggedIn }: HeroProps) => {
                                 lineHeight: 1.1,
                             }}
                         >
-                            {title.main} <span style={{ color: '#1677ff' }}>{title.accent}</span>
+                            {title.main} <span style={{ color: token.colorPrimary }}>{title.accent}</span>
                         </Title>
                         <Title
                             level={2}
                             style={{
                                 margin: '1.5rem 0 0',
                                 fontWeight: 400,
-                                color: '#8c8c8c',
+                                color: token.colorTextSecondary,
                                 fontSize: '1.5rem',
                                 letterSpacing: '0.05em',
                             }}
@@ -66,7 +67,7 @@ const Hero = ({ title, isLoggedIn }: HeroProps) => {
                                         icon={<ArrowRightOutlined />}
                                         style={{
                                             padding: '0 3rem',
-                                            boxShadow: '0 8px 24px rgba(22, 119, 255, 0.15)',
+                                            boxShadow: '0 4px 12px rgba(22, 119, 255, 0.20)',
                                         }}
                                     >
                                         Get Started
@@ -87,7 +88,7 @@ const Hero = ({ title, isLoggedIn }: HeroProps) => {
                                         icon={<ThunderboltOutlined />}
                                         style={{
                                             padding: '0 3rem',
-                                            boxShadow: '0 8px 24px rgba(22, 119, 255, 0.15)',
+                                            boxShadow: '0 4px 12px rgba(22, 119, 255, 0.20)',
                                         }}
                                     >
                                         Learn Units

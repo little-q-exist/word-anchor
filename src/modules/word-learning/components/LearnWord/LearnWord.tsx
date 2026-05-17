@@ -100,7 +100,7 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
     }
 
     return (
-        <Flex style={{ height: '100%', marginTop: '1rem' }} vertical>
+        <Flex style={{ height: '100%', paddingTop: 24 }} vertical>
             {briefWords && <LearnProgress briefWords={briefWords} index={index} key={index} />}
             <div style={{ flex: 1 }}>
                 {detailedWordQuery.status === 'success' ? (

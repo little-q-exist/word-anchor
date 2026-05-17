@@ -8,8 +8,10 @@ import wordLearningUserService from '@modules/word-learning/services/users';
 import type { UserLearningData } from '@modules/word-core/types';
 import type React from 'react';
 
+const FAVOURITE_COLOR = '#f5dc4d';
+
 const iconStyle: React.CSSProperties = {
-    color: '#f5dc4d',
+    color: FAVOURITE_COLOR,
 };
 
 interface FavouriteSideButtonInterface {

@@ -1,4 +1,4 @@
-import { Flex, ConfigProvider } from 'antd';
+import { Flex } from 'antd';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { useMemo } from 'react';
@@ -19,46 +19,32 @@ const Home = () => {
     }, []);
 
     return (
-        <ConfigProvider
-            theme={{
-                token: {
-                    borderRadius: 12,
-                },
-                components: {
-                    Button: {
-                        controlHeightLG: 56,
-                        fontSizeLG: 18,
-                    },
-                },
+        <Flex
+            vertical
+            style={{
+                height: '100%',
+                background: 'transparent',
+                overflow: 'hidden',
+                position: 'relative',
             }}
         >
-            <Flex
-                vertical
+            <div
                 style={{
-                    height: 'calc(100vh - 64px)',
-                    background: '#ffffff',
-                    overflow: 'hidden',
-                    position: 'relative',
+                    position: 'absolute',
+                    top: '-10%',
+                    right: '-5%',
+                    width: '40vw',
+                    height: '40vw',
+                    background:
+                        'radial-gradient(circle, rgba(22, 119, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%)',
+                    borderRadius: '50%',
+                    zIndex: 0,
                 }}
-            >
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: '-10%',
-                        right: '-5%',
-                        width: '40vw',
-                        height: '40vw',
-                        background:
-                            'radial-gradient(circle, rgba(22, 119, 255, 0.03) 0%, rgba(255, 255, 255, 0) 70%)',
-                        borderRadius: '50%',
-                        zIndex: 0,
-                    }}
-                />
+            />
 
-                <Hero title={title} isLoggedIn={Boolean(user)} />
-                <Feature isLoggedIn={Boolean(user)} />
-            </Flex>
-        </ConfigProvider>
+            <Hero title={title} isLoggedIn={Boolean(user)} />
+            <Feature isLoggedIn={Boolean(user)} />
+        </Flex>
     );
 };
 

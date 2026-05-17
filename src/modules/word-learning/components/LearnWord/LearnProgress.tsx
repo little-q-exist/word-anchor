@@ -1,4 +1,4 @@
-import { Timeline } from 'antd';
+import { Timeline, theme } from 'antd';
 import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
 
 interface LearnProgressProps {
@@ -7,17 +7,19 @@ interface LearnProgressProps {
 }
 
 const LearnProgress = ({ briefWords, index }: LearnProgressProps) => {
+    const { token } = theme.useToken();
+
     const generateColor = (word: BriefWordWithLearnStatus, wordIndex: number) => {
         if (wordIndex === index) {
-            return 'blue';
+            return token.colorPrimary;
         } else {
             switch (word.status) {
                 case 'idle':
-                    return 'gray';
+                    return token.colorTextTertiary;
                 case 'passed':
-                    return 'green';
+                    return token.colorSuccess;
                 case 'failed':
-                    return 'red';
+                    return token.colorError;
             }
         }
     };

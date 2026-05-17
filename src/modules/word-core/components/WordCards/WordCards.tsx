@@ -17,11 +17,11 @@ const WordCards = ({ word, visible }: WordCardProps) => {
         <Flex align="center" justify="space-between" style={{ width: '100%', height: '100%' }}>
             <WordCard centerContent>
                 <Space size="large" style={{ flex: 1 }}>
-                    <Title level={1} style={{ margin: 0 }}>
+                    <Title level={1} style={{ margin: 0, fontSize: 36, fontWeight: 700 }}>
                         {word.english}
                     </Title>
                     <Space vertical align="end">
-                        <Text style={{ fontSize: 20, padding: '0.5em 0' }}>{word.phonetic}</Text>
+                        <Text style={{ fontSize: 16, padding: '0.25em 0' }}>{word.phonetic}</Text>
                     </Space>
                 </Space>
             </WordCard>
