@@ -24,15 +24,13 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
             <Typography.Title level={3}>Register</Typography.Title>
             <Form
                 name="register"
-                style={{ width: '30rem' }}
+                style={{ width: '25rem' }}
                 initialValues={{ agreement: true }}
-                labelCol={{ span: 5 }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
             >
                 <Form.Item<RegisterFormFieldType>
-                    label="Username"
                     name="username"
                     validateDebounce={1000}
                     hasFeedback
@@ -59,20 +57,18 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
                         },
                     ]}
                 >
-                    <Input />
+                    <Input placeholder="Username" />
                 </Form.Item>
 
                 <Form.Item<RegisterFormFieldType>
-                    label="Email"
                     name="email"
                     rules={[{ type: 'email' }]}
                     hasFeedback
                 >
-                    <Input />
+                    <Input placeholder="Email" />
                 </Form.Item>
 
                 <Form.Item<RegisterFormFieldType>
-                    label="Password"
                     name="password"
                     hasFeedback
                     rules={[
@@ -87,7 +83,7 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
                         },
                     ]}
                 >
-                    <Input.Password />
+                    <Input.Password placeholder="Password" />
                 </Form.Item>
 
                 <Form.Item<RegisterFormFieldType>
