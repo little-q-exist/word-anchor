@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Input, message, type FormProps } from 'antd';
+import { Button, Checkbox, Form, Input, message, Typography, type FormProps } from 'antd';
 import { Link } from 'react-router';
 import type { LoginFormFieldType } from '../types';
 
@@ -27,7 +27,7 @@ export const LoginForm = ({ login }: LoginFormInterface) => {
     return (
         <>
             {contextHolder}
-            <h2>login</h2>
+            <Typography.Title level={3}>login</Typography.Title>
             <Form
                 name="login"
                 wrapperCol={{ span: 50 }}

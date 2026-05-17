@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Input, message, type FormProps } from 'antd';
+import { Button, Checkbox, Form, Input, message, Typography, type FormProps } from 'antd';
 import type { RegisterFormFieldType } from '../types';
 import userService from '../services/users';
 
@@ -21,7 +21,7 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
     return (
         <>
             {contextHolder}
-            <h2>Register</h2>
+            <Typography.Title level={3}>Register</Typography.Title>
             <Form
                 name="register"
                 style={{ width: '30rem' }}

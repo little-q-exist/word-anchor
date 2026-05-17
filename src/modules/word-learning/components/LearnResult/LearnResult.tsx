@@ -1,4 +1,4 @@
-import { Flex, Button } from 'antd';
+import { Flex, Button, Typography } from 'antd';
 import { useNavigate } from 'react-router';
 import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
 import LearnResultTable from './LearnResultTable';
@@ -11,8 +11,8 @@ const LearnResult = ({ briefWords }: LearnResultProps) => {
     const navigate = useNavigate();
 
     return (
-        <Flex vertical gap="middle" style={{ margin: '1rem 0', height: '100%' }}>
-            <h2 style={{ textAlign: 'center' }}>Learning Complete!</h2>
+        <Flex vertical gap="middle" style={{ padding: 24, height: '100%' }}>
+            <Typography.Title level={2} style={{ textAlign: 'center' }}>Learning Complete!</Typography.Title>
             <LearnResultTable briefWords={briefWords} />
             <Flex justify="center">
                 <Button type="primary" onClick={() => navigate('..')} size="large">
