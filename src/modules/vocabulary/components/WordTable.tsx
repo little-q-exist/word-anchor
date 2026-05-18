@@ -1,4 +1,4 @@
-import { Spin, Table } from 'antd';
+import { Skeleton, Table, Result, Button, theme } from 'antd';
 import { Link } from 'react-router';
 import type { Word } from '@modules/word-core/types';
 import { useCallback } from 'react';
@@ -17,6 +17,8 @@ interface WordTableProps {
 }
 
 const WordTable = ({ selectedTags, searchType, searchValue, page, setPage }: WordTableProps) => {
+    const { token } = theme.useToken();
+
     const fetchWords = useCallback(() => {
         const tags = selectedTags.length > 0 ? selectedTags.join(',') : undefined;
 
@@ -41,60 +43,74 @@ const WordTable = ({ selectedTags, searchType, searchValue, page, setPage }: Wor
 
     if (wordQuery.isError) {
         console.error(wordQuery.error);
-        return <div>Error loading words. Please try again later.</div>;
+        return (
+            <Result
+                status="error"
+                title="Failed to load words"
+                subTitle="An error occurred while loading the word list."
+                extra={[
+                    <Button type="primary" key="retry" onClick={() => wordQuery.refetch()}>
+                        Try Again
+                    </Button>,
+                ]}
+            />
+        );
+    }
+
+    if (wordQuery.isPending) {
+        return <Skeleton active paragraph={{ rows: 9 }} />;
     }
 
     return (
-        <Spin spinning={wordQuery.isPending}>
-            <Table<Word>
-                dataSource={wordsToShow}
-                pagination={{
-                    total: wordQuery.data?.count || 0,
-                    current: page,
-                    pageSize: 9,
-                    onChange(page) {
-                        setPage(page);
-                    },
-                }}
-                style={{ flex: 1 }}
-            >
+        <Table<Word>
+            dataSource={wordsToShow}
+            pagination={{
+                total: wordQuery.data?.count || 0,
+                current: page,
+                pageSize: 9,
+                onChange(page) {
+                    setPage(page);
+                },
+            }}
+            style={{ flex: 1, borderRadius: token.borderRadiusLG }}
+            rowClassName={() => 'vocabulary-table-row'}
+        >
+            <Column
+                title="English"
+                dataIndex="english"
+                key="english"
+                render={(english: Word['english'], word: Word) => (
+                    <Link to={`./${word._id}`}>{english}</Link>
+                )}
+            />
+            <Column title="Phonetic" dataIndex="phonetic" key="phonetic" />
+            <ColumnGroup title="Definitions">
                 <Column
-                    title="English"
-                    dataIndex="english"
-                    key="english"
-                    render={(english: Word['english'], word: Word) => (
-                        <Link to={`./${word._id}`}>{english}</Link>
+                    title="partOfSpeech"
+                    dataIndex="definitions"
+                    key="partOfSpeech"
+                    render={(definitions: Word['definitions']) => (
+                        <>
+                            {definitions.map((def, i) => (
+                                <div key={i}>{def.partOfSpeech}</div>
+                            ))}
+                        </>
                     )}
                 />
-                <Column title="Phonetic" dataIndex="phonetic" key="phonetic" />
-                <ColumnGroup title="Definitions">
-                    <Column
-                        title="partOfSpeech"
-                        dataIndex="definitions"
-                        key="partOfSpeech"
-                        render={(definitions: Word['definitions']) => (
-                            <>
-                                {definitions.map((def, i) => (
-                                    <div key={i}>{def.partOfSpeech}</div>
-                                ))}
-                            </>
-                        )}
-                    />
-                    <Column
-                        title="meaning"
-                        dataIndex="definitions"
-                        key="meaning"
-                        render={(definitions: Word['definitions']) => (
-                            <>
-                                {definitions.map((def, i) => (
-                                    <div key={i}>{def.meaning}</div>
-                                ))}
-                            </>
-                        )}
-                    />
-                </ColumnGroup>
-            </Table>
-        </Spin>
+                <Column
+                    title="meaning"
+                    dataIndex="definitions"
+                    key="meaning"
+                    render={(definitions: Word['definitions']) => (
+                        <>
+                            {definitions.map((def, i) => (
+                                <div key={i}>{def.meaning}</div>
+                            ))}
+                        </>
+                    )}
+                />
+            </ColumnGroup>
+        </Table>
     );
 };
 
