@@ -1,5 +1,5 @@
 import { Col, Flex, Row, Typography, theme } from 'antd';
-import { RocketOutlined, ReadOutlined } from '@ant-design/icons';
+import { RocketOutlined, ReadOutlined, AimOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
@@ -14,15 +14,15 @@ const Feature = ({ isLoggedIn }: FeatureProps) => {
             <div
                 style={{
                     borderTop: `1px solid ${token.colorSplit}`,
-                    padding: '48px 32px',
+                    padding: `${token.paddingXXL * 2}px ${token.paddingXXL}px`,
                     background: token.colorBgContainer,
                     zIndex: 1,
                 }}
             >
                 <Row
-                    gutter={[48, 24]}
+                    gutter={[token.paddingXXL, token.paddingSM]}
                     justify="center"
-                    style={{ maxWidth: 1200, margin: '0 auto' }}
+                    style={{ maxWidth: 960, margin: '0 auto' }}
                 >
                     <Col xs={24} sm={8}>
                         <Flex gap="middle" align="flex-start">
@@ -56,27 +56,9 @@ const Feature = ({ isLoggedIn }: FeatureProps) => {
                     </Col>
                     <Col xs={24} sm={8}>
                         <Flex gap="middle" align="flex-start">
-                            <div
-                                style={{
-                                    width: 24,
-                                    height: 24,
-                                    borderRadius: '50%',
-                                    border: `2px solid ${token.colorPrimary}`,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginTop: 4,
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        width: 8,
-                                        height: 8,
-                                        borderRadius: '50%',
-                                        background: token.colorPrimary,
-                                    }}
-                                />
-                            </div>
+                            <AimOutlined
+                                style={{ fontSize: '1.5rem', color: token.colorPrimary, marginTop: 4 }}
+                            />
                             <div>
                                 <Text strong style={{ fontSize: '1.1rem', display: 'block' }}>
                                     Minimal Design
