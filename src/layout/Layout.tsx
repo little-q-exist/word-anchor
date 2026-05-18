@@ -16,7 +16,7 @@ const BackgroundLayout = () => {
     const location = useLocation();
     const { token } = theme.useToken();
 
-    const loginItem: MenuItem = { label: <NavLink to={`/login`}>LOGIN</NavLink>, key: '/login' };
+    const loginItem: MenuItem = { label: <NavLink to={`/login`}>Login</NavLink>, key: '/login' };
 
     const userItem: MenuItem = {
         label: (
@@ -45,11 +45,11 @@ const BackgroundLayout = () => {
     const menuItems: MenuItem[] = [
         ...(user
             ? [
-                  { label: <NavLink to={`/learn`}>LEARN</NavLink>, key: '/learn' },
-                  { label: <NavLink to={'/review'}>REVIEW</NavLink>, key: '/review' },
+                  { label: <NavLink to={`/learn`}>Learn</NavLink>, key: '/learn' },
+                  { label: <NavLink to={'/review'}>Review</NavLink>, key: '/review' },
               ]
             : []),
-        { label: <NavLink to="/words">WORDS</NavLink>, key: '/words' },
+        { label: <NavLink to="/words">Words</NavLink>, key: '/words' },
         user ? userItem : loginItem,
     ];
 
@@ -64,8 +64,8 @@ const BackgroundLayout = () => {
             >
                 <Link to="..">
                     <Flex align="center" gap={'small'}>
-                        <BookOutlined style={{ fontSize: '1.5rem' }} />
-                        <Title level={1} style={{ fontSize: '1.5rem', margin: 0 }}>
+                        <BookOutlined style={{ fontSize: '1.25rem' }} />
+                        <Title level={4} style={{ margin: 0 }}>
                             WordAnchor
                         </Title>
                     </Flex>
