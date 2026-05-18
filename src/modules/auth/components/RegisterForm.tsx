@@ -1,6 +1,7 @@
 import { Button, Checkbox, Form, Input, Typography, theme, type FormProps } from 'antd';
 import type { RegisterFormFieldType } from '../types';
 import userService from '../services/users';
+import { Link } from 'react-router';
 
 type RegisterFormInterface = {
     register: (values: RegisterFormFieldType) => void;
@@ -20,13 +21,16 @@ export const RegisterForm = ({ register, loading }: RegisterFormInterface) => {
 
     return (
         <>
-            <Typography.Title level={3} style={{ textAlign: 'center', marginBottom: token.paddingXL }}>
+            <Typography.Title
+                level={3}
+                style={{ textAlign: 'center', marginBottom: token.paddingXL }}
+            >
                 Register
             </Typography.Title>
             <Form
                 name="register"
                 style={{
-                    width: '100%',
+                    width: '25rem',
                     maxWidth: 400,
                     margin: '0 auto',
                 }}
@@ -116,6 +120,9 @@ export const RegisterForm = ({ register, loading }: RegisterFormInterface) => {
                     <Button type="primary" htmlType="submit" block loading={loading}>
                         Register
                     </Button>
+                    <div style={{ marginTop: token.paddingSM, textAlign: 'center' }}>
+                        <Link to="../login">Already have an account? Login</Link>
+                    </div>
                 </Form.Item>
             </Form>
         </>

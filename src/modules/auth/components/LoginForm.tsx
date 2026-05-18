@@ -20,13 +20,16 @@ export const LoginForm = ({ login, loading }: LoginFormInterface) => {
 
     return (
         <>
-            <Typography.Title level={3} style={{ textAlign: 'center', marginBottom: token.paddingXL }}>
+            <Typography.Title
+                level={3}
+                style={{ textAlign: 'center', marginBottom: token.paddingXL }}
+            >
                 Login
             </Typography.Title>
             <Form
                 name="login"
                 style={{
-                    width: '100%',
+                    width: '25rem',
                     maxWidth: 400,
                     margin: '0 auto',
                 }}
@@ -38,13 +41,12 @@ export const LoginForm = ({ login, loading }: LoginFormInterface) => {
             >
                 <Form.Item<LoginFormFieldType>
                     name="username"
-                    label="Username"
                     rules={[
                         { required: true, message: 'Please input your username' },
                         { type: 'string' },
                         { whitespace: true },
                         {
-                            pattern: new RegExp('^[一-龥a-zA-Z0-9]+$'),
+                            pattern: new RegExp('^[\u4e00-\u9fa5a-zA-Z0-9]+$'),
                             message: 'Username only allows Chinese, characters and numbers',
                         },
                     ]}
@@ -54,7 +56,6 @@ export const LoginForm = ({ login, loading }: LoginFormInterface) => {
 
                 <Form.Item<LoginFormFieldType>
                     name="password"
-                    label="Password"
                     rules={[
                         { required: true, message: 'Please input your password' },
                         { type: 'string' },
