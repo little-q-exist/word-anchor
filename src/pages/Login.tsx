@@ -1,4 +1,4 @@
-import { Button, Card, Flex, Spin } from 'antd';
+import { Button, Card, Flex, theme } from 'antd';
 import { Link } from 'react-router';
 
 import FailedResult from '../shared/components/FailedResult';
@@ -8,6 +8,7 @@ import ProtectedRoute from '../layout/ProtectedRoute/ProtectedRoute';
 import LogoutButton from '../modules/auth/components/LogoutButton';
 
 const Login = () => {
+    const { token } = theme.useToken();
     const { login, status, errorMessage, reset } = useLogin();
 
     const renderContent = () => {
@@ -15,11 +16,7 @@ const Login = () => {
             case 'idle':
             case 'loading':
             case 'success':
-                return (
-                    <Spin spinning={status !== 'idle'}>
-                        <LoginForm login={login} />
-                    </Spin>
-                );
+                return <LoginForm login={login} loading={status === 'loading'} />;
             case 'failed':
                 return (
                     <FailedResult message={errorMessage}>
@@ -48,7 +45,7 @@ const Login = () => {
             disabled={status === 'success'}
         >
             <Flex vertical align="center" justify="space-around" style={{ height: '100%' }}>
-                <Card>{renderContent()}</Card>
+                <Card style={{ padding: token.paddingXL }}>{renderContent()}</Card>
             </Flex>
         </ProtectedRoute>
     );
