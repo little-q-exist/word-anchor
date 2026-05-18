@@ -1,13 +1,14 @@
-import { Button, Checkbox, Form, Input, message, Typography, type FormProps } from 'antd';
+import { Button, Checkbox, Form, Input, Typography, theme, type FormProps } from 'antd';
 import type { RegisterFormFieldType } from '../types';
 import userService from '../services/users';
 
 type RegisterFormInterface = {
     register: (values: RegisterFormFieldType) => void;
+    loading?: boolean;
 };
 
-export const RegisterForm = ({ register }: RegisterFormInterface) => {
-    const [messageApi, contextHolder] = message.useMessage();
+export const RegisterForm = ({ register, loading }: RegisterFormInterface) => {
+    const { token } = theme.useToken();
 
     const onFinish: FormProps<RegisterFormFieldType>['onFinish'] = async (values) => {
         register(values);
@@ -15,33 +16,39 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
 
     const onFinishFailed: FormProps<RegisterFormFieldType>['onFinishFailed'] = (errorInfo) => {
         console.log('Failed:', errorInfo);
-        messageApi.error('Registration failed!');
     };
 
     return (
         <>
-            {contextHolder}
-            <Typography.Title level={3}>Register</Typography.Title>
+            <Typography.Title level={3} style={{ textAlign: 'center', marginBottom: token.paddingXL }}>
+                Register
+            </Typography.Title>
             <Form
                 name="register"
-                style={{ width: '25rem' }}
+                style={{
+                    width: '100%',
+                    maxWidth: 400,
+                    margin: '0 auto',
+                }}
                 initialValues={{ agreement: true }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
+                layout="vertical"
             >
                 <Form.Item<RegisterFormFieldType>
                     name="username"
+                    label="Username"
                     validateDebounce={1000}
                     hasFeedback
                     rules={[
-                        { required: true, message: 'Please input your username!' },
+                        { required: true, message: 'Please input your username' },
                         { type: 'string' },
                         { whitespace: true },
                         { max: 20 },
                         { min: 2 },
                         {
-                            pattern: new RegExp('^[\u4e00-\u9fa5a-zA-Z0-9]+$'),
+                            pattern: new RegExp('^[一-龥a-zA-Z0-9]+$'),
                             message: 'Username only allows Chinese, characters and numbers',
                         },
                         {
@@ -57,22 +64,24 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
                         },
                     ]}
                 >
-                    <Input placeholder="Username" />
+                    <Input placeholder="Enter your username" />
                 </Form.Item>
 
                 <Form.Item<RegisterFormFieldType>
                     name="email"
-                    rules={[{ type: 'email' }]}
+                    label="Email"
+                    rules={[{ type: 'email', message: 'Please enter a valid email' }]}
                     hasFeedback
                 >
-                    <Input placeholder="Email" />
+                    <Input placeholder="Enter your email (optional)" />
                 </Form.Item>
 
                 <Form.Item<RegisterFormFieldType>
                     name="password"
+                    label="Password"
                     hasFeedback
                     rules={[
-                        { required: true, message: 'Please input your password!' },
+                        { required: true, message: 'Please input your password' },
                         { type: 'string' },
                         { whitespace: true },
                         { max: 100 },
@@ -83,19 +92,18 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
                         },
                     ]}
                 >
-                    <Input.Password placeholder="Password" />
+                    <Input.Password placeholder="Enter your password" />
                 </Form.Item>
 
                 <Form.Item<RegisterFormFieldType>
                     name="agreement"
                     valuePropName="checked"
-                    label={null}
                     rules={[
                         {
                             validator: (_, value) =>
                                 value
                                     ? Promise.resolve()
-                                    : Promise.reject(new Error('Please accept agreement')),
+                                    : Promise.reject(new Error('Please accept the agreement')),
                         },
                     ]}
                 >
@@ -105,7 +113,7 @@ export const RegisterForm = ({ register }: RegisterFormInterface) => {
                 </Form.Item>
 
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" block>
+                    <Button type="primary" htmlType="submit" block loading={loading}>
                         Register
                     </Button>
                 </Form.Item>
