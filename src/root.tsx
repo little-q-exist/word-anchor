@@ -1,4 +1,4 @@
-import { Button, ConfigProvider, Flex, Result, Spin } from 'antd';
+import { Button, ConfigProvider, Flex, Progress, Result, Skeleton } from 'antd';
 import type { ThemeConfig } from 'antd';
 import {
     isRouteErrorResponse,
@@ -34,6 +34,9 @@ const themeConfig: ThemeConfig = {
         colorBgContainer: '#ffffff',
         colorBorder: '#e5e7eb',
         colorSplit: '#f0f0f0',
+        colorText: '#1a1a2e',
+        colorTextSecondary: '#6b7280',
+        colorTextTertiary: '#9ca3af',
         borderRadius: 12,
         borderRadiusSM: 8,
         borderRadiusXS: 6,
@@ -85,7 +88,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         height: '100vh',
         overflow: 'hidden',
     };
-    const bodyStyle = { ...htmlStyle, backgroundColor: '#f5f7fa' };
+    const bodyStyle = { ...htmlStyle, backgroundColor: themeConfig.token?.colorBgLayout as string };
 
     return (
         <html lang="en" style={htmlStyle}>
@@ -94,6 +97,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta charSet="UTF-8" />
                 <link rel="icon" type="image/svg+xml" href="/vite.svg" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <style
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            *:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; }
+                            h1, h2, h3 { text-wrap: balance; }
+                            p { text-wrap: pretty; }
+                            .vocabulary-table-row:hover { transform: translateY(-1px); transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+                        `,
+                    }}
+                />
             </head>
             <body style={bodyStyle}>
                 <ConfigProvider theme={themeConfig}>
@@ -108,8 +121,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export function HydrateFallback() {
     return (
-        <Flex justify="center" align="center" vertical style={{ height: '100%' }}>
-            <Spin />
+        <Flex justify="center" align="center" style={{ height: '100%' }}>
+            <Skeleton active style={{ width: 300 }} />
         </Flex>
     );
 }
@@ -132,15 +145,29 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         );
     } else if (error instanceof Error) {
         return (
-            <div>
-                <h1>Error</h1>
-                <p>{error.message}</p>
-                <p>The stack trace is:</p>
-                <pre>{error.stack}</pre>
-            </div>
+            <Result
+                status="error"
+                title="Application Error"
+                subTitle={error.message}
+                extra={[
+                    <Button
+                        type="primary"
+                        key="reload"
+                        onClick={() => window.location.reload()}
+                    >
+                        Reload Page
+                    </Button>,
+                ]}
+            />
         );
     } else {
-        return <h1>Unknown Error</h1>;
+        return (
+            <Result
+                status="error"
+                title="Unknown Error"
+                subTitle="An unexpected error occurred."
+            />
+        );
     }
 }
 
@@ -156,7 +183,24 @@ const App = () => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <Spin spinning={navigation.state === 'loading'} fullscreen />
+            {navigation.state === 'loading' && (
+                <Flex
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 9999,
+                    }}
+                >
+                    <Progress
+                        percent={100}
+                        showInfo={false}
+                        strokeWidth={2}
+                        style={{ margin: 0 }}
+                    />
+                </Flex>
+            )}
             <Outlet />
         </QueryClientProvider>
     );

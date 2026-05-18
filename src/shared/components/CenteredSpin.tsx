@@ -1,8 +1,8 @@
-import { Flex, Spin } from 'antd';
+import { Flex, Skeleton } from 'antd';
 
 const CenteredSpin = () => (
     <Flex style={{ height: '100%' }} align="center" justify="center">
-        <Spin spinning />
+        <Skeleton active paragraph={{ rows: 4 }} />
     </Flex>
 );
 

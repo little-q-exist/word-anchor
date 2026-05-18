@@ -8,8 +8,8 @@ const SuccessResult = ({ children }: SuccessResultInterface) => {
     return (
         <Result
             status="success"
-            title="You have successfully registered!"
-            subTitle="please go back and login again."
+            title="Registration successful"
+            subTitle="Please go back and log in again."
             extra={children}
         />
     );

@@ -4,8 +4,8 @@ const FailedResult = ({ message, children }: { message?: string; children?: Reac
     return (
         <Result
             status="error"
-            title="Opps! Something went wrong."
-            subTitle={message || 'please go back or try again.'}
+            title="Operation failed"
+            subTitle={message || 'Please go back and try again.'}
             extra={children}
         />
     );
