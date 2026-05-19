@@ -97,16 +97,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <meta charSet="UTF-8" />
                 <link rel="icon" type="image/svg+xml" href="/vite.svg" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <style
-                    dangerouslySetInnerHTML={{
-                        __html: `
-                            *:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; }
-                            h1, h2, h3 { text-wrap: balance; }
-                            p { text-wrap: pretty; }
-                            .vocabulary-table-row:hover { transform: translateY(-1px); transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1); }
-                        `,
-                    }}
-                />
+                <style>{`
+                    *:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; }
+                    h1, h2, h3 { text-wrap: balance; }
+                    p { text-wrap: pretty; }
+                    .vocabulary-table-row:hover { transform: translateY(-1px); transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+                `}</style>
             </head>
             <body style={bodyStyle}>
                 <ConfigProvider theme={themeConfig}>
