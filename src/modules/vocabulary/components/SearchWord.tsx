@@ -28,8 +28,8 @@ const SearchWord = ({
     });
 
     return (
-        <Flex justify="center" style={{ padding: `0 ${token.paddingXXL}px` }}>
-            <Space style={{ width: '100%', maxWidth: 960 }} wrap>
+        <Flex style={{ padding: `0 ${token.paddingXXL}px` }}>
+            <Space style={{ width: '100%', maxWidth: 960, flex: 1 }} wrap>
                 <Space.Compact style={{ flex: 1, minWidth: 280 }}>
                     <Select
                         defaultValue={searchType}
