@@ -32,6 +32,7 @@ npm run server           # json-server mock API on port 4000
 
 ## Path aliases (defined in `vite.config.ts`)
 
+When an import path contains two or more consecutive `../` segments (i.e., references to a parent directory two or more levels up), a path alias must be used instead.
 - `@/` → `src/`
 - `@modules/` → `src/modules/`
 - `@shared/` → `src/shared/`
