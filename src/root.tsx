@@ -105,9 +105,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 `}</style>
             </head>
             <body style={bodyStyle}>
-                <ConfigProvider theme={themeConfig}>
-                    {children}
-                </ConfigProvider>
+                <ConfigProvider theme={themeConfig}>{children}</ConfigProvider>
                 <ScrollRestoration />
                 <Scripts />
             </body>
@@ -146,11 +144,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                 title="Application Error"
                 subTitle={error.message}
                 extra={[
-                    <Button
-                        type="primary"
-                        key="reload"
-                        onClick={() => window.location.reload()}
-                    >
+                    <Button type="primary" key="reload" onClick={() => window.location.reload()}>
                         Reload Page
                     </Button>,
                 ]}
@@ -158,11 +152,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         );
     } else {
         return (
-            <Result
-                status="error"
-                title="Unknown Error"
-                subTitle="An unexpected error occurred."
-            />
+            <Result status="error" title="Unknown Error" subTitle="An unexpected error occurred." />
         );
     }
 }
@@ -189,12 +179,7 @@ const App = () => {
                         zIndex: 9999,
                     }}
                 >
-                    <Progress
-                        percent={100}
-                        showInfo={false}
-                        strokeWidth={2}
-                        style={{ margin: 0 }}
-                    />
+                    <Progress percent={100} showInfo={false} size={2} style={{ margin: 0 }} />
                 </Flex>
             )}
             <Outlet />
