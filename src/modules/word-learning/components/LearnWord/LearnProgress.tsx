@@ -1,38 +1,39 @@
-import { Timeline, theme } from 'antd';
+import { useState } from 'react';
+import { Progress, Button, Flex } from 'antd';
+import { BarsOutlined } from '@ant-design/icons';
 import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
+import LearnSteps from './LearnSteps';
 
 interface LearnProgressProps {
     briefWords: BriefWordWithLearnStatus[];
     index: number;
+    onChange: (index: number) => void;
 }
 
-const LearnProgress = ({ briefWords, index }: LearnProgressProps) => {
-    const { token } = theme.useToken();
+const LearnProgress = ({ briefWords, index, onChange }: LearnProgressProps) => {
+    const [open, setOpen] = useState(false);
+    const percent = Math.round((index / briefWords.length) * 100);
 
-    const generateColor = (word: BriefWordWithLearnStatus, wordIndex: number) => {
-        if (wordIndex === index) {
-            return token.colorPrimary;
-        } else {
-            switch (word.status) {
-                case 'idle':
-                    return token.colorTextTertiary;
-                case 'passed':
-                    return token.colorSuccess;
-                case 'failed':
-                    return token.colorError;
-            }
-        }
-    };
     return (
-        <Timeline
-            orientation="horizontal"
-            items={briefWords.map((word, wordIndex) => {
-                return {
-                    content: <div>{word.english}</div>,
-                    color: generateColor(word, wordIndex),
-                };
-            })}
-        />
+        <Flex gap="small" align="center">
+            <Button
+                icon={<BarsOutlined />}
+                size="middle"
+                onClick={() => setOpen(true)}
+            />
+            <div style={{ flex: 1 }}>
+                <Progress percent={percent} showInfo={false} />
+            </div>
+            <LearnSteps
+                briefWords={briefWords}
+                index={index}
+                onChange={(i) => {
+                    onChange(i);
+                    setOpen(false);
+                }}
+                open={open}
+            />
+        </Flex>
     );
 };
 
