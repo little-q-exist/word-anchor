@@ -60,6 +60,7 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
         isRepeating,
         isFinished,
         toNextWord,
+        jumpToIndex,
         addToRepeatQueue,
         handleRepeat,
     } = useLearnQueue(briefWords, hydrateQueue, user?._id, mode);
@@ -127,7 +128,7 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
 
     return (
         <Flex style={{ height: '100%', paddingTop: token.paddingXXL }} vertical>
-            {briefWords && <LearnProgress briefWords={briefWords} index={index} key={index} />}
+            {briefWords && <LearnProgress briefWords={briefWords} index={index} key={index} onChange={jumpToIndex} />}
             <div style={{ flex: 1 }}>
                 {detailedWordQuery.status === 'success' ? (
                     <WordCards

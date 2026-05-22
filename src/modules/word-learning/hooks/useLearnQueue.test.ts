@@ -9,15 +9,23 @@ let capturedOnSuccess: ((data: unknown) => void) | undefined;
 let capturedOnError: ((error: unknown) => void) | undefined;
 
 vi.mock('@tanstack/react-query', () => ({
-    useMutation: vi.fn((options: {
-        mutationFn: (...args: unknown[]) => unknown;
-        onSuccess?: (data: unknown) => void;
-        onError?: (error: unknown) => void;
-    }): Partial<UseMutationResult> => {
-        capturedOnSuccess = options.onSuccess;
-        capturedOnError = options.onError;
-        return { mutate: mockMutate, data: undefined, isPending: false, isError: false, isSuccess: false };
-    }),
+    useMutation: vi.fn(
+        (options: {
+            mutationFn: (...args: unknown[]) => unknown;
+            onSuccess?: (data: unknown) => void;
+            onError?: (error: unknown) => void;
+        }): Partial<UseMutationResult> => {
+            capturedOnSuccess = options.onSuccess;
+            capturedOnError = options.onError;
+            return {
+                mutate: mockMutate,
+                data: undefined,
+                isPending: false,
+                isError: false,
+                isSuccess: false,
+            };
+        }
+    ),
 }));
 
 vi.mock('@modules/word-learning/services/learningSession', () => ({
@@ -90,7 +98,7 @@ describe('useLearnQueue', () => {
             };
             const { result, rerender } = renderHook(
                 (props) => useLearnQueue(threeWords, props.hydrateQueue),
-                { initialProps: { hydrateQueue } },
+                { initialProps: { hydrateQueue } }
             );
             expect(result.current.index).toBe(1);
 
@@ -116,7 +124,7 @@ describe('useLearnQueue', () => {
                             hydrateKey: 'key-1',
                         },
                     },
-                },
+                }
             );
             expect(result.current.index).toBe(0);
 
@@ -316,7 +324,7 @@ describe('useLearnQueue', () => {
                 hydrateKey: 'k',
             };
             const { result } = renderHook(() =>
-                useLearnQueue(threeWords, hydrateQueue, 'user1', 'learn'),
+                useLearnQueue(threeWords, hydrateQueue, 'user1', 'learn')
             );
 
             // Hydration should not trigger sync
@@ -340,7 +348,7 @@ describe('useLearnQueue', () => {
                 hydrateKey: 'k',
             };
             const { result } = renderHook(() =>
-                useLearnQueue(threeWords, hydrateQueue, 'user1', 'review'),
+                useLearnQueue(threeWords, hydrateQueue, 'user1', 'review')
             );
 
             mockMutate.mockClear();
@@ -362,7 +370,7 @@ describe('useLearnQueue', () => {
                 hydrateKey: 'k',
             };
             const { result } = renderHook(() =>
-                useLearnQueue(threeWords, hydrateQueue, 'user1', 'learn'),
+                useLearnQueue(threeWords, hydrateQueue, 'user1', 'learn')
             );
 
             mockMutate.mockClear();
@@ -405,7 +413,7 @@ describe('useLearnQueue', () => {
                         userId: 'user1',
                         mode: 'learn' as const,
                     },
-                },
+                }
             );
 
             mockMutate.mockClear();
@@ -443,7 +451,7 @@ describe('useLearnQueue', () => {
                 hydrateKey: 'k',
             };
             const { result } = renderHook(() =>
-                useLearnQueue(threeWords, hydrateQueue, 'user1', 'learn'),
+                useLearnQueue(threeWords, hydrateQueue, 'user1', 'learn')
             );
 
             // First user action
@@ -467,26 +475,53 @@ describe('useLearnQueue', () => {
             expect(mockMutate).toHaveBeenCalledTimes(1);
         });
 
-        it('does not sync when toNextWord has no state effect (e.g., end of repeat)', () => {
-            const hydrateQueue = {
-                initialState: makeSnapshot({ index: 0, isRepeating: true, repeatQueue: [] }),
-                hydrateKey: 'k',
-            };
-            const { result } = renderHook(() =>
-                useLearnQueue(threeWords, hydrateQueue, 'user1', 'learn'),
-            );
-
-            mockMutate.mockClear();
-
-            act(() => {
-                result.current.toNextWord();
+        // ── jumpToIndex ──
+        describe('jumpToIndex', () => {
+            it('jumps to the specified index', () => {
+                const hydrateQueue = {
+                    initialState: makeSnapshot({ index: 0 }),
+                    hydrateKey: 'k',
+                };
+                const { result } = renderHook(() => useLearnQueue(threeWords, hydrateQueue));
+                act(() => {
+                    result.current.jumpToIndex(2);
+                });
+                expect(result.current.index).toBe(2);
             });
-            // isFinished changes but queueSnapshot is unchanged
-            // The effect guard checks isUserActionRef, but syncQueueSnapshot should not be called
-            // because queueSnapshot didn't change (no re-render triggered by its deps)
-            // Actually, since isUserActionRef is set, and queueSnapshot didn't change,
-            // the effect won't fire at all since queueSnapshot is in its deps.
-            expect(mockMutate).not.toHaveBeenCalled();
+
+            it('does not change repeatQueue or isRepeating state', () => {
+                const hydrateQueue = {
+                    initialState: makeSnapshot({ index: 0, repeatQueue: [1], isRepeating: true }),
+                    hydrateKey: 'k',
+                };
+                const { result } = renderHook(() => useLearnQueue(threeWords, hydrateQueue));
+                act(() => {
+                    result.current.jumpToIndex(2);
+                });
+                expect(result.current.index).toBe(2);
+                expect(result.current.repeatQueue).toEqual([1]);
+                expect(result.current.isRepeating).toBe(true);
+            });
+        });
+
+        // ── Sync behavior ──
+        describe('sync on user action', () => {
+            it('does not trigger sync when toNextWord has no state effect (e.g., end of repeat)', () => {
+                const hydrateQueue = {
+                    initialState: makeSnapshot({ index: 0, isRepeating: true, repeatQueue: [] }),
+                    hydrateKey: 'k',
+                };
+                const { result } = renderHook(() =>
+                    useLearnQueue(threeWords, hydrateQueue, 'user1', 'learn')
+                );
+
+                mockMutate.mockClear();
+
+                act(() => {
+                    result.current.toNextWord();
+                });
+                expect(mockMutate).not.toHaveBeenCalled();
+            });
         });
     });
 });
