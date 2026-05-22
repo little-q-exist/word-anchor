@@ -6,32 +6,40 @@ interface LearnStepsProps {
     index: number;
     onChange: (index: number) => void;
     open: boolean;
+    onClose: () => void;
 }
 
-const LearnSteps = ({ briefWords, index, onChange, open }: LearnStepsProps) => {
-    if (briefWords.length === 0) {
-        return (
-            <Drawer open={open} placement="left" mask={false}>
-                <Empty />
-            </Drawer>
-        );
-    }
+const LearnSteps = ({ briefWords, index, onChange, open, onClose }: LearnStepsProps) => {
+    const generateStatus = (status: BriefWordWithLearnStatus['status']) => {
+        switch (status) {
+            case 'passed':
+                return 'finish';
+            case 'failed':
+                return 'error';
+            default:
+                return 'wait';
+        }
+    };
 
     const items = briefWords.map((word) => ({
         key: word._id,
         title: word.english,
-        status: (word.status === 'passed' ? 'finish' : 'wait') as 'finish' | 'wait',
+        status: generateStatus(word.status),
         disabled: word.status !== 'passed',
-    }));
+    })) satisfies { status: 'finish' | 'error' | 'wait' }[];
 
     return (
-        <Drawer open={open} placement="left" mask={false}>
-            <Steps
-                orientation="vertical"
-                current={index}
-                items={items}
-                onChange={(stepIndex) => onChange(stepIndex)}
-            />
+        <Drawer open={open} placement="left" mask={false} onClose={onClose}>
+            {briefWords.length > 0 ? (
+                <Steps
+                    orientation="vertical"
+                    current={index}
+                    items={items}
+                    onChange={(stepIndex) => onChange(stepIndex)}
+                />
+            ) : (
+                <Empty description="No words to learn" />
+            )}
         </Drawer>
     );
 };

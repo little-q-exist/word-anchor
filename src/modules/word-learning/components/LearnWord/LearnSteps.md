@@ -13,6 +13,7 @@
 - Drawer 中应当显示 Steps 组件。
 - Steps 呈竖直方向显示，且显示单词简略信息：展示单词英文与学习状态(status)。
 - 当单词学习状态(status)为 `passed` 时，Steps 的 item 可点击。也即是说，当 status 为 `idle` & `failed` 时，禁用点击。
+- 根据单词 status ，在 Steps 正确显示三个状态。
 
 ## 实现约束
 ### 参数
@@ -22,6 +23,7 @@ interface LearnStepsProps {
     index: number;
     onChange: (index) => void;
     open: boolean;
+    onClose: () => void
 }
 ```
 
