@@ -11,11 +11,13 @@ interface LearnWordButtonsProps {
     currentIndex: number;
     isRepeating: boolean;
     showInfo: boolean;
+    isOnJump: boolean;
     onShowInfoChange: (visible: boolean) => void;
     onMarkWordStatus: (wordId: string, status: BriefWordWithLearnStatus['status']) => void;
     onAddToRepeatQueue: (wordId: string) => void;
     onHandleRepeat: (familiarity: number) => void;
     onNextWord: () => void;
+    onJumpBack: () => void;
 }
 
 const LearnWordButtons = ({
@@ -24,6 +26,8 @@ const LearnWordButtons = ({
     currentIndex,
     isRepeating,
     showInfo,
+    isOnJump,
+    onJumpBack,
     onShowInfoChange,
     onMarkWordStatus,
     onAddToRepeatQueue,
@@ -108,7 +112,14 @@ const LearnWordButtons = ({
         <>
             {contextHolder}
             <Flex justify="space-around" gap="middle" style={{ marginBottom: token.paddingXXL }}>
-                {!showInfo && (
+                {isOnJump && (
+                    <>
+                        <Button type="primary" onClick={onJumpBack} style={{ width: '50%' }}>
+                            Back
+                        </Button>
+                    </>
+                )}
+                {!isOnJump && !showInfo && (
                     <>
                         <Button
                             type="primary"
@@ -147,7 +158,7 @@ const LearnWordButtons = ({
                         </Button>
                     </>
                 )}
-                {showInfo && (
+                {!isOnJump && showInfo && (
                     <Button
                         type="primary"
                         onClick={navigateToNextWord}
