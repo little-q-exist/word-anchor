@@ -475,35 +475,6 @@ describe('useLearnQueue', () => {
             expect(mockMutate).toHaveBeenCalledTimes(1);
         });
 
-        // ── jumpToIndex ──
-        describe('jumpToIndex', () => {
-            it('jumps to the specified index', () => {
-                const hydrateQueue = {
-                    initialState: makeSnapshot({ index: 0 }),
-                    hydrateKey: 'k',
-                };
-                const { result } = renderHook(() => useLearnQueue(threeWords, hydrateQueue));
-                act(() => {
-                    result.current.jumpToIndex(2);
-                });
-                expect(result.current.index).toBe(2);
-            });
-
-            it('does not change repeatQueue or isRepeating state', () => {
-                const hydrateQueue = {
-                    initialState: makeSnapshot({ index: 0, repeatQueue: [1], isRepeating: true }),
-                    hydrateKey: 'k',
-                };
-                const { result } = renderHook(() => useLearnQueue(threeWords, hydrateQueue));
-                act(() => {
-                    result.current.jumpToIndex(2);
-                });
-                expect(result.current.index).toBe(2);
-                expect(result.current.repeatQueue).toEqual([1]);
-                expect(result.current.isRepeating).toBe(true);
-            });
-        });
-
         // ── Sync behavior ──
         describe('sync on user action', () => {
             it('does not trigger sync when toNextWord has no state effect (e.g., end of repeat)', () => {

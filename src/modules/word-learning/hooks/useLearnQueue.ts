@@ -32,7 +32,6 @@ const useLearnQueue = (
     const [repeatQueue, setRepeatQueue] = useState<number[]>([]);
     const [isRepeating, setIsRepeating] = useState(false);
     const [version, setVersion] = useState('');
-    const jumpToIndex = useCallback((newIndex: number) => { setIndex(newIndex); }, []);
 
     const [isFinished, setIsFinished] = useState(false);
     const [appliedHydrateKey, setAppliedHydrateKey] = useState<string | undefined>(undefined);
@@ -158,7 +157,6 @@ const useLearnQueue = (
         repeatQueue,
         queueSnapshot,
         toNextWord,
-        jumpToIndex,
         addToRepeatQueue,
         handleRepeat,
     };

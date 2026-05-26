@@ -14,7 +14,6 @@
 | `repeatQueue` | `number[]` | 待重复学习的单词索引列表 |
 | `queueSnapshot` | `QueueSnapshot \| undefined` | 当前队列状态的快照，用于持久化同步 |
 | `toNextWord` | `() => void` | 前进到下一个单词；若已到末尾且有重学项则进入重复阶段 |
-| `jumpToIndex` | `(newIndex: number) => void` | 直接跳转到指定索引的单词 |
 | `addToRepeatQueue` | `(wordId: string) => void` | 根据单词 `_id` 将其加入重学队列 |
 | `handleRepeat` | `(familiarity: number) => void` | 处理重复阶段的熟悉度评分：从队列移出当前项，若评分 < 4 则重新入队 |
 
@@ -29,7 +28,6 @@
    - 随后调用 `toNextWord` 进入下一个词。
 4. **重复阶段**：正常流程走完后，`isRepeating` 变为 `true`，队列开始逐个复习错词。每次评分调用 `handleRepeat(familiarity)`，熟悉度足够则移出队列，不够则重新入队。
 5. **结束判断**：`isFinished` 变为 `true` 时，组件切换为 `<LearnResult />` 展示学习结果。
-6. **进度导航**：`LearnProgress` 组件通过 `jumpToIndex` 实现点击跳转。
 
 ---
 
