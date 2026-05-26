@@ -36,7 +36,7 @@ describe('LearnProgress', () => {
     it('renders a button that opens the drawer on click', () => {
         const words = makeWords(5);
         renderWithConfig(
-            <LearnProgress briefWords={words} index={2} onChange={vi.fn()} />,
+            <LearnProgress briefWords={words} currentIndex={2} index={2} onChange={vi.fn()} />
         );
 
         const button = screen.getByRole('button');
@@ -49,7 +49,7 @@ describe('LearnProgress', () => {
     it('renders button with icon only and no visible text', () => {
         const words = makeWords(3);
         renderWithConfig(
-            <LearnProgress briefWords={words} index={0} onChange={vi.fn()} />,
+            <LearnProgress briefWords={words} currentIndex={0} index={0} onChange={vi.fn()} />
         );
 
         const button = screen.getByRole('button');

@@ -19,7 +19,8 @@
 ```ts
 interface LearnProgressProps {
     briefWords: BriefWordWithLearnStatus[];
+    currentIndex: number;
     index: number;
-    onChange: (index) => void;
+    onChange: (index: number) => void;
 }
 ```

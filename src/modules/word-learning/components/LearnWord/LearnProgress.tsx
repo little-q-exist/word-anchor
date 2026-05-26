@@ -6,11 +6,12 @@ import LearnSteps from './LearnSteps';
 
 interface LearnProgressProps {
     briefWords: BriefWordWithLearnStatus[];
+    currentIndex: number;
     index: number;
     onChange: (index: number) => void;
 }
 
-const LearnProgress = ({ briefWords, index, onChange }: LearnProgressProps) => {
+const LearnProgress = ({ briefWords, currentIndex, index, onChange }: LearnProgressProps) => {
     const [open, setOpen] = useState(false);
     const percent = useMemo(
         () => Math.round((index / briefWords.length) * 100),
@@ -29,11 +30,9 @@ const LearnProgress = ({ briefWords, index, onChange }: LearnProgressProps) => {
             </div>
             <LearnSteps
                 briefWords={briefWords}
+                currentIndex={currentIndex}
                 index={index}
-                onChange={(i) => {
-                    onChange(i);
-                    onClose();
-                }}
+                onChange={onChange}
                 open={open}
                 onClose={onClose}
             />
