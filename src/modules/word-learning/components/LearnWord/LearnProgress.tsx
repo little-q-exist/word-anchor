@@ -13,10 +13,13 @@ interface LearnProgressProps {
 
 const LearnProgress = ({ briefWords, currentIndex, index, onChange }: LearnProgressProps) => {
     const [open, setOpen] = useState(false);
-    const percent = useMemo(
-        () => Math.round((index / briefWords.length) * 100),
-        [briefWords.length, index]
-    );
+    const percent = useMemo(() => {
+        if (briefWords.length === 0) {
+            return 0;
+        }
+
+        return Math.round((index / briefWords.length) * 100);
+    }, [briefWords.length, index]);
 
     const onClose = () => {
         setOpen(false);
