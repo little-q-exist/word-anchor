@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import WordCards from '@modules/word-core/components/WordCards/WordCards';
 import { Empty, Flex, Skeleton, Result, Button, theme } from 'antd';
@@ -55,17 +55,26 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
         [learnQueueHydrateKey, learnQueueInitialState]
     );
 
-    const {
-        index,
-        isRepeating,
-        isFinished,
-        toNextWord,
-        jumpToIndex,
-        addToRepeatQueue,
-        handleRepeat,
-    } = useLearnQueue(briefWords, hydrateQueue, user?._id, mode);
+    const { index, isRepeating, isFinished, toNextWord, addToRepeatQueue, handleRepeat } =
+        useLearnQueue(briefWords, hydrateQueue, user?._id, mode);
 
-    const detailedWordQuery = useDetailedWordQuery(briefWords?.[index]?._id);
+    const [currentIndex, setCurrentIndex] = useState(index);
+
+    useEffect(() => {
+        setCurrentIndex(index);
+    }, [index]);
+
+    const isOnJump = useMemo(() => index !== currentIndex, [index, currentIndex]);
+
+    const jumpToIndex = useCallback((newIndex: number) => {
+        setCurrentIndex(newIndex);
+    }, []);
+
+    const jumpBack = useCallback(() => {
+        setCurrentIndex(index);
+    }, [index]);
+
+    const detailedWordQuery = useDetailedWordQuery(briefWords?.[currentIndex]?._id);
 
     const markWordStatus = (wordId: string, status: BriefWordWithLearnStatus['status']) => {
         setBriefWords((prev) => {
@@ -128,7 +137,14 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
 
     return (
         <Flex style={{ height: '100%', paddingTop: token.paddingXXL }} vertical>
-            {briefWords && <LearnProgress briefWords={briefWords} index={index} onChange={jumpToIndex} />}
+            {briefWords && (
+                <LearnProgress
+                    briefWords={briefWords}
+                    currentIndex={currentIndex}
+                    index={index}
+                    onChange={jumpToIndex}
+                />
+            )}
             <div style={{ flex: 1 }}>
                 {detailedWordQuery.status === 'success' ? (
                     <WordCards
@@ -144,9 +160,11 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
             <LearnWordButtons
                 userId={user?._id}
                 briefWords={briefWords}
-                currentIndex={index}
+                currentIndex={currentIndex}
                 isRepeating={isRepeating}
                 showInfo={shouldShowInfo}
+                isOnJump={isOnJump}
+                onJumpBack={jumpBack}
                 onShowInfoChange={setShouldShowInfo}
                 onMarkWordStatus={markWordStatus}
                 onAddToRepeatQueue={addToRepeatQueue}
