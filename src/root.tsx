@@ -101,7 +101,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     *:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; }
                     h1, h2, h3 { text-wrap: balance; }
                     p { text-wrap: pretty; }
-                    .vocabulary-table-row:hover { transform: translateY(-1px); transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+                    .vocabulary-table-row { transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+                    .vocabulary-table-row:hover { transform: translateY(-1px); }
                 `}</style>
             </head>
             <body style={bodyStyle}>
