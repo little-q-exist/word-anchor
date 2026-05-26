@@ -20,10 +20,11 @@
 ```ts
 interface LearnStepsProps {
     briefWords: BriefWordWithLearnStatus[];
+    currentIndex: number;
     index: number;
-    onChange: (index) => void;
+    onChange: (index: number) => void;
     open: boolean;
-    onClose: () => void
+    onClose: () => void;
 }
 ```
 

@@ -3,14 +3,25 @@ import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
 
 interface LearnStepsProps {
     briefWords: BriefWordWithLearnStatus[];
+    currentIndex: number;
     index: number;
     onChange: (index: number) => void;
     open: boolean;
     onClose: () => void;
 }
 
-const LearnSteps = ({ briefWords, index, onChange, open, onClose }: LearnStepsProps) => {
-    const generateStatus = (status: BriefWordWithLearnStatus['status']) => {
+const LearnSteps = ({
+    briefWords,
+    currentIndex,
+    index,
+    onChange,
+    open,
+    onClose,
+}: LearnStepsProps) => {
+    const generateStatus = (status: BriefWordWithLearnStatus['status'], wordIndex: number) => {
+        if (wordIndex === index) {
+            return 'process';
+        }
         switch (status) {
             case 'passed':
                 return 'finish';
@@ -21,21 +32,21 @@ const LearnSteps = ({ briefWords, index, onChange, open, onClose }: LearnStepsPr
         }
     };
 
-    const items = briefWords.map((word) => ({
+    const items = briefWords.map((word, wordIndex) => ({
         key: word._id,
         title: word.english,
-        status: generateStatus(word.status),
-        disabled: word.status !== 'passed',
-    })) satisfies { status: 'finish' | 'error' | 'wait' }[];
+        status: generateStatus(word.status, wordIndex),
+        disabled: word.status !== 'passed' && wordIndex !== index,
+    })) satisfies { status: 'finish' | 'error' | 'wait' | 'process' }[];
 
     return (
         <Drawer open={open} placement="left" mask={false} onClose={onClose}>
             {briefWords.length > 0 ? (
                 <Steps
                     orientation="vertical"
-                    current={index}
+                    current={currentIndex}
                     items={items}
-                    onChange={(stepIndex) => onChange(stepIndex)}
+                    onChange={onChange}
                 />
             ) : (
                 <Empty description="No words to learn" />

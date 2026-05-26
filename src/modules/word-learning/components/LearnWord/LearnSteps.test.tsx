@@ -37,11 +37,12 @@ describe('LearnSteps', () => {
         renderWithConfig(
             <LearnSteps
                 briefWords={words}
+                currentIndex={0}
                 index={0}
                 onChange={vi.fn()}
                 onClose={vi.fn()}
                 open={true}
-            />,
+            />
         );
 
         expect(screen.getByText('apple')).toBeInTheDocument();
@@ -54,11 +55,12 @@ describe('LearnSteps', () => {
         renderWithConfig(
             <LearnSteps
                 briefWords={words}
+                currentIndex={0}
                 index={0}
                 onChange={vi.fn()}
                 onClose={vi.fn()}
                 open={false}
-            />,
+            />
         );
 
         expect(screen.queryByText('apple')).not.toBeInTheDocument();
@@ -68,11 +70,12 @@ describe('LearnSteps', () => {
         renderWithConfig(
             <LearnSteps
                 briefWords={[]}
+                currentIndex={0}
                 index={0}
                 onChange={vi.fn()}
                 onClose={vi.fn()}
                 open={true}
-            />,
+            />
         );
 
         expect(screen.getByText('No words to learn')).toBeInTheDocument();
@@ -83,11 +86,12 @@ describe('LearnSteps', () => {
         renderWithConfig(
             <LearnSteps
                 briefWords={makeWords()}
+                currentIndex={0}
                 index={0}
                 onChange={vi.fn()}
                 onClose={onClose}
                 open={true}
-            />,
+            />
         );
 
         const closeButton = document.querySelector('.ant-drawer-close');
@@ -100,17 +104,18 @@ describe('LearnSteps', () => {
         renderWithConfig(
             <LearnSteps
                 briefWords={makeWords()}
+                currentIndex={0}
                 index={0}
                 onChange={vi.fn()}
                 onClose={vi.fn()}
                 open={true}
-            />,
+            />
         );
 
         const items = document.querySelectorAll('.ant-steps-item');
         expect(items.length).toBe(3);
 
-        expect(items[0].classList).toContain('ant-steps-item-finish');
+        expect(items[0].classList).toContain('ant-steps-item-process');
         expect(items[1].classList).toContain('ant-steps-item-wait');
         expect(items[2].classList).toContain('ant-steps-item-error');
     });
