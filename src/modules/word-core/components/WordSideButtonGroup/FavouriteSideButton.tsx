@@ -8,6 +8,7 @@ import wordLearningUserService from '@modules/word-learning/services/users';
 import type { UserLearningData } from '@modules/word-core/types';
 import type React from 'react';
 
+/** Spec: Favourite functional color #f5dc4d */
 const FAVOURITE_COLOR = '#f5dc4d';
 
 const iconStyle: React.CSSProperties = {

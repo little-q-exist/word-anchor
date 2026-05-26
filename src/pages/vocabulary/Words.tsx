@@ -1,10 +1,11 @@
-import { Flex } from 'antd';
+import { Flex, theme } from 'antd';
 
 import SearchWord from '@/modules/vocabulary/components/SearchWord';
 import WordTable from '@/modules/vocabulary/components/WordTable';
 import useSearchWord from '@/modules/vocabulary/hooks/useSearchWord';
 
 const Words = () => {
+    const { token } = theme.useToken();
     const {
         page,
         setPage,
@@ -17,7 +18,7 @@ const Words = () => {
         setSearchType,
     } = useSearchWord();
     return (
-        <Flex style={{ padding: '24px 0', height: '100%' }} vertical gap="small">
+        <Flex style={{ padding: `${token.paddingXXL}px 0`, height: '100%' }} vertical gap="small">
             <SearchWord
                 searchType={searchType}
                 setSearchType={setSearchType}

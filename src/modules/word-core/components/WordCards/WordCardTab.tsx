@@ -1,11 +1,13 @@
-import { type TabsProps, Tabs } from 'antd';
+import { type TabsProps, Tabs, Typography } from 'antd';
 import { useState } from 'react';
 import type { Word } from '@modules/word-core/types';
 import { centerStyle } from '@/shared/styles/centerStyle';
 
+const { Text } = Typography;
+
 const tabKeyTypes = {
     definitions: 'definitions',
-    'example sentense': 'example sentense',
+    'example sentence': 'example sentence',
 } as const;
 
 type TabKeyType = (typeof tabKeyTypes)[keyof typeof tabKeyTypes];
@@ -16,7 +18,7 @@ const tabItems: TabsProps['items'] = [
         label: 'Definitions',
     },
     {
-        key: tabKeyTypes['example sentense'],
+        key: tabKeyTypes['example sentence'],
         label: 'Example',
     },
 ];
@@ -31,6 +33,9 @@ const WordCardTab = ({ word }: WordCardTabProps) => {
     const renderTabContent = () => {
         switch (tabKey) {
             case 'definitions':
+                if (!word.definitions || word.definitions.length === 0) {
+                    return <Text type="secondary">No definitions available.</Text>;
+                }
                 return (
                     <>
                         {word.definitions.map((definition, index) => (
@@ -40,11 +45,14 @@ const WordCardTab = ({ word }: WordCardTabProps) => {
                         ))}
                     </>
                 );
-            case 'example sentense':
+            case 'example sentence':
+                if (!word.exampleSentence || word.exampleSentence.length === 0) {
+                    return <Text type="secondary">No example sentences available.</Text>;
+                }
                 return (
                     <>
-                        {word.exampleSentence.map((sentense, index) => (
-                            <div key={index}>{sentense}</div>
+                        {word.exampleSentence.map((sentence, index) => (
+                            <div key={index}>{sentence}</div>
                         ))}
                     </>
                 );

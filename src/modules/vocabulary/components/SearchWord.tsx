@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Flex, Space, Select, Input } from 'antd';
+import { Flex, Space, Select, Input, theme } from 'antd';
 import wordServices from '@modules/vocabulary/services/words';
 import type { UseSearchWordReturnType } from '../hooks/useSearchWord';
 
@@ -18,6 +18,8 @@ const SearchWord = ({
     handleAutoSearch,
     handleTagChange,
 }: SearchWordProps) => {
+    const { token } = theme.useToken();
+
     const tagQuery = useQuery({
         queryKey: ['tags'],
         queryFn: () => wordServices.getTags(),
@@ -26,9 +28,9 @@ const SearchWord = ({
     });
 
     return (
-        <Flex justify="center">
-            <Space style={{ width: '95%' }}>
-                <Space.Compact>
+        <Flex style={{ padding: `0 ${token.paddingXXL}px` }}>
+            <Space style={{ width: '100%', maxWidth: 960, flex: 1 }} wrap>
+                <Space.Compact style={{ flex: 1, minWidth: 280 }}>
                     <Select
                         defaultValue={searchType}
                         options={[
@@ -38,13 +40,14 @@ const SearchWord = ({
                         onChange={(value: 'Eng' | 'Zh') => {
                             setSearchType(value);
                         }}
+                        style={{ width: 80 }}
                     />
                     <Input.Search
                         placeholder={`Search ${searchType === 'Eng' ? 'English' : 'Chinese'}...`}
                         onSearch={onSearch}
                         allowClear
                         onChange={handleAutoSearch}
-                        style={{ width: 500 }}
+                        style={{ flex: 1 }}
                         enterButton
                         key={searchType}
                     />
@@ -52,7 +55,7 @@ const SearchWord = ({
                 <Select
                     mode="multiple"
                     placeholder="Filter by tags"
-                    style={{ minWidth: 200 }}
+                    style={{ minWidth: 200, flex: 1 }}
                     options={tagQuery.data?.map((tag) => ({ label: tag, value: tag }))}
                     onChange={handleTagChange}
                     allowClear

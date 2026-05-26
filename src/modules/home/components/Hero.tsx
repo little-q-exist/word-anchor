@@ -1,6 +1,7 @@
 import { Button, Flex, Space, Typography, theme } from 'antd';
 import { CalendarOutlined, ThunderboltOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { Link } from 'react-router';
+import { shadows } from '@/shared/styles/shadowStyle';
 
 const { Title } = Typography;
 
@@ -25,10 +26,10 @@ const Hero = ({ title, isLoggedIn }: HeroProps) => {
             style={{
                 flex: 1,
                 zIndex: 1,
-                padding: '0 2rem',
+                padding: `0 ${token.paddingXXL}px`,
             }}
         >
-            <div style={{ textAlign: 'center', maxWidth: 800 }}>
+            <div style={{ textAlign: 'center', maxWidth: 960 }}>
                 <Space orientation="vertical" size={24} style={{ width: '100%' }}>
                     <div style={{ marginBottom: 8 }}>
                         <Title
@@ -36,7 +37,7 @@ const Hero = ({ title, isLoggedIn }: HeroProps) => {
                             style={{
                                 fontSize: 'clamp(3rem, 10vw, 5rem)',
                                 margin: 0,
-                                fontWeight: 800,
+                                fontWeight: 700,
                                 letterSpacing: '-0.02em',
                                 lineHeight: 1.1,
                             }}
@@ -57,7 +58,7 @@ const Hero = ({ title, isLoggedIn }: HeroProps) => {
                         </Title>
                     </div>
 
-                    <Space size="middle" style={{ marginTop: '2rem' }}>
+                    <Space size="middle" style={{ marginTop: token.paddingXXL }}>
                         {!isLoggedIn ? (
                             <>
                                 <Link to="/login">
@@ -66,8 +67,8 @@ const Hero = ({ title, isLoggedIn }: HeroProps) => {
                                         size="large"
                                         icon={<ArrowRightOutlined />}
                                         style={{
-                                            padding: '0 3rem',
-                                            boxShadow: '0 4px 12px rgba(22, 119, 255, 0.20)',
+                                            padding: `0 ${token.paddingXXL}px`,
+                                            boxShadow: shadows.primaryButton,
                                         }}
                                     >
                                         Get Started
@@ -87,8 +88,8 @@ const Hero = ({ title, isLoggedIn }: HeroProps) => {
                                         size="large"
                                         icon={<ThunderboltOutlined />}
                                         style={{
-                                            padding: '0 3rem',
-                                            boxShadow: '0 4px 12px rgba(22, 119, 255, 0.20)',
+                                            padding: `0 ${token.paddingXXL}px`,
+                                            boxShadow: shadows.primaryButton,
                                         }}
                                     >
                                         Learn Units

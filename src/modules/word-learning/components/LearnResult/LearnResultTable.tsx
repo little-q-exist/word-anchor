@@ -1,7 +1,9 @@
 import { queryOptions, useQueries } from '@tanstack/react-query';
-import { Skeleton, Table } from 'antd';
+import { Skeleton, Table, Empty, Flex, Typography, theme } from 'antd';
 import wordService from '@modules/word-core/services/words';
 import type { BriefWordWithLearnStatus } from '@modules/word-learning/types';
+
+const { Text } = Typography;
 
 const { Column, ColumnGroup } = Table;
 
@@ -18,6 +20,8 @@ interface DetailedWordWithLoading {
 }
 
 const LearnResultTable = ({ briefWords }: LearnResultTableProps) => {
+    const { token } = theme.useToken();
+
     function fetchDetailedWordDataOption(wordId: string) {
         return queryOptions({
             queryKey: ['word', wordId],
@@ -40,11 +44,19 @@ const LearnResultTable = ({ briefWords }: LearnResultTableProps) => {
         },
     });
 
+    if (!briefWords || briefWords.length === 0) {
+        return (
+            <Flex justify="center" align="center" style={{ flex: 1 }}>
+                <Empty description={<Text type="secondary">No words in this session.</Text>} />
+            </Flex>
+        );
+    }
+
     return (
         <Table<DetailedWordWithLoading>
             dataSource={detailedWordsQuery}
             pagination={false}
-            style={{ flex: 1, overflow: 'auto' }}
+            style={{ flex: 1, overflow: 'auto', borderRadius: token.borderRadiusLG }}
         >
             <Column
                 title="English"

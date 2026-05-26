@@ -1,6 +1,6 @@
 import type { Word } from '@modules/word-core/types';
 
-import { Flex, Typography, Space, Skeleton } from 'antd';
+import { Flex, Typography, Space, Skeleton, theme } from 'antd';
 
 import WordCardTab from './WordCardTab';
 import WordCard from './WordCard';
@@ -12,12 +12,28 @@ interface WordCardProps {
     visible: boolean;
 }
 
+const WORD_DISPLAY_FONT_SIZE = 36;
+const WORD_DISPLAY_FONT_WEIGHT = 700;
+
 const WordCards = ({ word, visible }: WordCardProps) => {
+    const { token } = theme.useToken();
     return (
-        <Flex align="center" justify="space-between" style={{ width: '100%', height: '100%' }}>
+        <Flex
+            align="center"
+            justify="space-between"
+            gap={token.paddingLG}
+            style={{ flex: 1, width: '100%', height: '100%' }}
+        >
             <WordCard centerContent>
                 <Space size="large" style={{ flex: 1 }}>
-                    <Title level={1} style={{ margin: 0, fontSize: 36, fontWeight: 700 }}>
+                    <Title
+                        level={1}
+                        style={{
+                            margin: 0,
+                            fontSize: WORD_DISPLAY_FONT_SIZE,
+                            fontWeight: WORD_DISPLAY_FONT_WEIGHT,
+                        }}
+                    >
                         {word.english}
                     </Title>
                     <Space vertical align="end">

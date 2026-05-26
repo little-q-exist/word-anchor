@@ -1,46 +1,48 @@
-import { Button, Checkbox, Form, Input, message, Typography, type FormProps } from 'antd';
+import { Button, Checkbox, Form, Input, Typography, theme, type FormProps } from 'antd';
 import { Link } from 'react-router';
 import type { LoginFormFieldType } from '../types';
 
 type LoginFormInterface = {
     login: (values: LoginFormFieldType) => void;
+    loading?: boolean;
 };
 
-export const LoginForm = ({ login }: LoginFormInterface) => {
-    const [messageApi, contextHolder] = message.useMessage();
+export const LoginForm = ({ login, loading }: LoginFormInterface) => {
+    const { token } = theme.useToken();
 
     const onFinish: FormProps<LoginFormFieldType>['onFinish'] = async (values) => {
-        try {
-            await Promise.resolve(login(values));
-            messageApi.success('Login successful!');
-        } catch (error) {
-            console.error('Login error:', error);
-            messageApi.error('Login failed!');
-        }
+        login(values);
     };
 
     const onFinishFailed: FormProps<LoginFormFieldType>['onFinishFailed'] = (errorInfo) => {
         console.log('Failed:', errorInfo);
-        messageApi.error('Login failed!');
     };
 
     return (
         <>
-            {contextHolder}
-            <Typography.Title level={3}>login</Typography.Title>
+            <Typography.Title
+                level={3}
+                style={{ textAlign: 'center', marginBottom: token.paddingXL }}
+            >
+                Login
+            </Typography.Title>
             <Form
                 name="login"
-                wrapperCol={{ span: 50 }}
-                style={{ width: '25rem' }}
+                style={{
+                    width: '25rem',
+                    maxWidth: 400,
+                    margin: '0 auto',
+                }}
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
+                layout="vertical"
             >
                 <Form.Item<LoginFormFieldType>
                     name="username"
                     rules={[
-                        { required: true, message: 'Please input your username!' },
+                        { required: true, message: 'Please input your username' },
                         { type: 'string' },
                         { whitespace: true },
                         {
@@ -49,13 +51,13 @@ export const LoginForm = ({ login }: LoginFormInterface) => {
                         },
                     ]}
                 >
-                    <Input placeholder="Username" />
+                    <Input placeholder="Enter your username" />
                 </Form.Item>
 
                 <Form.Item<LoginFormFieldType>
                     name="password"
                     rules={[
-                        { required: true, message: 'Please input your password!' },
+                        { required: true, message: 'Please input your password' },
                         { type: 'string' },
                         { whitespace: true },
                         {
@@ -64,7 +66,7 @@ export const LoginForm = ({ login }: LoginFormInterface) => {
                         },
                     ]}
                 >
-                    <Input.Password placeholder="Password" />
+                    <Input.Password placeholder="Enter your password" />
                 </Form.Item>
 
                 <Form.Item<LoginFormFieldType> name="remember" valuePropName="checked">
@@ -72,10 +74,12 @@ export const LoginForm = ({ login }: LoginFormInterface) => {
                 </Form.Item>
 
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" block>
+                    <Button type="primary" htmlType="submit" block loading={loading}>
                         Log in
                     </Button>
-                    <Link to="../register">Register here!</Link>
+                    <div style={{ marginTop: token.paddingSM, textAlign: 'center' }}>
+                        <Link to="../register">Don't have an account? Register</Link>
+                    </div>
                 </Form.Item>
             </Form>
         </>

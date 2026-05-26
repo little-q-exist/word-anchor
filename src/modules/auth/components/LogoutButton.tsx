@@ -11,14 +11,14 @@ const LogoutButton = ({ extraFn }: LogoutButtonProps) => {
     return (
         <div>
             <div>
-                wanna log in?{' '}
+                Already have an account?{' '}
                 <a
                     onClick={() => {
                         dispatch(logout());
                         extraFn();
                     }}
                 >
-                    Log out first.
+                    Log out
                 </a>
             </div>
         </div>

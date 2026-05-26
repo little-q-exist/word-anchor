@@ -30,3 +30,5 @@ test-results
 
 *.ps1
 .env
+
+.claude/settings.local.json
