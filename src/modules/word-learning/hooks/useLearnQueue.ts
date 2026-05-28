@@ -23,7 +23,7 @@ function isSnapshotEqual(a: QueueSnapshot, b: QueueSnapshot): boolean {
 }
 
 const useLearnQueue = (
-    briefWords?: BriefWordWithLearnStatus[],
+    initialWords?: BriefWordWithLearnStatus[],
     hydrateQueue?: HydrateQueue,
     userId?: string,
     mode?: LearningMode,
@@ -36,7 +36,15 @@ const useLearnQueue = (
     const [isFinished, setIsFinished] = useState(false);
     const [appliedHydrateKey, setAppliedHydrateKey] = useState<string | undefined>(undefined);
 
+    const [briefWords, setBriefWords] = useState(initialWords);
+
     const lastSyncedRef = useRef<QueueSnapshot | undefined>(undefined);
+    const briefWordsRef = useRef(briefWords);
+    briefWordsRef.current = briefWords;
+
+    useEffect(() => {
+        setBriefWords(initialWords);
+    }, [initialWords]);
 
     const toNextWord = useCallback(() => {
         if (!briefWords) {
@@ -79,6 +87,20 @@ const useLearnQueue = (
         });
     }, [index]);
 
+    const markWordStatus = useCallback(
+        (wordId: string, status: BriefWordWithLearnStatus['status']) => {
+            setBriefWords((prev) => {
+                if (!prev) {
+                    return prev;
+                }
+                return prev.map((prevWord) =>
+                    prevWord._id === wordId ? { ...prevWord, status } : prevWord
+                );
+            });
+        },
+        []
+    );
+
     const queueSnapshot: QueueSnapshot | undefined = useMemo(() => {
         return hydrateQueue
             ? {
@@ -95,13 +117,16 @@ const useLearnQueue = (
             userId: mutUserId,
             mode: mutMode,
             queueSnapshot: mutQueueSnapshot,
+            words,
         }: {
             userId: string;
             mode: LearningMode;
             queueSnapshot: QueueSnapshot;
+            words: { _id: string; status: string }[];
         }) =>
             learningSessionServices.updateLearningSession(mutUserId, mutMode, {
                 queueSnapshot: mutQueueSnapshot,
+                words,
             }),
         onSuccess(learningSession) {
             lastSyncedRef.current = learningSession.queueSnapshot;
@@ -109,6 +134,9 @@ const useLearnQueue = (
             setIsRepeating(learningSession.queueSnapshot.isRepeating);
             setRepeatQueue(learningSession.queueSnapshot.repeatQueue);
             setVersion(learningSession.queueSnapshot.version);
+            if (learningSession.words) {
+                setBriefWords(learningSession.words);
+            }
         },
         onError(error) {
             console.log('queue snapshot error', error);
@@ -119,7 +147,9 @@ const useLearnQueue = (
         if (!queueSnapshot || !userId || !mode) {
             return;
         }
-        queueSnapshotMutate({ userId, mode, queueSnapshot });
+        const words =
+            briefWordsRef.current?.map(({ _id, status }) => ({ _id, status })) ?? [];
+        queueSnapshotMutate({ userId, mode, queueSnapshot, words });
     }, [queueSnapshot, queueSnapshotMutate, userId, mode]);
 
     useEffect(() => {
@@ -155,10 +185,12 @@ const useLearnQueue = (
         isRepeating,
         isFinished,
         repeatQueue,
+        briefWords,
         queueSnapshot,
         toNextWord,
         addToRepeatQueue,
         handleRepeat,
+        markWordStatus,
     };
 };
 
