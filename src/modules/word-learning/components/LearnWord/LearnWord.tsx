@@ -11,8 +11,8 @@ import LearnResult from '../LearnResult/LearnResult';
 import LearnProgress from './LearnProgress';
 import LearnWordButtons from './LearnWordButtons';
 import useLearnQueue from '@/modules/word-learning/hooks/useLearnQueue';
-import useDetailedWordQuery from '../../hooks/queries/useDetailedWordQuery';
-import useLearningSession from '../../hooks/queries/useLearningSessionQuery';
+import useDetailedWordQuery from '@/modules/word-learning/hooks/queries/useDetailedWordQuery';
+import useLearningSession from '@/modules/word-learning/hooks/queries/useLearningSessionQuery';
 
 const LearnWord = ({ mode }: { mode: LearningMode }) => {
     const { token } = theme.useToken();
