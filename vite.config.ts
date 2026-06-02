@@ -13,4 +13,8 @@ export default defineConfig({
             '@shared': path.resolve(__dirname, './src/shared'),
         },
     },
+    server: {
+        host: '::', // 关键：监听所有 IPv6 地址，同时也会接收 IPv4 的连接（IPv4 映射到 IPv6）
+        port: 5173,
+    },
 });
