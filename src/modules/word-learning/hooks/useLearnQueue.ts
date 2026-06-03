@@ -122,7 +122,7 @@ const useLearnQueue = (
             userId: string;
             mode: LearningMode;
             queueSnapshot: QueueSnapshot;
-            words: { _id: string; status: string }[];
+            words: { _id: string; status: BriefWordWithLearnStatus['status'] }[];
         }) =>
             learningSessionServices.updateLearningSession(mutUserId, mutMode, {
                 queueSnapshot: mutQueueSnapshot,
