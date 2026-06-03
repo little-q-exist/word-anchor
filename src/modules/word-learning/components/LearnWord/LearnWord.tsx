@@ -131,7 +131,7 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
                 {detailedWordQuery.status === 'success' ? (
                     <WordCards
                         word={detailedWordQuery.data}
-                        visible={shouldShowInfo}
+                        visible={shouldShowInfo || isOnJump}
                         key={detailedWordQuery.data._id}
                     />
                 ) : (
