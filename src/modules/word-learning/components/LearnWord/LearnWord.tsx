@@ -6,19 +6,18 @@ import { Empty, Flex, Skeleton, Result, Button, theme } from 'antd';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import WordSideButtonGroup from '@modules/word-core/components/WordSideButtonGroup/WordSideButtonGroup';
-import type { BriefWordWithLearnStatus, LearningMode } from '@modules/word-learning/types';
+import type { LearningMode } from '@modules/word-learning/types';
 import LearnResult from '../LearnResult/LearnResult';
 import LearnProgress from './LearnProgress';
 import LearnWordButtons from './LearnWordButtons';
 import useLearnQueue from '@/modules/word-learning/hooks/useLearnQueue';
-import useDetailedWordQuery from '../../hooks/queries/useDetailedWordQuery';
-import useLearningSession from '../../hooks/queries/useLearningSessionQuery';
+import useDetailedWordQuery from '@/modules/word-learning/hooks/queries/useDetailedWordQuery';
+import useLearningSession from '@/modules/word-learning/hooks/queries/useLearningSessionQuery';
 
 const LearnWord = ({ mode }: { mode: LearningMode }) => {
     const { token } = theme.useToken();
     const user = useSelector((state: RootState) => state.user);
 
-    const [briefWords, setBriefWords] = useState<BriefWordWithLearnStatus[] | undefined>(undefined);
     const [shouldShowInfo, setShouldShowInfo] = useState(false);
 
     const { learningSessionQuery, noWordReturned } = useLearningSession(mode, user?._id);
@@ -30,12 +29,6 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
         isSuccess: isLearningSessionSuccess,
         refetch: refetchLearningSession,
     } = learningSessionQuery;
-
-    useEffect(() => {
-        if (isLearningSessionSuccess && learningSession?.words) {
-            setBriefWords(learningSession.words);
-        }
-    }, [learningSession, isLearningSessionSuccess]);
 
     const learnQueueInitialState = useMemo(
         () => learningSession?.queueSnapshot ?? undefined,
@@ -55,8 +48,8 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
         [learnQueueHydrateKey, learnQueueInitialState]
     );
 
-    const { index, isRepeating, isFinished, toNextWord, addToRepeatQueue, handleRepeat } =
-        useLearnQueue(briefWords, hydrateQueue, user?._id, mode);
+    const { index, isRepeating, isFinished, briefWords, toNextWord, addToRepeatQueue, handleRepeat, markWordStatus } =
+        useLearnQueue(learningSession?.words, hydrateQueue, user?._id, mode);
 
     const [currentIndex, setCurrentIndex] = useState(index);
 
@@ -75,17 +68,6 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
     }, [index]);
 
     const detailedWordQuery = useDetailedWordQuery(briefWords?.[currentIndex]?._id);
-
-    const markWordStatus = (wordId: string, status: BriefWordWithLearnStatus['status']) => {
-        setBriefWords((prev) => {
-            if (!prev) {
-                return prev;
-            }
-            return prev.map((prevWord) =>
-                prevWord._id === wordId ? { ...prevWord, status } : prevWord
-            );
-        });
-    };
 
     if (isLearningSessionLoading) {
         return (
@@ -149,7 +131,7 @@ const LearnWord = ({ mode }: { mode: LearningMode }) => {
                 {detailedWordQuery.status === 'success' ? (
                     <WordCards
                         word={detailedWordQuery.data}
-                        visible={shouldShowInfo}
+                        visible={shouldShowInfo || isOnJump}
                         key={detailedWordQuery.data._id}
                     />
                 ) : (

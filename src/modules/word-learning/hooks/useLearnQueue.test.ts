@@ -75,6 +75,82 @@ describe('useLearnQueue', () => {
             const { result } = renderHook(() => useLearnQueue(threeWords));
             expect(result.current.queueSnapshot).toBeUndefined();
         });
+
+        it('sets briefWords from initialWords', () => {
+            const { result } = renderHook(() => useLearnQueue(threeWords));
+            expect(result.current.briefWords).toEqual(threeWords);
+        });
+
+        it('briefWords is undefined when initialWords is undefined', () => {
+            const { result } = renderHook(() => useLearnQueue());
+            expect(result.current.briefWords).toBeUndefined();
+        });
+    });
+
+    // ── briefWords management ──
+    describe('briefWords management', () => {
+        it('markWordStatus updates a word status', () => {
+            const { result } = renderHook(() => useLearnQueue(threeWords));
+            act(() => {
+                result.current.markWordStatus('w2', 'passed');
+            });
+            expect(result.current.briefWords).toEqual([
+                makeWord('w1', 'one'),
+                { ...makeWord('w2', 'two'), status: 'passed' },
+                makeWord('w3', 'three'),
+            ]);
+        });
+
+        it('markWordStatus does nothing when briefWords is undefined', () => {
+            const { result } = renderHook(() => useLearnQueue());
+            act(() => {
+                result.current.markWordStatus('w1', 'passed');
+            });
+            expect(result.current.briefWords).toBeUndefined();
+        });
+
+        it('markWordStatus does nothing when wordId is not found', () => {
+            const { result } = renderHook(() => useLearnQueue(threeWords));
+            act(() => {
+                result.current.markWordStatus('nonexistent', 'passed');
+            });
+            expect(result.current.briefWords).toEqual(threeWords);
+        });
+
+        it('initialWords change resets briefWords', () => {
+            const { result, rerender } = renderHook(
+                (props: { initialWords?: BriefWordWithLearnStatus[] }) =>
+                    useLearnQueue(props.initialWords),
+                { initialProps: { initialWords: threeWords } }
+            );
+            expect(result.current.briefWords).toEqual(threeWords);
+
+            // Update word status
+            act(() => {
+                result.current.markWordStatus('w1', 'failed');
+            });
+
+            const newWords = [makeWord('w4', 'four'), makeWord('w5', 'five')];
+            rerender({ initialWords: newWords });
+            expect(result.current.briefWords).toEqual(newWords);
+        });
+
+        it('same initialWords reference does not reset briefWords', () => {
+            const { result, rerender } = renderHook(
+                (props: { initialWords?: BriefWordWithLearnStatus[] }) =>
+                    useLearnQueue(props.initialWords),
+                { initialProps: { initialWords: threeWords } }
+            );
+
+            act(() => {
+                result.current.markWordStatus('w1', 'passed');
+            });
+            expect(result.current.briefWords?.[0].status).toBe('passed');
+
+            // Re-render with same array (same reference) — status should be preserved
+            rerender({ initialWords: threeWords });
+            expect(result.current.briefWords?.[0].status).toBe('passed');
+        });
     });
 
     // ── Hydration ──
@@ -339,6 +415,32 @@ describe('useLearnQueue', () => {
                 userId: 'user1',
                 mode: 'learn',
                 queueSnapshot: expect.objectContaining({ index: 1 }),
+                words: expect.any(Array),
+            });
+        });
+
+        it('sync payload includes words with _id and status', () => {
+            const hydrateQueue = {
+                initialState: makeSnapshot(),
+                hydrateKey: 'k',
+            };
+            const { result } = renderHook(() =>
+                useLearnQueue(threeWords, hydrateQueue, 'user1', 'learn')
+            );
+
+            act(() => {
+                result.current.markWordStatus('w1', 'passed');
+                result.current.toNextWord();
+            });
+            expect(mockMutate).toHaveBeenCalledWith({
+                userId: 'user1',
+                mode: 'learn',
+                queueSnapshot: expect.objectContaining({ index: 1 }),
+                words: [
+                    { _id: 'w1', status: 'passed' },
+                    { _id: 'w2', status: 'idle' },
+                    { _id: 'w3', status: 'idle' },
+                ],
             });
         });
 
@@ -361,6 +463,7 @@ describe('useLearnQueue', () => {
                 userId: 'user1',
                 mode: 'review',
                 queueSnapshot: expect.objectContaining({ repeatQueue: [1] }),
+                words: expect.any(Array),
             });
         });
 
@@ -383,6 +486,7 @@ describe('useLearnQueue', () => {
                 userId: 'user1',
                 mode: 'learn',
                 queueSnapshot: expect.objectContaining({ repeatQueue: [1] }),
+                words: expect.any(Array),
             });
         });
 
@@ -445,6 +549,22 @@ describe('useLearnQueue', () => {
             expect(mockMutate).not.toHaveBeenCalled();
         });
 
+        it('does NOT sync when briefWords is undefined (empty words)', () => {
+            const hydrateQueue = {
+                initialState: makeSnapshot(),
+                hydrateKey: 'k',
+            };
+            const { result } = renderHook(() => useLearnQueue(undefined, hydrateQueue, 'user1', 'learn'));
+
+            mockMutate.mockClear();
+
+            act(() => {
+                result.current.markWordStatus('w1', 'passed');
+            });
+            // markWordStatus should not trigger sync when briefWords is undefined
+            expect(mockMutate).not.toHaveBeenCalled();
+        });
+
         it('after sync onSuccess, server state is applied and no re-sync loop occurs', () => {
             const hydrateQueue = {
                 initialState: makeSnapshot({ index: 0, version: 'old' }),
@@ -460,16 +580,23 @@ describe('useLearnQueue', () => {
             });
             expect(mockMutate).toHaveBeenCalledTimes(1);
 
-            // Simulate server response — state comes back with a new version
+            // Simulate server response — state comes back with a new version and updated words
             const serverSnapshot = makeSnapshot({ index: 1, version: 'new' });
+            const serverWords = [
+                { _id: 'w1', english: 'one', status: 'passed' as const },
+                { _id: 'w2', english: 'two', status: 'idle' as const },
+                { _id: 'w3', english: 'three', status: 'idle' as const },
+            ];
             act(() => {
                 capturedOnSuccess?.({
                     queueSnapshot: serverSnapshot,
+                    words: serverWords,
                 } as unknown);
             });
 
             // Server state should be applied
             expect(result.current.queueSnapshot?.version).toBe('new');
+            expect(result.current.briefWords).toEqual(serverWords);
 
             // No additional sync should have been triggered by onSuccess
             expect(mockMutate).toHaveBeenCalledTimes(1);
