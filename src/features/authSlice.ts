@@ -9,3 +9,7 @@ export const authSlice = createSlice({
         },
     },
 });
+
+export const { setInitialized } = authSlice.actions;
+
+export default authSlice.reducer;
