@@ -20,7 +20,7 @@ export interface NewUser {
 }
 
 export interface User {
-    token: string;
+    accessToken: string;
     username: string;
     _id: string;
 }
