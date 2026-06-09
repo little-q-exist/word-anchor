@@ -17,9 +17,6 @@ const useLogin = () => {
         try {
             const userToken = await authService.login(values);
             setStatus('success');
-            if (values.remember) {
-                localStorage.setItem('reciteWordAppUser', JSON.stringify(userToken));
-            }
             dispatch(loginAction(userToken));
             navigate('..');
         } catch (error: unknown) {
