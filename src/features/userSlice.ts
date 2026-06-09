@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { User } from '@modules/auth/types';
+import { removeAccessToken, setAccessToken } from '@/shared/services/tokenStore';
 
 type SliceStateType = User | null;
 
@@ -8,18 +9,12 @@ export const userSlice = createSlice({
     name: 'user',
     initialState: null satisfies SliceStateType as SliceStateType,
     reducers: {
-        login: (_state, action: PayloadAction<User | undefined>) => {
-            if (action.payload) {
-                return action.payload;
-            } else {
-                const loggedUserJSON = localStorage.getItem('reciteWordAppUser');
-                if (loggedUserJSON) {
-                    return JSON.parse(loggedUserJSON);
-                }
-            }
+        login: (_state, action: PayloadAction<User>) => {
+            setAccessToken(action.payload.accessToken);
+            return action.payload;
         },
         logout: () => {
-            localStorage.removeItem('reciteWordAppUser');
+            removeAccessToken();
             return null;
         },
     },
