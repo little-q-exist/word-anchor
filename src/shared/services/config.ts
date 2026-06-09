@@ -2,6 +2,8 @@ import axios from 'axios';
 import { AxiosError } from 'axios';
 
 import { SERVER_URL } from '@/constant';
+import { getAccessToken, setAccessToken } from './tokenStore';
+import type { User } from '@/modules/auth/types';
 
 interface StandardResponse<T = unknown> {
     code: number;
@@ -23,6 +25,24 @@ const isStandardResponse = (payload: unknown): payload is StandardResponse => {
 
 let configured = false;
 
+let refreshPromise: Promise<string> | null = null;
+
+const refreshToken = (): Promise<string> => {
+    if (!refreshPromise) {
+        refreshPromise = axios
+            .post<User>('/api/refresh', undefined, {
+                withCredentials: true,
+                baseURL: SERVER_URL,
+            })
+            .then((res) => {
+                setAccessToken(res.data.accessToken);
+                return res.data.accessToken;
+            })
+            .finally(() => (refreshPromise = null));
+    }
+    return refreshPromise;
+};
+
 export default () => {
     if (configured) {
         return;
@@ -31,11 +51,12 @@ export default () => {
 
     axios.defaults.baseURL = SERVER_URL;
 
+    axios.defaults.withCredentials = true;
+
     axios.interceptors.request.use((config) => {
-        const loggedUserJSON = localStorage.getItem('reciteWordAppUser');
-        if (loggedUserJSON) {
-            const user = JSON.parse(loggedUserJSON);
-            config.headers.Authorization = `Bearer ${user.token}`;
+        const accessToken = getAccessToken();
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
         }
         return config;
     });
@@ -56,6 +77,27 @@ export default () => {
                 };
             }
             return Promise.reject(error);
+        }
+    );
+
+    axios.interceptors.response.use(
+        (res) => res,
+        async (error: AxiosError) => {
+            const originalRequest = error.config;
+
+            if (!originalRequest || error.response?.status !== 401 || originalRequest?._retry) {
+                return Promise.reject(error);
+            }
+
+            originalRequest._retry = true;
+
+            try {
+                const newAccessToken = await refreshToken();
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return axios(originalRequest);
+            } catch (error) {
+                return Promise.reject(error);
+            }
         }
     );
 };
