@@ -1,10 +1,10 @@
 import { Avatar, Flex, Layout, Menu, theme, type MenuProps } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import type { RootState } from '../store';
-import { logout } from '../features/userSlice';
 import Title from 'antd/es/typography/Title';
 import { BookOutlined } from '@ant-design/icons';
+import LogoutButton from '@/modules/auth/components/LogoutButton';
 
 const { Header, Content } = Layout;
 
@@ -12,7 +12,6 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 const BackgroundLayout = () => {
     const user = useSelector((state: RootState) => state.user);
-    const dispatch = useDispatch();
     const location = useLocation();
     const { token } = theme.useToken();
 
@@ -36,7 +35,7 @@ const BackgroundLayout = () => {
             },
             { type: 'divider' },
             {
-                label: <a onClick={() => dispatch(logout())}>Logout</a>,
+                label: <LogoutButton />,
                 key: 'logout',
             },
         ],
