@@ -11,8 +11,9 @@ import {
 import type { Route } from './+types/root';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { login } from './features/userSlice';
+import { initialize } from './features/userSlice';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { getAccessToken } from './shared/services/tokenStore';
 
 const themeConfig: ThemeConfig = {
     token: {
@@ -165,7 +166,8 @@ const App = () => {
     const navigation = useNavigation();
 
     useEffect(() => {
-        dispatch(login());
+        const accessToken = getAccessToken();
+        dispatch(initialize(accessToken));
     }, [dispatch]);
 
     return (
