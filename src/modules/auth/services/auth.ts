@@ -6,6 +6,7 @@ import globalConfig from '@/shared/services/config';
 globalConfig();
 
 const LOGIN_API_URL = `/login`;
+const LOGOUT_API_URL = `/logout`;
 const REGISTER_API_URL = `/users/register`;
 
 const login = async (loginFormField: LoginFormFieldType): Promise<User> => {
@@ -13,9 +14,13 @@ const login = async (loginFormField: LoginFormFieldType): Promise<User> => {
     return response.data;
 };
 
+const logout = async () => {
+    await axios.post(LOGOUT_API_URL);
+};
+
 const register = async (user: NewUser) => {
     const response = await axios.post(REGISTER_API_URL, user);
     return response.data;
 };
 
-export default { login, register };
+export default { login, logout, register };
