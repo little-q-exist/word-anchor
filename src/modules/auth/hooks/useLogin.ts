@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login as loginAction } from '@/features/userSlice';
 import { useNavigate } from 'react-router';
+import { setAccessTokenUser } from '@/shared/services/tokenStore';
 
 const useLogin = () => {
     const [status, setStatus] = useState<StatusType>('idle');
@@ -18,6 +19,7 @@ const useLogin = () => {
             const userToken = await authService.login(values);
             setStatus('success');
             dispatch(loginAction(userToken));
+            setAccessTokenUser(JSON.stringify(userToken));
             navigate('..');
         } catch (error: unknown) {
             if (error instanceof AxiosError) {

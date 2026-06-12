@@ -11,7 +11,7 @@ import {
 import type { Route } from './+types/root';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { initialize } from './features/userSlice';
+import { login } from './features/userSlice';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { getAccessTokenUser } from './shared/services/tokenStore';
 import type { User } from './modules/auth/types';
@@ -170,7 +170,7 @@ const App = () => {
         const accessTokenUser = getAccessTokenUser();
         if (accessTokenUser) {
             const user: User = JSON.parse(accessTokenUser);
-            dispatch(initialize(user));
+            dispatch(login(user));
         }
     }, [dispatch]);
 
