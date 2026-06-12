@@ -1,9 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { decode } from 'jsonwebtoken';
-
 import type { User } from '@modules/auth/types';
-import { removeAccessToken, setAccessToken } from '@/shared/services/tokenStore';
+import { removeAccessTokenUser, setAccessTokenUser } from '@/shared/services/tokenStore';
 
 type SliceStateType = User | null;
 
@@ -11,19 +9,18 @@ export const userSlice = createSlice({
     name: 'user',
     initialState: null satisfies SliceStateType as SliceStateType,
     reducers: {
-        initialize: (_state, action: PayloadAction<string | null>) => {
+        initialize: (_state, action: PayloadAction<User | null>) => {
             if (action.payload === null) {
                 return null;
             }
-            const decodedUser = decode(action.payload);
-            return decodedUser as User;
+            return action.payload;
         },
         login: (_state, action: PayloadAction<User>) => {
-            setAccessToken(action.payload.accessToken);
+            setAccessTokenUser(JSON.stringify(action.payload));
             return action.payload;
         },
         logout: () => {
-            removeAccessToken();
+            removeAccessTokenUser();
             return null;
         },
     },
