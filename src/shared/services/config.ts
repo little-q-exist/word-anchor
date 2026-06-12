@@ -86,7 +86,12 @@ export default () => {
         async (error: AxiosError) => {
             const originalRequest = error.config;
 
-            if (!originalRequest || error.response?.status !== 401 || originalRequest?._retry) {
+            if (
+                !originalRequest ||
+                originalRequest.url?.includes('/api/refresh') ||
+                error.response?.status !== 401 ||
+                originalRequest?._retry
+            ) {
                 return Promise.reject(error);
             }
 
