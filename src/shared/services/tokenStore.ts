@@ -1,13 +1,13 @@
-const TOKEN_KEY = 'reciteWordAccessToken';
+const USER_TOKEN_KEY = 'reciteWordUser';
 
-export const getAccessToken = () => {
-    return localStorage.getItem(TOKEN_KEY);
+export const getAccessTokenUser = () => {
+    return localStorage.getItem(USER_TOKEN_KEY);
 };
 
-export const setAccessToken = (token: string) => {
-    localStorage.setItem(TOKEN_KEY, token);
+export const setAccessTokenUser = (user: string) => {
+    localStorage.setItem(USER_TOKEN_KEY, user);
 };
 
-export const removeAccessToken = () => {
-    localStorage.removeItem(TOKEN_KEY);
+export const removeAccessTokenUser = () => {
+    localStorage.removeItem(USER_TOKEN_KEY);
 };
