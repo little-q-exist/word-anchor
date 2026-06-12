@@ -13,7 +13,8 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { initialize } from './features/userSlice';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { getAccessToken } from './shared/services/tokenStore';
+import { getAccessTokenUser } from './shared/services/tokenStore';
+import type { User } from './modules/auth/types';
 
 const themeConfig: ThemeConfig = {
     token: {
@@ -166,8 +167,11 @@ const App = () => {
     const navigation = useNavigation();
 
     useEffect(() => {
-        const accessToken = getAccessToken();
-        dispatch(initialize(accessToken));
+        const accessTokenUser = getAccessTokenUser();
+        if (accessTokenUser) {
+            const user: User = JSON.parse(accessTokenUser);
+            dispatch(initialize(user));
+        }
     }, [dispatch]);
 
     return (
