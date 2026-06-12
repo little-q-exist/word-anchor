@@ -2,7 +2,7 @@ import axios from 'axios';
 import { AxiosError } from 'axios';
 
 import { SERVER_URL } from '@/constant';
-import { getAccessToken, setAccessToken } from './tokenStore';
+import { getAccessTokenUser, setAccessTokenUser } from './tokenStore';
 import type { User } from '@/modules/auth/types';
 
 interface StandardResponse<T = unknown> {
@@ -35,7 +35,7 @@ const refreshToken = (): Promise<string> => {
                 baseURL: SERVER_URL,
             })
             .then((res) => {
-                setAccessToken(res.data.accessToken);
+                setAccessTokenUser(JSON.stringify(res.data));
                 return res.data.accessToken;
             })
             .finally(() => (refreshPromise = null));
@@ -54,8 +54,9 @@ export default () => {
     axios.defaults.withCredentials = true;
 
     axios.interceptors.request.use((config) => {
-        const accessToken = getAccessToken();
-        if (accessToken) {
+        const accessTokenUser = getAccessTokenUser();
+        if (accessTokenUser) {
+            const accessToken = (JSON.parse(accessTokenUser) as User).accessToken;
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
         return config;
