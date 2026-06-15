@@ -30,7 +30,7 @@ let refreshPromise: Promise<string> | null = null;
 const refreshToken = (): Promise<string> => {
     if (!refreshPromise) {
         refreshPromise = axios
-            .post<User>('/api/refresh', undefined, {
+            .post<User>('/refresh', undefined, {
                 withCredentials: true,
                 baseURL: SERVER_URL,
             })
